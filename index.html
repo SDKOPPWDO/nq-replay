@@ -2105,22 +2105,25 @@ function walkTradeFloatingPnl(t, onBar){
   ];
   let openQty = 0, avgPrice = 0, legPtr = 0;
   segment.forEach(b => {
-    // 套用這根K棒(含)之前發生的所有加碼/減碼動作，更新目前實際持倉口數與平均成本
-    while(legPtr < legs.length && legs[legPtr].idx <= b.idx){
+    // ★ 修正：進場要在「算這根K棒的浮動損益」之前套用（新增口數從這根開始要算風險）
+    while(legPtr < legs.length && legs[legPtr].idx <= b.idx && legs[legPtr].type === 'entry'){
       const l = legs[legPtr];
-      if(l.type === 'entry'){
-        const newQty = openQty + l.qty;
-        avgPrice = newQty > 0 ? (avgPrice*openQty + l.price*l.qty)/newQty : l.price;
-        openQty = newQty;
-      } else {
-        openQty = Math.max(0, openQty - l.qty);
-      }
+      const newQty = openQty + l.qty;
+      avgPrice = newQty > 0 ? (avgPrice*openQty + l.price*l.qty)/newQty : l.price;
+      openQty = newQty;
       legPtr++;
     }
     if(openQty > 0){
       const hPts = t.dir === 'long' ? (b.h - avgPrice) : (avgPrice - b.l);
       const lPts = t.dir === 'long' ? (b.l - avgPrice) : (avgPrice - b.h);
       onBar(hPts * openQty * TRADE_PT_VALUE, lPts * openQty * TRADE_PT_VALUE);
+    }
+    // ★ 修正：出場要在「算完這根K棒的浮動損益」之後才套用，不然出場當根K棒的價格波動會被漏算，
+    //   導致出場損益比記錄到的MAE還差這種矛盾的情況
+    while(legPtr < legs.length && legs[legPtr].idx <= b.idx && legs[legPtr].type === 'exit'){
+      const l = legs[legPtr];
+      openQty = Math.max(0, openQty - l.qty);
+      legPtr++;
     }
   });
 }
