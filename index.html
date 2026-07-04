@@ -240,6 +240,8 @@ canvas.cross{pointer-events:none;}
 .trade-detail-leg-tag.exit{color:#a855f7;}
 .simple-tip-box{position:fixed;transform:translate(-50%,-100%);background:rgba(20,20,24,0.97);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;border-radius:8px;z-index:10000;display:none;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);pointer-events:none;}
 .simple-tip-box.show{display:block;animation:tipFadeIn .15s ease-out;}
+.chart-info-panel{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.3);border-radius:8px;padding:8px 12px;font-size:11.5px;color:var(--t2);margin-bottom:8px;font-weight:600;min-height:16px;}
+.chart-info-panel.active{color:#fff;border-color:rgba(250,204,21,0.55);}
 @keyframes tipFadeIn{from{opacity:0;transform:translate(-50%,-95%);}to{opacity:1;transform:translate(-50%,-100%);}}
 /* Ranking page */
 .ranking-section{margin-bottom:18px;}
@@ -276,7 +278,7 @@ canvas.cross{pointer-events:none;}
 .tresult-page{display:none;}
 .tresult-page.show{display:block;}
 /* Trade replay list+detail */
-.treplay-layout{display:flex;gap:12px;align-items:stretch;}
+.treplay-layout{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:stretch;}
 .treplay-left{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-height:0;}
 .treplay-list{flex:1 1 auto;min-height:120px;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:6px;}
 .treplay-item{padding:8px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:10px;}
@@ -365,6 +367,7 @@ canvas.cross{pointer-events:none;}
         <button class="trade-action-btn trade-buy" id="tradeBuyBtn" onclick="tradeAction('buy')">買進</button>
         <button class="trade-action-btn trade-sell" id="tradeSellBtn" onclick="tradeAction('sell')">賣出</button>
         <button class="trade-action-btn trade-flat" id="tradeFlatBtn" onclick="tradeAction('flat')">平倉</button>
+        <button class="trade-action-btn" id="tradeUndoBtn" onclick="undoTradeAction()" style="background:#78716c;" title="復原上一次買進/賣出/平倉的操作">↩ 上一步</button>
         <button class="trade-action-btn trade-settle" id="tradeSettleBtn" onclick="showTradeResult()">📊 結算</button>
         <button class="trade-action-btn" id="tradeResetBtn" onclick="resetTradeSystem()" style="background:var(--bg3);border:1px solid var(--b2);color:var(--t2);">↺ 重置</button>
         <div class="trade-cur-qty" id="tradeCurQty">口數：<span style="color:var(--t3)">0口</span></div>
@@ -1240,6 +1243,8 @@ let tradeQty = 1;
 const TRADE_PT_VALUE = 2; // MNQ $2/point
 let dayPositions = {}; // {dateStr: [{dir,qty,entryPrice,entryTime,entryIdx}]}
 let dayClosedTrades = {}; // {dateStr: [{dir,qty,entryPrice,exitPrice,entryTime,exitTime,pnl}]}
+let tradeUndoStack = []; // 每次下單前的狀態快照，供「上一步」復原用
+const TRADE_UNDO_MAX = 50; // 最多保留50步，避免無限增長
 
 function zoomTF(tf, dir){
   // dir=1: 放大(較少K棒,CW變大), dir=-1: 縮小(較多K棒,CW變小)
@@ -1292,6 +1297,11 @@ function clearActiveTrade(){
 
 function tradeAction(action){
   if(!mode1kBars.length) return;
+
+  // ★ 新增：下單前先存一份狀態快照，供「上一步」復原用
+  tradeUndoStack.push(JSON.stringify({dayPositions, dayClosedTrades, dayMarkers, dayActiveTrade}));
+  if(tradeUndoStack.length > TRADE_UNDO_MAX) tradeUndoStack.shift();
+
   const price = getTradePrice();
   const time = mode1kBars[cur1].ts;
   const idx = mode1kBars[cur1].idx;
@@ -1363,6 +1373,20 @@ function tradeAction(action){
       clearActiveTrade();
     }
   }
+  refreshTradePosDisplay();
+  renderAll();
+}
+
+function undoTradeAction(){
+  if(!tradeUndoStack.length){
+    alert('沒有可以復原的操作了');
+    return;
+  }
+  const snap = JSON.parse(tradeUndoStack.pop());
+  dayPositions = snap.dayPositions;
+  dayClosedTrades = snap.dayClosedTrades;
+  dayMarkers = snap.dayMarkers;
+  dayActiveTrade = snap.dayActiveTrade;
   refreshTradePosDisplay();
   renderAll();
 }
@@ -2607,8 +2631,8 @@ function smartGridStep(range, targetLines){
   return best;
 }
 
-function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
-  const W=720, H=220, PAD=30;
+function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, chartId){
+  const W=720, H=320, PAD=30;
   const allVals = [0, ...curveArr, ...(highArr||[]), ...(lowArr||[])];
   const minV = Math.min(...allVals), maxV = Math.max(...allVals);
   const pd = (maxV-minV)*0.1 || 100;
@@ -2635,7 +2659,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
       const [px,py] = hPts[i];
       const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
       const tipText = `第${i}筆${dLbl} ・ 盤中最高浮動損益 $${v.toFixed(0)}`;
-      highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showSimpleTip(event,'${tipText}')"/>`;
+      highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
       highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${HIGH_COLOR}" style="pointer-events:none;"/>`;
     });
   }
@@ -2647,7 +2671,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
       const [px,py] = lPts[i];
       const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
       const tipText = `第${i}筆${dLbl} ・ 盤中最低浮動損益 $${v.toFixed(0)}`;
-      lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showSimpleTip(event,'${tipText}')"/>`;
+      lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
       lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${LOW_COLOR}" style="pointer-events:none;"/>`;
     });
   }
@@ -2681,7 +2705,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
     const delta = v - curveArr[i-1];
     const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
     const tipText = `第${i}筆${dLbl} ・ 本筆損益 ${delta>=0?'+':''}$${delta.toFixed(0)} ・ 累積 $${v.toFixed(0)}`;
-    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="9" fill="transparent" style="cursor:pointer;" onclick="showSimpleTip(event,'${tipText}')"/>`;
+    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="9" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
     pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${dotColor}" stroke="#0d0d0f" stroke-width="2" style="pointer-events:none;"/>`;
   });
 
@@ -2693,7 +2717,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
       <span><span style="display:inline-block;width:14px;height:2px;background:${LOW_COLOR};margin-right:4px;vertical-align:middle;border-top:2px dashed ${LOW_COLOR};height:0;"></span>盤中最低浮動損益</span>
     </div>` : '';
 
-  return `${legend}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;">
+  return `<div class="chart-info-panel" id="${chartId}_info">👆 點擊圖上的點查看該筆交易詳細資料</div>${legend}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;">
     <defs>
       <linearGradient id="grad-${idSuffix}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="${curveColor}" stop-opacity="0.35"/>
@@ -2712,6 +2736,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
     ${highPathD ? `<path d="${highPathD}" fill="none" stroke="${HIGH_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
     ${lowPathD ? `<path d="${lowPathD}" fill="none" stroke="${LOW_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
     <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow-${idSuffix})"/>
+    <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${PAD}" x2="0" y2="${H-PAD}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
     ${highDots}
     ${lowDots}
     ${pointDots}
@@ -2720,7 +2745,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr){
 }
 
 // 全部交易曲線
-const overallSVG = buildEquityCurveSVG(curve, '#facc15', trades.map(t=>t.date), curveHigh, curveLow);
+const overallSVG = buildEquityCurveSVG(curve, '#facc15', trades.map(t=>t.date), curveHigh, curveLow, 'eqOverall');
 
 // 做多曲線（只算多單交易，依時間序累加）
 const longTradesSorted = longTrades.slice().sort((a,b)=>(a.date+a.exitTime).localeCompare(b.date+b.exitTime));
@@ -2730,7 +2755,7 @@ longTradesSorted.forEach(t=>{
   longCurveLow.push(longRunning + (t.mae||0));
   longRunning+=t.pnl; longCurve.push(longRunning);
 });
-const longSVG = buildEquityCurveSVG(longCurve, '#ef4444', longTradesSorted.map(t=>t.date), longCurveHigh, longCurveLow);
+const longSVG = buildEquityCurveSVG(longCurve, '#ef4444', longTradesSorted.map(t=>t.date), longCurveHigh, longCurveLow, 'eqLong');
 
 // 做空曲線
 const shortTradesSorted = shortTrades.slice().sort((a,b)=>(a.date+a.exitTime).localeCompare(b.date+b.exitTime));
@@ -2740,10 +2765,10 @@ shortTradesSorted.forEach(t=>{
   shortCurveLow.push(shortRunning + (t.mae||0));
   shortRunning+=t.pnl; shortCurve.push(shortRunning);
 });
-const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.map(t=>t.date), shortCurveHigh, shortCurveLow);
+const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.map(t=>t.date), shortCurveHigh, shortCurveLow, 'eqShort');
 
   // MAE/MFE 柱狀圖（共用函數，可供整體/多單/空單分別呼叫）
-  function buildMaeMfeChart(tradesArr){
+  function buildMaeMfeChart(tradesArr, chartId){
     if(!tradesArr.length) return '<div class="treplay-empty" style="padding:30px;">無資料</div>';
     const mmW = Math.max(500, tradesArr.length*26+40), mmH = 240, mmPad = {l:50, r:14, t:14, b:30};
     const allVals = tradesArr.flatMap(t => [t.mfe, t.mae, t.pnl]);
@@ -2771,7 +2796,7 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
       const x = mmX(i);
       const mfeY = mmY(t.mfe), maeY = mmY(t.mae);
       const tipText = `#${i+1} ${t.dir==='long'?'多':'空'} ・ ${t.date} ・ MFE:$${t.mfe.toFixed(0)} MAE:$${t.mae.toFixed(0)} 出場:${t.pnl>=0?'+':''}$${t.pnl.toFixed(0)}`;
-      mmBars += `<rect x="${(x-10).toFixed(1)}" y="${mmPad.t}" width="20" height="${mmH-mmPad.t-mmPad.b}" fill="transparent" style="cursor:pointer;" onclick="showSimpleTip(event,'${tipText}')"/>`;
+      mmBars += `<rect x="${(x-10).toFixed(1)}" y="${mmPad.t}" width="20" height="${mmH-mmPad.t-mmPad.b}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${x.toFixed(1)},'${tipText}')"/>`;
       mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(mfeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(mfeY-mmZeroY).toFixed(1)}" fill="#22c55e" rx="1.5" style="pointer-events:none;"/>`;
       mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(maeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(maeY-mmZeroY).toFixed(1)}" fill="#ef4444" rx="1.5" style="pointer-events:none;"/>`;
       const pnlY = mmY(t.pnl);
@@ -2779,16 +2804,17 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
       mmBars += `<text x="${x.toFixed(1)}" y="${mmH-mmPad.b+14}" fill="#888" font-size="9" text-anchor="middle">#${i+1}</text>`;
     });
 
-    return `<div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${mmW} ${mmH}" style="width:${mmW}px;height:${mmH}px;display:block;min-width:100%;">
+    return `<div class="chart-info-panel" id="${chartId}_info">👆 點擊圖上的長條查看該筆交易詳細資料</div><div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${mmW} ${mmH}" style="width:${mmW}px;height:${mmH}px;display:block;min-width:100%;">
       ${mmGrid}
       <line x1="${mmPad.l}" y1="${mmZeroY.toFixed(1)}" x2="${mmW-mmPad.r}" y2="${mmZeroY.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
       ${mmBars}
+      <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${mmPad.t}" x2="0" y2="${mmH-mmPad.b}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
     </svg></div>`;
   }
 
-  const maeMfeChart = buildMaeMfeChart(trades);
-  const longMaeMfeChart = buildMaeMfeChart(longTrades);
-  const shortMaeMfeChart = buildMaeMfeChart(shortTrades);
+  const maeMfeChart = buildMaeMfeChart(trades, 'mmOverall');
+  const longMaeMfeChart = buildMaeMfeChart(longTrades, 'mmLong');
+  const shortMaeMfeChart = buildMaeMfeChart(shortTrades, 'mmShort');
 
   card.innerHTML = `
     <div class="tresult-header">
@@ -3092,6 +3118,23 @@ function showTradeDetailPopover(evt, idx){
   pop.classList.add('show');
 }
 
+// 點擊累積損益/MAE-MFE圖表上的資料點：畫出持續顯示的垂直虛線，並在圖表上方的面板顯示該筆資料，
+// 不會像 showSimpleTip 那樣幾秒後自動消失，方便對照著虛線慢慢看
+function showChartPoint(evt, chartId, x, text){
+  evt.stopPropagation();
+  const vline = document.getElementById(chartId+'_vline');
+  if(vline){
+    vline.setAttribute('x1', x);
+    vline.setAttribute('x2', x);
+    vline.setAttribute('visibility', 'visible');
+  }
+  const infoEl = document.getElementById(chartId+'_info');
+  if(infoEl){
+    infoEl.textContent = text;
+    infoEl.classList.add('active');
+  }
+}
+
 function showSimpleTip(evt, text){
   evt.stopPropagation();
   let tip = document.getElementById('simpleTipBox');
@@ -3180,6 +3223,7 @@ function resetTradeSystem(){
   dayClosedTrades = {};
   dayMarkers = {};
   dayActiveTrade = {};
+  tradeUndoStack = [];
   refreshTradePosDisplay();
   renderAll();
 }
