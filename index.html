@@ -242,6 +242,11 @@ canvas.cross{pointer-events:none;}
 .simple-tip-box.show{display:block;animation:tipFadeIn .15s ease-out;}
 .chart-info-panel{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.3);border-radius:8px;padding:8px 12px;font-size:11.5px;color:var(--t2);margin-bottom:8px;font-weight:600;min-height:16px;}
 .chart-info-panel.active{color:#fff;border-color:rgba(250,204,21,0.55);}
+.chart-info-title{font-size:11px;color:#facc15;font-weight:700;margin-bottom:6px;}
+.chart-info-stats{display:flex;flex-wrap:wrap;gap:8px;}
+.chart-info-stat{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.06);border-radius:6px;padding:4px 10px;}
+.chart-info-lbl{font-size:9.5px;color:var(--t3);font-weight:600;}
+.chart-info-val{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;}
 @keyframes tipFadeIn{from{opacity:0;transform:translate(-50%,-95%);}to{opacity:1;transform:translate(-50%,-100%);}}
 /* Ranking page */
 .ranking-section{margin-bottom:18px;}
@@ -2631,6 +2636,11 @@ function smartGridStep(range, targetLines){
   return best;
 }
 
+// 建立給 showChartPoint 用的結構化資料字串，並轉義雙引號，讓它能安全塞進HTML的onclick雙引號屬性裡
+function chartClickData(title, items){
+  return JSON.stringify({title, items}).replace(/"/g, '&quot;');
+}
+
 function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, chartId){
   const W=720, H=320, PAD=30;
   const allVals = [0, ...curveArr, ...(highArr||[]), ...(lowArr||[])];
@@ -2707,13 +2717,14 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     const gx = PAD+i*xStep;
     const delta = v - curveArr[i-1];
     const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
-    const parts = [`第${i}筆${dLbl}`];
-    if(highArr && highArr[i]!==undefined) parts.push(`最高:$${highArr[i].toFixed(0)}`);
-    parts.push(`本筆:${delta>=0?'+':''}$${delta.toFixed(0)}(累積$${v.toFixed(0)})`);
-    if(lowArr && lowArr[i]!==undefined) parts.push(`最低:$${lowArr[i].toFixed(0)}`);
-    const tipText = parts.join(' ・ ');
+    const items = [];
+    if(highArr && highArr[i]!==undefined) items.push({label:'最高', value:'$'+highArr[i].toFixed(0), color:HIGH_COLOR});
+    items.push({label:'累積', value:'$'+v.toFixed(0), color:'#fff'});
+    if(lowArr && lowArr[i]!==undefined) items.push({label:'最低', value:'$'+lowArr[i].toFixed(0), color:LOW_COLOR});
+    items.push({label:'本筆', value:(delta>=0?'+':'')+'$'+delta.toFixed(0), color: delta>=0?'#22c55e':'#ef4444'});
+    const dataStr = chartClickData(`第${i}筆${dLbl}`, items);
     const hw = Math.max(10, xStep*0.9);
-    hitZones += `<rect x="${(gx-hw/2).toFixed(1)}" y="${PAD}" width="${hw.toFixed(1)}" height="${H-2*PAD}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${gx.toFixed(1)},'${tipText.replace(/'/g,"\\'")}')"/>`;
+    hitZones += `<rect x="${(gx-hw/2).toFixed(1)}" y="${PAD}" width="${hw.toFixed(1)}" height="${H-2*PAD}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${gx.toFixed(1)},'${dataStr}')"/>`;
   });
 
   const idSuffix = Math.random().toString(36).slice(2,8);
@@ -2803,8 +2814,12 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
     tradesArr.forEach((t,i) => {
       const x = mmX(i);
       const mfeY = mmY(t.mfe), maeY = mmY(t.mae);
-      const tipText = `#${i+1} ${t.dir==='long'?'多':'空'} ・ ${t.date} ・ MFE:$${t.mfe.toFixed(0)} MAE:$${t.mae.toFixed(0)} 出場:${t.pnl>=0?'+':''}$${t.pnl.toFixed(0)}`;
-      mmBars += `<rect x="${(x-10).toFixed(1)}" y="${mmPad.t}" width="20" height="${mmH-mmPad.t-mmPad.b}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${x.toFixed(1)},'${tipText}')"/>`;
+      const dataStr = chartClickData(`#${i+1} ${t.dir==='long'?'多':'空'} ・ ${t.date}`, [
+        {label:'MFE', value:'$'+t.mfe.toFixed(0), color:'#22c55e'},
+        {label:'MAE', value:'$'+t.mae.toFixed(0), color:'#ef4444'},
+        {label:'出場', value:(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(0), color: t.pnl>=0?'#22c55e':'#ef4444'},
+      ]);
+      mmBars += `<rect x="${(x-10).toFixed(1)}" y="${mmPad.t}" width="20" height="${mmH-mmPad.t-mmPad.b}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${x.toFixed(1)},'${dataStr}')"/>`;
       mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(mfeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(mfeY-mmZeroY).toFixed(1)}" fill="#22c55e" rx="1.5" style="pointer-events:none;"/>`;
       mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(maeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(maeY-mmZeroY).toFixed(1)}" fill="#ef4444" rx="1.5" style="pointer-events:none;"/>`;
       const pnlY = mmY(t.pnl);
@@ -3128,7 +3143,8 @@ function showTradeDetailPopover(evt, idx){
 
 // 點擊累積損益/MAE-MFE圖表上的資料點：畫出持續顯示的垂直虛線，並在圖表上方的面板顯示該筆資料，
 // 不會像 showSimpleTip 那樣幾秒後自動消失，方便對照著虛線慢慢看
-function showChartPoint(evt, chartId, x, text){
+// dataStr 是 JSON 字串：{title, items:[{label,value,color}]}，用結構化排版取代擠成一行的純文字
+function showChartPoint(evt, chartId, x, dataStr){
   evt.stopPropagation();
   const vline = document.getElementById(chartId+'_vline');
   if(vline){
@@ -3138,7 +3154,14 @@ function showChartPoint(evt, chartId, x, text){
   }
   const infoEl = document.getElementById(chartId+'_info');
   if(infoEl){
-    infoEl.textContent = text;
+    let data;
+    try { data = JSON.parse(dataStr); } catch(e){ data = {title: dataStr, items: []}; }
+    infoEl.innerHTML = `
+      <div class="chart-info-title">${data.title}</div>
+      <div class="chart-info-stats">
+        ${data.items.map(it => `<span class="chart-info-stat"><span class="chart-info-lbl">${it.label}</span><span class="chart-info-val" style="color:${it.color||'#fff'}">${it.value}</span></span>`).join('')}
+      </div>
+    `;
     infoEl.classList.add('active');
   }
 }
