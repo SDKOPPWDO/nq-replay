@@ -2648,7 +2648,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
   const pathD = pts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   const areaD = pathD + ` L${pts[pts.length-1][0].toFixed(1)},${zeroY.toFixed(1)} L${pts[0][0].toFixed(1)},${zeroY.toFixed(1)} Z`;
 
-  // 盤中最高/最低浮動損益線（虛線，不填色）
+  // 盤中最高/最低浮動損益線（虛線，不填色）— 這兩條線的圓點只做視覺呈現，點擊統一交給下面的整欄熱區處理
   const HIGH_COLOR = '#22d3ee', LOW_COLOR = '#fb7185';
   let highPathD = '', lowPathD = '', highDots = '', lowDots = '';
   if(highArr && highArr.length === curveArr.length){
@@ -2657,9 +2657,6 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     highArr.forEach((v,i) => {
       if(i===0) return;
       const [px,py] = hPts[i];
-      const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
-      const tipText = `第${i}筆${dLbl} ・ 盤中最高浮動損益 $${v.toFixed(0)}`;
-      highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
       highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${HIGH_COLOR}" style="pointer-events:none;"/>`;
     });
   }
@@ -2669,9 +2666,6 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     lowArr.forEach((v,i) => {
       if(i===0) return;
       const [px,py] = lPts[i];
-      const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
-      const tipText = `第${i}筆${dLbl} ・ 盤中最低浮動損益 $${v.toFixed(0)}`;
-      lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
       lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${LOW_COLOR}" style="pointer-events:none;"/>`;
     });
   }
@@ -2702,11 +2696,24 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     const [px,py] = pts[i];
     const isWin = v >= curveArr[i-1];
     const dotColor = isWin ? '#22c55e' : '#ef4444';
+    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${dotColor}" stroke="#0d0d0f" stroke-width="2" style="pointer-events:none;"/>`;
+  });
+
+  // ★ 整欄點擊熱區：不用再精準點在小圓點上，點這一整條欄位任何地方，
+  //   一次顯示「盤中最高、出場(累積)、盤中最低」三筆資料，平板點小圓點太密集時特別好用
+  let hitZones = '';
+  curveArr.forEach((v,i) => {
+    if(i===0) return;
+    const gx = PAD+i*xStep;
     const delta = v - curveArr[i-1];
     const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
-    const tipText = `第${i}筆${dLbl} ・ 本筆損益 ${delta>=0?'+':''}$${delta.toFixed(0)} ・ 累積 $${v.toFixed(0)}`;
-    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="9" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${px.toFixed(1)},'${tipText}')"/>`;
-    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${dotColor}" stroke="#0d0d0f" stroke-width="2" style="pointer-events:none;"/>`;
+    const parts = [`第${i}筆${dLbl}`];
+    if(highArr && highArr[i]!==undefined) parts.push(`最高:$${highArr[i].toFixed(0)}`);
+    parts.push(`本筆:${delta>=0?'+':''}$${delta.toFixed(0)}(累積$${v.toFixed(0)})`);
+    if(lowArr && lowArr[i]!==undefined) parts.push(`最低:$${lowArr[i].toFixed(0)}`);
+    const tipText = parts.join(' ・ ');
+    const hw = Math.max(10, xStep*0.9);
+    hitZones += `<rect x="${(gx-hw/2).toFixed(1)}" y="${PAD}" width="${hw.toFixed(1)}" height="${H-2*PAD}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${gx.toFixed(1)},'${tipText.replace(/'/g,"\\'")}')"/>`;
   });
 
   const idSuffix = Math.random().toString(36).slice(2,8);
@@ -2740,6 +2747,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     ${highDots}
     ${lowDots}
     ${pointDots}
+    ${hitZones}
     <text x="${PAD}" y="${zeroY-8}" fill="rgba(255,255,255,0.6)" font-size="10" font-family="monospace" font-weight="700">$0</text>
   </svg>`;
 }
