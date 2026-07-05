@@ -417,7 +417,6 @@ canvas.cross{pointer-events:none;}
     <div class="tresult-page" id="pageReplay"></div>
   </div>
   <div style="display:flex;gap:8px;width:100%;max-width:1200px;">
-    <button class="tresult-close-btn" id="tresultExportBtn" onclick="exportInteractiveReport()" style="background:#16a34a;flex:1;">📄 匯出互動報告</button>
     <button class="tresult-close-btn" onclick="closeTradeResult()" style="flex:1;">關閉</button>
   </div>
 </div>
@@ -2680,24 +2679,14 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
 
   // 盤中最高/最低浮動損益線（虛線，不填色）— 這兩條線的圓點只做視覺呈現，點擊統一交給下面的整欄熱區處理
   const HIGH_COLOR = '#22d3ee', LOW_COLOR = '#fb7185';
-  let highPathD = '', lowPathD = '', highDots = '', lowDots = '';
+  let highPathD = '', lowPathD = '';
   if(highArr && highArr.length === curveArr.length){
     const hPts = highArr.map((v,i) => [PAD+i*xStep, yPos(v)]);
     highPathD = hPts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-    highArr.forEach((v,i) => {
-      if(i===0) return;
-      const [px,py] = hPts[i];
-      highDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${HIGH_COLOR}" style="pointer-events:none;"/>`;
-    });
   }
   if(lowArr && lowArr.length === curveArr.length){
     const lPts = lowArr.map((v,i) => [PAD+i*xStep, yPos(v)]);
     lowPathD = lPts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-    lowArr.forEach((v,i) => {
-      if(i===0) return;
-      const [px,py] = lPts[i];
-      lowDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" fill="${LOW_COLOR}" style="pointer-events:none;"/>`;
-    });
   }
 
   const GRID_STEP = smartGridStep(dispMax-dispMin, 6);
@@ -2710,24 +2699,31 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     gridLinesH += `<line x1="${PAD}" y1="${gy.toFixed(1)}" x2="${W-PAD}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
     gridLinesH += `<text x="2" y="${(gy+3).toFixed(1)}" fill="#777" font-size="9" font-family="monospace" font-weight="600">$${gv.toFixed(0)}</text>`;
   }
-  // 垂直淡網格（每筆交易位置）
+  // ★ 效能：不再畫「每筆交易一條」的垂直網格線，交易筆數一多(好幾個月的回測常常上百筆)
+  //   單張圖就會多出上百個SVG節點，累積損益/多/空三張圖加起來就是好幾百個，是造成匯出報告滾動卡頓的主因之一。
+  //   改成固定畫5條大致平均分布的垂直參考線，純粹當視覺分隔，不用逐筆畫。
   let gridLinesV = '';
-  curveArr.forEach((v,i) => {
-    const gx = PAD+i*xStep;
+  const V_LINES = 5;
+  for(let k=1; k<V_LINES; k++){
+    const idx = Math.round((curveArr.length-1) * k / V_LINES);
+    const gx = PAD + idx*xStep;
     gridLinesV += `<line x1="${gx.toFixed(1)}" y1="${PAD}" x2="${gx.toFixed(1)}" y2="${H-PAD}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
-  });
+  }
 
   let pointDots = '';
-  curveArr.forEach((v,i) => {
-    if(i===0){
-      pointDots += `<circle cx="${pts[0][0].toFixed(1)}" cy="${pts[0][1].toFixed(1)}" r="4" fill="${curveColor}" stroke="#0d0d0f" stroke-width="2"/>`;
-      return;
-    }
-    const [px,py] = pts[i];
-    const isWin = v >= curveArr[i-1];
-    const dotColor = isWin ? '#22c55e' : '#ef4444';
-    pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${dotColor}" stroke="#0d0d0f" stroke-width="2" style="pointer-events:none;"/>`;
-  });
+  const DOT_DENSE_THRESHOLD = 150; // 交易筆數超過這個門檻，個別圓點在視覺上已經看不清楚了，乾脆不畫，只留線本身+點擊熱區
+  if(curveArr.length <= DOT_DENSE_THRESHOLD){
+    curveArr.forEach((v,i) => {
+      if(i===0){
+        pointDots += `<circle cx="${pts[0][0].toFixed(1)}" cy="${pts[0][1].toFixed(1)}" r="4" fill="${curveColor}" stroke="#0d0d0f" stroke-width="2"/>`;
+        return;
+      }
+      const [px,py] = pts[i];
+      const isWin = v >= curveArr[i-1];
+      const dotColor = isWin ? '#22c55e' : '#ef4444';
+      pointDots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${dotColor}" stroke="#0d0d0f" stroke-width="2" style="pointer-events:none;"/>`;
+    });
+  }
 
   // ★ 整欄點擊熱區：不用再精準點在小圓點上，點這一整條欄位任何地方，
   //   一次顯示「盤中最高、出場(累積)、盤中最低」三筆資料，平板點小圓點太密集時特別好用
@@ -2772,8 +2768,6 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" opacity="0.18"/>
     <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
     <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${PAD}" x2="0" y2="${H-PAD}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
-    ${highDots}
-    ${lowDots}
     ${pointDots}
     ${hitZones}
     <text x="${PAD}" y="${zeroY-8}" fill="rgba(255,255,255,0.6)" font-size="10" font-family="monospace" font-weight="700">$0</text>
@@ -2828,6 +2822,7 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
     }
 
     let mmBars = '';
+    const MM_LABEL_THRESHOLD = 150; // 筆數太多時，省略每根bar下面的編號文字，減少節點數（點擊還是能看到完整資訊）
     tradesArr.forEach((t,i) => {
       const x = mmX(i);
       const mfeY = mmY(t.mfe), maeY = mmY(t.mae);
@@ -2841,7 +2836,9 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
       mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(maeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(maeY-mmZeroY).toFixed(1)}" fill="#ef4444" rx="1.5" style="pointer-events:none;"/>`;
       const pnlY = mmY(t.pnl);
       mmBars += `<rect x="${(x-5).toFixed(1)}" y="${(pnlY-5).toFixed(1)}" width="10" height="10" fill="#fff" stroke="${t.pnl>=0?'#22c55e':'#ef4444'}" stroke-width="2" transform="rotate(45 ${x.toFixed(1)} ${pnlY.toFixed(1)})" style="pointer-events:none;"/>`;
-      mmBars += `<text x="${x.toFixed(1)}" y="${mmH-mmPad.b+14}" fill="#888" font-size="9" text-anchor="middle">#${i+1}</text>`;
+      if(tradesArr.length <= MM_LABEL_THRESHOLD){
+        mmBars += `<text x="${x.toFixed(1)}" y="${mmH-mmPad.b+14}" fill="#888" font-size="9" text-anchor="middle">#${i+1}</text>`;
+      }
     });
 
     return `<div class="chart-info-panel" id="${chartId}_info">👆 點擊圖上的長條查看該筆交易詳細資料</div><div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${mmW} ${mmH}" style="width:${mmW}px;height:${mmH}px;display:block;min-width:100%;">
@@ -3225,697 +3222,6 @@ document.addEventListener('click', e=>{
 
 function closeTradeResult(){
   document.getElementById('tresultOverlay').classList.remove('show');
-}
-
-// 匯出「互動式報告」：把績效統計+排行榜頁面，連同必要的互動功能(點圖表看資料、點日期看每口明細)
-// 一起打包成一個獨立的HTML檔案，不需要原始App、不需要網路，打開就能像在App裡一樣點來點去查看
-// 匯出時用：把每一筆交易「進場前後一段時間」的K棒資料切出來，讓匯出的報告能顯示進場回顧圖表，
-// 不用把整天的資料都塞進去，檔案大小比較可控
-function extractTradeSegments(){
-  const segments = {};
-  _allClosedTradesCache.forEach((t, i) => {
-    const dayData = DATA[t.date];
-    if(!dayData){ segments[i] = null; return; }
-    const tfSegs = {};
-    ['1k','5k','15k','60k'].forEach(tf => {
-      const dayBars = dayData[tf];
-      if(!dayBars || !dayBars.length){ tfSegs[tf] = []; return; }
-      let entryPos, exitPos;
-      if(tf === '1k'){
-        entryPos = dayBars.findIndex(b => b.idx === t.entryIdx);
-        exitPos = dayBars.findIndex(b => b.idx === t.exitIdx);
-      } else {
-        entryPos = dayBars.findIndex(b => b.idx <= t.entryIdx && t.entryIdx <= (b.idx_end||b.idx));
-        exitPos = dayBars.findIndex(b => b.idx <= t.exitIdx && t.exitIdx <= (b.idx_end||b.idx));
-        if(entryPos < 0) entryPos = dayBars.findIndex(b => b.idx >= t.entryIdx);
-        if(exitPos < 0) exitPos = dayBars.findIndex(b => b.idx >= t.exitIdx);
-      }
-      if(entryPos < 0 || exitPos < 0){ tfSegs[tf] = []; return; }
-      const basePadBars = tf==='1k' ? 150 : (tf==='5k' ? 100 : (tf==='15k' ? 70 : 150));
-      const pad = basePadBars * 2; // 多留一些餘裕，讓匯出版本也能縮放
-      const startPos = Math.max(0, entryPos - pad);
-      const endPos = Math.min(dayBars.length-1, exitPos + pad);
-      tfSegs[tf] = dayBars.slice(startPos, endPos+1);
-    });
-    segments[i] = tfSegs;
-  });
-  return segments;
-}
-
-async function exportInteractiveReport(){
-  const btn = document.getElementById('tresultExportBtn');
-  const origText = btn.textContent;
-  btn.textContent = '⏳ 匯出中...';
-  btn.disabled = true;
-  try{
-    buildRankingPage(); // 確保排行榜已經算好，不然使用者這次結算沒點過排行榜分頁的話會抓到空的
-    const statsHTML = document.getElementById('pageStats').innerHTML;
-    const rankingHTML = document.getElementById('pageRanking').innerHTML;
-    const cssText = Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
-
-    // 預先把每一天的「每口明細」都算好，直接把結果嵌進匯出的檔案裡，
-    // 這樣匯出的版本不需要原始K棒資料也能點日期查看明細
-    const lotsByDate = {};
-    getTradeDayList().forEach(d => { lotsByDate[d] = computeDayLots(d); });
-
-    // 把每筆交易「進場前後一段時間」的K棒資料切出來，支援匯出版本的進場回顧圖表
-    const tradeSegments = extractTradeSegments();
-    const tradeList = _allClosedTradesCache;
-
-    const dateRange = _fullTradesCache.length ? `${_fullTradesCache[0].date}~${_fullTradesCache[_fullTradesCache.length-1].date}` : currentDay;
-
-    const reportHTML = `<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NQ複盤 交易分析報告 ${dateRange}</title>
-<style>
-${cssText}
-body{margin:0;padding:16px;background:#0d0d0f;}
-.export-tabs{display:flex;gap:8px;max-width:1200px;margin:0 auto 16px;}
-.export-tabs .tresult-tab{flex:1;text-align:center;}
-.export-page-wrap{max-width:1200px;margin:0 auto;}
-.export-hint{max-width:1200px;margin:0 auto 14px;font-size:11px;color:var(--t3);text-align:center;}
-</style>
-</head>
-<body>
-  <div class="export-hint">📄 NQ複盤交易分析報告（互動式，可離線開啟）・ 產生時間 ${new Date().toLocaleString('zh-TW')}</div>
-  <div class="export-tabs">
-    <div class="tresult-tab on" id="expTabStats" onclick="switchExportTab('stats')">📊 績效統計</div>
-    <div class="tresult-tab" id="expTabRanking" onclick="switchExportTab('ranking')">🏆 排行榜</div>
-    <div class="tresult-tab" id="expTabReplay" onclick="switchExportTab('replay')">🎬 進場回顧</div>
-  </div>
-  <div class="export-page-wrap">
-    <div class="tresult-page show" id="pageStats">${statsHTML}</div>
-    <div class="tresult-page" id="pageRanking">${rankingHTML}</div>
-    <div class="tresult-page" id="pageReplay"></div>
-  </div>
-<script>
-const LOTS_BY_DATE = ${JSON.stringify(lotsByDate)};
-const TRADE_SEGMENTS = ${JSON.stringify(tradeSegments)};
-let _allClosedTradesCache = ${JSON.stringify(tradeList)};
-const TRADE_PT_VALUE = ${TRADE_PT_VALUE};
-const UP = ${JSON.stringify(UP)}, DN = ${JSON.stringify(DN)};
-const TF_LABELS = ${JSON.stringify(TF_LABELS)};
-let maConfig = ${JSON.stringify(maConfig)};
-let _replayBuilt = false;
-
-function switchExportTab(tab){
-  document.getElementById('pageStats').classList.toggle('show', tab==='stats');
-  document.getElementById('pageRanking').classList.toggle('show', tab==='ranking');
-  document.getElementById('pageReplay').classList.toggle('show', tab==='replay');
-  document.getElementById('expTabStats').classList.toggle('on', tab==='stats');
-  document.getElementById('expTabRanking').classList.toggle('on', tab==='ranking');
-  document.getElementById('expTabReplay').classList.toggle('on', tab==='replay');
-  if(tab === 'replay' && !_replayBuilt){ buildReplayPage(); _replayBuilt = true; }
-}
-
-// 點擊累積損益/MAE-MFE圖表：畫出持續顯示的垂直虛線，並在上方面板顯示該筆資料
-function showChartPoint(evt, chartId, x, dataStr){
-  evt.stopPropagation();
-  const vline = document.getElementById(chartId+'_vline');
-  if(vline){ vline.setAttribute('x1', x); vline.setAttribute('x2', x); vline.setAttribute('visibility', 'visible'); }
-  const infoEl = document.getElementById(chartId+'_info');
-  if(infoEl){
-    let data;
-    try { data = JSON.parse(dataStr); } catch(e){ data = {title: dataStr, items: []}; }
-    const titleBadge = '<span class="chart-info-stat" style="background:rgba(250,204,21,0.15);"><span class="chart-info-val" style="color:#facc15;">'+data.title+'</span></span>';
-    const itemBadges = data.items.map(it => '<span class="chart-info-stat"><span class="chart-info-lbl" style="color:#d1d5db;">'+it.label+'</span><span class="chart-info-val" style="color:'+(it.color||'#fff')+';">'+it.value+'</span></span>').join('');
-    infoEl.innerHTML = '<div class="chart-info-row">'+titleBadge+itemBadges+'</div>';
-    infoEl.classList.add('active');
-  }
-}
-
-function showSimpleTip(evt, text){
-  evt.stopPropagation();
-  let tip = document.getElementById('simpleTipBox');
-  if(!tip){
-    tip = document.createElement('div');
-    tip.id = 'simpleTipBox';
-    tip.className = 'simple-tip-box';
-    document.body.appendChild(tip);
-  }
-  tip.textContent = text;
-  const rect = evt.currentTarget.getBoundingClientRect();
-  tip.style.left = (rect.left + rect.width/2) + 'px';
-  tip.style.top = (rect.top - 10) + 'px';
-  tip.classList.add('show');
-  clearTimeout(tip._hideTimer);
-  tip._hideTimer = setTimeout(()=>tip.classList.remove('show'), 2500);
-}
-
-function getTradeDayList(){ return Object.keys(LOTS_BY_DATE).sort(); }
-function computeDayLots(dateStr){ return LOTS_BY_DATE[dateStr] || []; }
-
-function showDayLotsModal(dateStr){
-  let overlay = document.getElementById('dayLotsModalOverlay');
-  if(!overlay){
-    overlay = document.createElement('div');
-    overlay.id = 'dayLotsModalOverlay';
-    overlay.className = 'day-lots-modal-overlay';
-    overlay.onclick = (e) => { if(e.target === overlay) closeDayLotsModal(); };
-    document.body.appendChild(overlay);
-  }
-  const days = getTradeDayList();
-  const di = days.indexOf(dateStr);
-  const prevDate = di > 0 ? days[di-1] : null;
-  const nextDate = di >= 0 && di < days.length-1 ? days[di+1] : null;
-  const lots = computeDayLots(dateStr);
-  const totalQty = lots.reduce((a,l)=>a+l.qty,0);
-  const totalPnl = lots.reduce((a,l)=>a+l.pnl,0);
-  overlay.innerHTML = \`
-    <div class="day-lots-modal">
-      <div class="day-lots-modal-hdr">
-        <button class="day-lots-nav-btn" onclick="showDayLotsModal('\${prevDate}')" \${prevDate?'':'disabled'} title="前一天">◀</button>
-        <div class="day-lots-modal-hdr-mid">
-          <div class="day-lots-modal-title">📅 \${dateStr} 當日每口明細</div>
-          <div class="day-lots-modal-sub">共 \${lots.length} 筆 ・ \${totalQty} 口 ・ 總損益 <b style="color:\${totalPnl>=0?'#22c55e':'#ef4444'}">\${totalPnl>=0?'+':''}$\${totalPnl.toFixed(0)}</b></div>
-        </div>
-        <button class="day-lots-nav-btn" onclick="showDayLotsModal('\${nextDate}')" \${nextDate?'':'disabled'} title="下一天">▶</button>
-        <div class="day-lots-modal-close" onclick="closeDayLotsModal()">✕</div>
-      </div>
-      <div class="day-lots-modal-body">
-        <div class="day-lots-row hdr"><span>方向</span><span>口數</span><span>進場時間</span><span>進場價</span><span>離場時間</span><span>離場價</span><span>持有</span><span>損益</span><span>MFE</span><span>MAE</span></div>
-        \${lots.map(l => \`
-        <div class="day-lots-row \${l.pnl>0?'win':'loss'}">
-          <span><span class="tresult-dir-tag \${l.dir}">\${l.dir==='long'?'多':'空'}</span></span>
-          <span>\${l.qty}</span>
-          <span>\${l.entryTime}</span>
-          <span>\${l.entryPrice.toFixed(1)}</span>
-          <span>\${l.exitTime}</span>
-          <span>\${l.exitPrice.toFixed(1)}</span>
-          <span>\${l.holdMin}分</span>
-          <span style="color:\${l.pnl>0?'#22c55e':'#ef4444'};font-weight:700;">\${l.pnl>=0?'+':''}\${l.pnl.toFixed(0)}</span>
-          <span style="color:#22c55e">$\${l.mfe.toFixed(0)}</span>
-          <span style="color:#ef4444">$\${l.mae.toFixed(0)}</span>
-        </div>\`).join('')}
-      </div>
-    </div>
-  \`;
-  overlay.classList.add('show');
-}
-
-function closeDayLotsModal(){
-  const overlay = document.getElementById('dayLotsModalOverlay');
-  if(overlay) overlay.classList.remove('show');
-}
-
-function jumpToReplayTrade(i){
-  switchExportTab('replay');
-  setTimeout(()=>{ if(typeof selectReplayTrade === 'function') selectReplayTrade(i); }, 50);
-}
-
-function showTradeDetailPopover(){
-  alert('請點選上方「交易明細」的日期列，查看當日每口明細');
-}
-
-// ============================================================
-// 進場回顧（匯出版）：跟原始App共用同一套邏輯，只是K棒資料來源
-// 從即時的 DATA 改成匯出當下就切好的 TRADE_SEGMENTS
-// ============================================================
-let replayZoomByTF = {'1k':1,'5k':1,'15k':1,'60k':1};
-let selectedReplayTFs = ['5k','60k'];
-
-function zoomReplayTF(tf, dir){
-  let z = replayZoomByTF[tf] || 1;
-  z = dir===1 ? z*1.3 : z/1.3;
-  z = Math.max(0.25, Math.min(z, 4));
-  replayZoomByTF[tf] = z;
-  const sel = document.querySelector('.treplay-item.sel');
-  if(sel){
-    const i = parseInt(sel.id.replace('treplayItem',''));
-    const t = _allClosedTradesCache[i];
-    if(t) renderReplayChartOnCanvas('treplayCanvas_'+tf, t, tf);
-  }
-}
-
-function buildReplayPage(){
-  const page = document.getElementById('pageReplay');
-  const trades = _allClosedTradesCache;
-  if(!trades.length){
-    page.innerHTML = '<div class="treplay-empty">尚無交易紀錄</div>';
-    return;
-  }
-  selectedReplayTFs = ['5k','60k'];
-  replayZoom = 1;
-
-  // group by date
-  const byDate = {};
-  trades.forEach((t,i) => {
-    if(!byDate[t.date]) byDate[t.date] = [];
-    byDate[t.date].push(i);
-  });
-  const dates = Object.keys(byDate).sort();
-
-  page.innerHTML = \`
-    <div class="treplay-layout">
-      <div class="treplay-left">
-        <div class="treplay-day-summary" id="treplayDaySummary">
-          <div class="treplay-empty" style="padding:30px 10px;">點選下方日期查看當日統計</div>
-        </div>
-        <div class="treplay-list" id="treplayList">
-          \${dates.map(d => {
-            const idxs = byDate[d].slice().sort((a,b) => trades[a].entryIdx - trades[b].entryIdx);
-            const dayPnl = idxs.reduce((a,i)=>a+trades[i].pnl,0);
-            return \`
-            <div class="treplay-day-group">
-              <div class="treplay-day-hdr" id="treplayDayHdr-\${d}" onclick="selectReplayDay('\${d}')">
-                <span>📅 \${d}</span>
-                <span style="color:\${dayPnl>=0?'#22c55e':'#ef4444'}">\${dayPnl>=0?'+':''}$\${dayPnl.toFixed(0)} (\${idxs.length}筆)</span>
-              </div>
-              <div class="treplay-day-items" id="treplayDay-\${d}">
-                \${idxs.map(i => {
-                  const t=trades[i];
-                  return \`
-                  <div class="treplay-item" id="treplayItem\${i}" onclick="selectReplayTrade(\${i})">
-                    <div class="treplay-item-top">
-                      <span class="treplay-item-idx">\${i+1}</span>
-                      <span class="tresult-dir-tag \${t.dir}">\${t.dir==='long'?'多':'空'}</span>
-                      <span class="treplay-item-pnl" style="color:\${t.pnl>0?'var(--up)':'var(--dn)'}">\${t.pnl>=0?'+':''}\${t.pnl.toFixed(0)}</span>
-                    </div>
-                    <div class="treplay-item-date">\${t.entryTime} → \${t.exitTime}\${t.legs && t.legs.length>2 ? \` ・ \${t.legs.length}腳\` : ''}</div>
-                  </div>\`;
-                }).join('')}
-              </div>
-            </div>\`;
-          }).join('')}
-        </div>
-      </div>
-      <div class="treplay-detail">
-        <div class="tresult-tabs" style="margin-bottom:8px;justify-content:space-between;">
-          <div class="treplay-detail-hdr" id="treplayHdr">—</div>
-          <div style="display:flex;gap:6px;" id="replayTFButtons">
-            <div class="tresult-tab" id="rtf-1k" onclick="toggleReplayTF('1k')" style="padding:5px 12px;font-size:11px;">1K</div>
-            <div class="tresult-tab on" id="rtf-5k" onclick="toggleReplayTF('5k')" style="padding:5px 12px;font-size:11px;">5K</div>
-            <div class="tresult-tab" id="rtf-15k" onclick="toggleReplayTF('15k')" style="padding:5px 12px;font-size:11px;">15K</div>
-            <div class="tresult-tab on" id="rtf-60k" onclick="toggleReplayTF('60k')" style="padding:5px 12px;font-size:11px;">60K</div>
-          </div>
-        </div>
-        <div class="treplay-canvas-multi" id="treplayCanvasMulti"></div>
-      </div>
-    </div>
-  \`;
-  buildReplayCanvases();
-  if(trades.length) selectReplayTrade(0);
-  syncReplayListHeight();
-}
-
-function syncReplayListHeight(){
-  requestAnimationFrame(() => {
-    const detail = document.querySelector('.treplay-detail');
-    const summary = document.querySelector('.treplay-day-summary');
-    const list = document.querySelector('.treplay-list');
-    if(!detail || !summary || !list) return;
-    const detailH = detail.offsetHeight;
-    const summaryH = summary.offsetHeight;
-    const gap = 10;
-    const listH = Math.max(120, detailH - summaryH - gap);
-    list.style.maxHeight = listH + 'px';
-  });
-}
-
-function buildReplayCanvases(){
-  const wrap = document.getElementById('treplayCanvasMulti');
-  if(!wrap) return;
-  wrap.innerHTML = selectedReplayTFs.map(tf => \`
-    <div class="treplay-canvas-wrap">
-      <div class="treplay-canvas-hdr">
-        <span class="chdr-l">\${TF_LABELS[tf]||tf.toUpperCase()}</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="chdr-price" id="rprice_\${tf}">
-            <span class="chdr-price-lbl">漲跌</span>
-            <span class="chdr-price-val" id="rpriceVal_\${tf}">—</span>
-          </span>
-          <span class="chdr-wick" id="rwick_\${tf}">
-            <span class="chdr-wick-item up"><span class="chdr-wick-lbl">上影</span><span class="chdr-wick-val" id="rwickUp_\${tf}">—</span></span>
-            <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="rwickDn_\${tf}">—</span></span>
-          </span>
-          <div class="treplay-canvas-zoom">
-            <button class="zoom-btn" onclick="zoomReplayTF('\${tf}',-1)" title="顯示更多K棒">小</button>
-            <button class="zoom-btn" onclick="zoomReplayTF('\${tf}',1)" title="顯示較少K棒">大</button>
-          </div>
-        </div>
-      </div>
-      <div class="treplay-canvas-body" id="treplayCanvasBody_\${tf}">
-        <canvas id="treplayCanvas_\${tf}" style="width:100%;height:100%;"></canvas>
-        <canvas id="treplayCanvas_\${tf}_cross" class="cross"></canvas>
-      </div>
-    </div>
-  \`).join('');
-  selectedReplayTFs.forEach(tf => attachReplayCrosshair(tf));
-}
-
-function attachReplayCrosshair(tf){
-  const bodyEl = document.getElementById('treplayCanvasBody_'+tf);
-  if(!bodyEl) return;
-  bodyEl.addEventListener('mousemove', e => {
-    const r = bodyEl.getBoundingClientRect();
-    handleReplayCross(tf, (e.clientX-r.left)/r.width);
-  });
-  bodyEl.addEventListener('mouseleave', () => clearAllReplayCross());
-  bodyEl.addEventListener('touchmove', e => {
-    if(e.touches.length!==1) return;
-    e.preventDefault();
-    const t = e.touches[0], r = bodyEl.getBoundingClientRect();
-    handleReplayCross(tf, (t.clientX-r.left)/r.width);
-  }, {passive:false});
-  bodyEl.addEventListener('touchend', () => clearAllReplayCross());
-}
-
-function handleReplayCross(tf, xFrac){
-  const main = document.getElementById('treplayCanvas_'+tf);
-  if(!main || !main._layout) return;
-  const {W, segment, X} = main._layout;
-  const mx = xFrac*W;
-  let bi=0, bd=1e9;
-  segment.forEach((_,i)=>{const d=Math.abs(X(i)-mx); if(d<bd){bd=d;bi=i;}});
-  const bar = segment[bi];
-  if(!bar) return;
-  // 用這根K棒的idx，同步到所有目前顯示中的格局（跟主面板十字線同步邏輯一樣）
-  syncReplayCrossFromIdx(bar.idx);
-}
-
-function syncReplayCrossFromIdx(idx){
-  selectedReplayTFs.forEach(otherTf => {
-    const main = document.getElementById('treplayCanvas_'+otherTf);
-    if(!main || !main._layout) return;
-    const {segment} = main._layout;
-    if(!segment.length) return;
-    let best = segment.length-1;
-    for(let i=0;i<segment.length;i++){
-      const b = segment[i];
-      const bEnd = b.idx_end||b.idx;
-      if(b.idx<=idx && idx<=bEnd){ best=i; break; }
-      if(b.idx>idx){ best=Math.max(0,i-1); break; }
-    }
-    drawReplayCross(otherTf, best);
-    updateReplayChdrPrice(otherTf, segment[best]);
-  });
-}
-
-function drawReplayCross(tf, bi){
-  const main = document.getElementById('treplayCanvas_'+tf);
-  const cv = document.getElementById('treplayCanvas_'+tf+'_cross');
-  if(!cv || !main || !main._layout) return;
-  const L = main._layout, dpr = window.devicePixelRatio||2;
-  cv.width = main.width; cv.height = main.height; cv.style.width = main.style.width; cv.style.height = main.style.height;
-  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,L.W,L.H);
-  const {P,W,H,segment,X,Y} = L;
-  if(bi<0 || bi>=segment.length) return;
-  const bar = segment[bi], sx = X(bi), closeY = Y(bar.c);
-  ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(sx,P.t); ctx.lineTo(sx,H-P.b); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(P.l,closeY); ctx.lineTo(W-P.r,closeY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
-  ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left';
-  ctx.fillText(bar.c.toFixed(1),W-P.r+4,closeY+4);
-  const tlW=36, tlH=14, tlX=Math.max(tlW/2+P.l, Math.min(W-P.r-tlW/2, sx));
-  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
-  ctx.fillStyle='#000'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
-  ctx.fillText(bar.ts,tlX,H-P.b+10);
-}
-
-function clearAllReplayCross(){
-  selectedReplayTFs.forEach(tf => {
-    const cv = document.getElementById('treplayCanvas_'+tf+'_cross');
-    if(cv) cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
-    const main = document.getElementById('treplayCanvas_'+tf);
-    if(main && main._layout && main._layout.segment.length){
-      updateReplayChdrPrice(tf, main._layout.segment[main._layout.segment.length-1]);
-    }
-  });
-}
-
-function updateReplayChdrPrice(tf, bar){
-  const priceEl = document.getElementById('rprice_'+tf);
-  const priceValEl = document.getElementById('rpriceVal_'+tf);
-  if(!priceEl || !priceValEl || !bar) return;
-  const chg = bar.c-bar.o, up = chg>=0;
-  priceEl.className = 'chdr-price '+(up?'up':'dn');
-  priceValEl.textContent = (up?'+':'')+chg.toFixed(2);
-  priceValEl.style.color = up?'var(--up)':'var(--dn)';
-  const wickUpEl = document.getElementById('rwickUp_'+tf);
-  const wickDnEl = document.getElementById('rwickDn_'+tf);
-  if(wickUpEl && wickDnEl){
-    const upperWick = Math.max(0, bar.h-Math.max(bar.o,bar.c));
-    const lowerWick = Math.max(0, Math.min(bar.o,bar.c)-bar.l);
-    wickUpEl.textContent = upperWick.toFixed(1);
-    wickDnEl.textContent = lowerWick.toFixed(1);
-  }
-}
-
-function toggleReplayTF(tf){
-  if(selectedReplayTFs.includes(tf)){
-    if(selectedReplayTFs.length === 1) return; // 至少留一個
-    selectedReplayTFs = selectedReplayTFs.filter(x=>x!==tf);
-  } else {
-    if(selectedReplayTFs.length >= 2) return; // 最多兩個同時顯示
-    selectedReplayTFs.push(tf);
-  }
-  selectedReplayTFs.sort((a,b)=>TF_ORDER.indexOf(a)-TF_ORDER.indexOf(b));
-  document.querySelectorAll('#replayTFButtons .tresult-tab').forEach(el=>{
-    const t = el.id.replace('rtf-','');
-    el.classList.toggle('on', selectedReplayTFs.includes(t));
-  });
-  buildReplayCanvases();
-  const sel = document.querySelector('.treplay-item.sel');
-  if(sel){
-    const i = parseInt(sel.id.replace('treplayItem',''));
-    renderReplayChart(i);
-  }
-}
-
-function selectReplayDay(d){
-  const el = document.getElementById('treplayDay-'+d);
-  if(el) el.classList.toggle('collapsed');
-  document.querySelectorAll('.treplay-day-hdr').forEach(h=>h.classList.remove('sel'));
-  const hdrEl = document.getElementById('treplayDayHdr-'+d);
-  if(hdrEl) hdrEl.classList.add('sel');
-  renderDaySummaryPanel(d);
-}
-
-function computeDaySummary(dateStr){
-  const dayTrades = _allClosedTradesCache.filter(t => t.date === dateStr);
-  if(!dayTrades.length) return null;
-  const count = dayTrades.length;
-  const realizedPnl = dayTrades.reduce((a,t)=>a+t.pnl,0);
-  const totalQty = dayTrades.reduce((a,t)=>a+t.qty,0);
-  const avgMae = dayTrades.reduce((a,t)=>a+(t.mae||0),0)/count;
-  const avgMfe = dayTrades.reduce((a,t)=>a+(t.mfe||0),0)/count;
-  const wins = dayTrades.filter(t=>t.pnl>0);
-  const losses = dayTrades.filter(t=>t.pnl<0);
-  const avgWinPts = wins.length ? wins.reduce((a,t)=>a+(t.pnl/(t.qty*TRADE_PT_VALUE)),0)/wins.length : 0;
-  const avgLossPts = losses.length ? losses.reduce((a,t)=>a+(t.pnl/(t.qty*TRADE_PT_VALUE)),0)/losses.length : 0;
-  const gbTrades = dayTrades.filter(t=>t.pnl>0 && (t.mfe||0)>0);
-  const avgGiveback = gbTrades.length ? gbTrades.reduce((a,t)=>a+((t.mfe-t.pnl)/t.mfe*100),0)/gbTrades.length : 0;
-  const rrTrades = dayTrades.filter(t=>(t.mae||0)<0);
-  const avgIdealRR = rrTrades.length ? rrTrades.reduce((a,t)=>a+((t.mfe||0)/Math.abs(t.mae)),0)/rrTrades.length : 0;
-  const avgActualRR = rrTrades.length ? rrTrades.reduce((a,t)=>a+(t.pnl/Math.abs(t.mae)),0)/rrTrades.length : 0;
-  return {dateStr,count,realizedPnl,totalQty,avgMae,avgMfe,avgWinPts,avgLossPts,avgGiveback,avgIdealRR,avgActualRR,hasRR:rrTrades.length>0,hasGiveback:gbTrades.length>0};
-}
-
-function renderDaySummaryPanel(dateStr){
-  const panel = document.getElementById('treplayDaySummary');
-  if(!panel) return;
-  const s = computeDaySummary(dateStr);
-  if(!s){
-    panel.innerHTML = '<div class="treplay-empty" style="padding:30px 10px;">當日無交易資料</div>';
-    return;
-  }
-  panel.innerHTML = \`
-    <div class="treplay-day-summary-title">📅 \${s.dateStr} 當日統計</div>
-    <div class="treplay-day-summary-grid">
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">筆數</div><div class="treplay-day-stat-val">\${s.count} 筆</div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">已實現獲利</div><div class="treplay-day-stat-val" style="color:\${s.realizedPnl>=0?'#22c55e':'#ef4444'}">\${s.realizedPnl>=0?'+':''}$\${s.realizedPnl.toFixed(0)}</div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">總口數</div><div class="treplay-day-stat-val">\${s.totalQty} 口</div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">MAE / MFE 均值</div><div class="treplay-day-stat-val" style="font-size:10.5px;"><span style="color:#ef4444">$\${s.avgMae.toFixed(0)}</span> / <span style="color:#22c55e">$\${s.avgMfe.toFixed(0)}</span></div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">均獲 / 均虧 (PT)</div><div class="treplay-day-stat-val" style="font-size:10.5px;"><span style="color:#22c55e">+\${s.avgWinPts.toFixed(1)}</span> / <span style="color:#ef4444">\${s.avgLossPts.toFixed(1)}</span></div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">獲利回吐率</div><div class="treplay-day-stat-val" style="color:#a855f7;">\${s.hasGiveback ? s.avgGiveback.toFixed(1)+'%' : '—'}</div></div>
-      <div class="treplay-day-stat" style="grid-column:1/-1;"><div class="treplay-day-stat-lbl">理想RR / 實際RR</div><div class="treplay-day-stat-val" style="font-size:10.5px;">\${s.hasRR ? \`理想 <span style="color:#facc15">\${s.avgIdealRR.toFixed(2)}</span> ・ 實際 <span style="color:\${s.avgActualRR>=0?'#22c55e':'#ef4444'}">\${s.avgActualRR.toFixed(2)}</span>\` : '—'}</div></div>
-    </div>
-  \`;
-  syncReplayListHeight();
-}
-
-function selectReplayTrade(i){
-  document.querySelectorAll('.treplay-item').forEach(el => el.classList.remove('sel'));
-  const item = document.getElementById('treplayItem'+i);
-  if(item) item.classList.add('sel');
-
-  const t = _allClosedTradesCache[i];
-  const hdr = document.getElementById('treplayHdr');
-  hdr.innerHTML = \`第 <span style="color:#facc15">\${i+1}</span> 筆\`;
-
-  document.querySelectorAll('.treplay-day-hdr').forEach(h=>h.classList.remove('sel'));
-  const hdrEl = document.getElementById('treplayDayHdr-'+t.date);
-  if(hdrEl) hdrEl.classList.add('sel');
-  renderDaySummaryPanel(t.date);
-
-  renderReplayChart(i);
-}
-
-function renderReplayChartOnCanvas(canvasId, t, tf){
-  const canvas = document.getElementById(canvasId);
-  if(!canvas) return;
-  const segForTrade = TRADE_SEGMENTS[_allClosedTradesCache.indexOf(t)];
-  if(!segForTrade){ return; }
-  const dayBars = segForTrade[tf];
-  if(!dayBars || !dayBars.length){
-    const ctx = canvas.getContext('2d');
-    canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight;
-    ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#666';ctx.font='12px sans-serif';ctx.textAlign='center';
-    ctx.fillText(\`此日無 \${tf.toUpperCase()} 資料\`, canvas.width/2, canvas.height/2);
-    return;
-  }
-
-  function findBarPos(idx){
-    if(idx === undefined || idx === null) return -1;
-    let pos;
-    if(tf === '1k'){
-      pos = dayBars.findIndex(b => b.idx === idx);
-    } else {
-      pos = dayBars.findIndex(b => b.idx <= idx && idx <= (b.idx_end||b.idx));
-      if(pos < 0) pos = dayBars.findIndex(b => b.idx >= idx);
-    }
-    return pos;
-  }
-
-  // 每一次進場/出場的腳位（若無 legs 細節則退回單一進出場）
-  const legs = (t.legs && t.legs.length) ? t.legs : [
-    {type:'entry', qty:t.qty, price:t.entryPrice, time:t.entryTime, idx:t.entryIdx},
-    {type:'exit', qty:t.qty, price:t.exitPrice, time:t.exitTime, idx:t.exitIdx}
-  ];
-  const legPositions = legs.map(l => ({...l, pos: findBarPos(l.idx)})).filter(l => l.pos >= 0);
-  if(!legPositions.length) return;
-
-  const allPos = legPositions.map(l=>l.pos);
-  const minPos = Math.min(...allPos), maxPos = Math.max(...allPos);
-
-  const basePadBars = tf==='1k' ? 150 : (tf==='5k' ? 100 : (tf==='15k' ? 70 : 150));
-  const padBars = Math.max(2, Math.round(basePadBars / (replayZoomByTF[tf]||1)));
-  const startPos = Math.max(0, minPos - padBars);
-  const endPos = Math.min(dayBars.length-1, maxPos + padBars);
-  const segment = dayBars.slice(startPos, endPos+1);
-
-  const wrap = canvas.parentElement;
-  const dpr = window.devicePixelRatio || 2;
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-  canvas.width = W*dpr; canvas.height = H*dpr;
-  canvas.style.width = W+'px'; canvas.style.height = H+'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-  ctx.fillStyle = '#0d0d0f'; ctx.fillRect(0,0,W,H);
-
-  const P = {t:14, r:60, b:24, l:4};
-  const cw = (W-P.l-P.r)/segment.length;
-  const allP = segment.flatMap(b=>[b.h,b.l]);
-  let lo=Math.min(...allP), hi=Math.max(...allP);
-  const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;
-  const rng=hi-lo||1;
-  const Y2 = p => P.t + (H-P.t-P.b)*(1-(p-lo)/rng);
-  const X2 = i => P.l + i*cw + cw/2;
-  canvas._layout = {P, W, H, segment, X: X2, Y: Y2};
-
-  for(let i=0;i<=4;i++){
-    const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
-    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
-    ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
-  }
-
-  segment.forEach((b,i)=>{
-    const x=X2(i), up=b.c>=b.o, col=up?UP:DN;
-    ctx.strokeStyle=col;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x,Y2(b.h));ctx.lineTo(x,Y2(b.l));ctx.stroke();
-    const ty=Math.min(Y2(b.o),Y2(b.c)), bh=Math.max(Math.abs(Y2(b.c)-Y2(b.o)),1.2);
-    ctx.fillStyle=col;ctx.fillRect(x-Math.max(cw*0.35,2),ty,Math.max(cw*0.7,4),bh);
-  });
-
-  const rmk=['m5','m10','m20','m60'];
-  maConfig.forEach((ma,mi)=>{
-    if(!ma.on) return;
-    ctx.strokeStyle=ma.c;ctx.lineWidth=mi===3?1.8:1.2;ctx.beginPath();
-    let st=false;
-    segment.forEach((b,i)=>{
-      const v=b[rmk[mi]]??null;if(v==null) return;
-      st?(ctx.lineTo(X2(i),Y2(v))):(ctx.moveTo(X2(i),Y2(v)),st=true);
-    });
-    ctx.stroke();
-  });
-
-  // 畫出每一次進場/出場（若同一根K棒有多腳，用小偏移避免完全重疊）
-  // 標籤位置：多單在箭頭右邊，空單在箭頭左邊；平倉沿用該筆交易原本的多/空方向
-  const seenAtRelPos = {};
-  const labelGap = 9;
-  legPositions.forEach(l => {
-    const relPos = l.pos - startPos;
-    if(relPos < 0 || relPos >= segment.length) return;
-    const b = segment[relPos];
-    const stackKey = relPos+'_'+l.type;
-    const stackN = seenAtRelPos[stackKey] || 0;
-    seenAtRelPos[stackKey] = stackN + 1;
-    const x = X2(relPos);
-    const stackOffset = stackN * 13;
-    const onRight = t.dir === 'long';
-    const labelX = onRight ? x+labelGap : x-labelGap;
-
-    if(l.type === 'entry'){
-      const label = \`\${t.dir==='long'?'多':'空'}\${l.qty}\`;
-      if(t.dir==='long'){
-        const ey=Y2(b.l)+14+stackOffset;
-        ctx.fillStyle=UP;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey+10);ctx.lineTo(x+6,ey+10);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey+8);
-      } else {
-        const ey=Y2(b.h)-14-stackOffset;
-        ctx.fillStyle=DN;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey-10);ctx.lineTo(x+6,ey-10);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey-6);
-      }
-    } else {
-      const label = \`平\${l.qty}\`;
-      // 出場一律用箭頭（倒三角），從上方指向出場價位，避免跟進場的三角形混淆但同樣是箭頭而非圓點
-      const ey=Y2(b.c)-14-stackOffset;
-      ctx.fillStyle='#a855f7';ctx.beginPath();ctx.moveTo(x,ey+10);ctx.lineTo(x-6,ey);ctx.lineTo(x+6,ey);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey+3);
-    }
-  });
-
-  ctx.fillStyle='#999';ctx.font='8px sans-serif';ctx.textAlign='center';
-  segment.forEach((b,i)=>{if(i%5===0) ctx.fillText(b.ts,X2(i),H-6);});
-
-  // 預設顯示區段最後一根K棒的漲跌/上下影線（尚未移動滑鼠時）
-  if(segment.length) updateReplayChdrPrice(tf, segment[segment.length-1]);
-}
-
-function renderReplayChart(i){
-  const t = _allClosedTradesCache[i];
-  if(!t) return;
-  selectedReplayTFs.forEach(tf => {
-    renderReplayChartOnCanvas('treplayCanvas_'+tf, t, tf);
-  });
-}
-<\/script>
-</body>
-</html>`;
-
-    const blob = new Blob([reportHTML], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `NQ複盤分析報告_${dateRange}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  } catch(e){
-    console.error(e);
-    alert('匯出失敗: ' + e.message);
-  }
-  btn.textContent = origText;
-  btn.disabled = false;
 }
 
 function resetTradeSystem(){
