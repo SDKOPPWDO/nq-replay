@@ -2762,10 +2762,6 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
         <stop offset="60%" stop-color="${curveColor}" stop-opacity="0.08"/>
         <stop offset="100%" stop-color="${curveColor}" stop-opacity="0"/>
       </linearGradient>
-      <filter id="glow-${idSuffix}" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="3" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
     </defs>
     ${gridLinesV}
     ${gridLinesH}
@@ -2773,7 +2769,8 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     <path d="${areaD}" fill="url(#grad-${idSuffix})"/>
     ${highPathD ? `<path d="${highPathD}" fill="none" stroke="${HIGH_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
     ${lowPathD ? `<path d="${lowPathD}" fill="none" stroke="${LOW_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
-    <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow-${idSuffix})"/>
+    <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" opacity="0.18"/>
+    <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
     <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${PAD}" x2="0" y2="${H-PAD}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
     ${highDots}
     ${lowDots}
