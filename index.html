@@ -318,6 +318,78 @@ canvas.cross{pointer-events:none;}
 .lbar{width:200px;height:3px;background:var(--b1);border-radius:2px;overflow:hidden;}
 .lfill{height:100%;background:var(--blue);animation:ld 1.5s ease-in-out infinite;}
 @keyframes ld{0%{width:0}50%{width:70%}100%{width:100%}}
+
+/* ===== STORY LINE PANEL ===== */
+.story-col{width:236px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--b1);display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.story-col.hidden{display:none;}
+.story-hdr{padding:7px 10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.story-hdr-title{font-size:12px;font-weight:700;color:#facc15;}
+.story-scope{display:flex;gap:3px;}
+.story-scope-btn{padding:3px 8px;font-size:10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;font-family:inherit;}
+.story-scope-btn.on{background:#facc15;border-color:#facc15;color:#000;font-weight:700;}
+.story-input-area{padding:8px;border-bottom:1px solid var(--b1);display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.story-now-bar{display:flex;align-items:center;gap:4px;}
+.story-now-chip{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:var(--bg3);border:1px solid var(--b2);color:#fff;font-variant-numeric:tabular-nums;}
+.story-now-chip.price{color:#facc15;}
+.story-tf-sel{margin-left:auto;height:22px;font-size:10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;padding:0 2px;}
+.story-textarea{width:100%;min-height:58px;max-height:120px;resize:vertical;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;font-size:12px;padding:7px 8px;line-height:1.45;}
+.story-textarea:focus{outline:none;border-color:#facc15;}
+.story-save-btn{width:100%;padding:8px 4px;border-radius:7px;border:none;background:#facc15;color:#000;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.story-save-btn:active{opacity:.7;}
+.story-timeline{flex:1;min-height:0;overflow-y:auto;padding:8px 8px 8px 6px;}
+.story-empty{text-align:center;color:var(--t3);font-size:11px;padding:26px 8px;line-height:1.7;}
+.story-day-lbl{font-size:10px;font-weight:700;color:var(--t3);padding:6px 2px 4px;letter-spacing:.5px;}
+.story-note{position:relative;padding-left:14px;margin-bottom:8px;}
+.story-note::before{content:'';position:absolute;left:3px;top:12px;width:7px;height:7px;border-radius:50%;background:#facc15;box-shadow:0 0 6px rgba(250,204,21,.6);}
+.story-note::after{content:'';position:absolute;left:6px;top:22px;bottom:-10px;width:1px;background:var(--b2);}
+.story-note:last-child::after{display:none;}
+.story-note-card{background:var(--bg3);border:1px solid var(--b2);border-radius:8px;padding:6px 8px;cursor:pointer;}
+.story-note-card:active{opacity:.75;}
+.story-note-meta{display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap;}
+.story-note-time{font-size:10px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+.story-tf-badge{font-size:8.5px;font-weight:800;color:#fff;background:var(--blue);border-radius:4px;padding:1px 4px;letter-spacing:.3px;}
+.story-note-price{font-size:10px;font-weight:700;color:#facc15;font-variant-numeric:tabular-nums;}
+.story-note-acts{margin-left:auto;display:flex;gap:3px;}
+.story-note-act{width:20px;height:20px;border-radius:4px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.story-note-text{font-size:11px;color:var(--t1);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.story-note-folder-tag{font-size:8.5px;color:#c4b5fd;background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.45);border-radius:4px;padding:1px 5px;}
+.story-backup-bar{display:flex;gap:6px;padding:7px 8px;border-top:1px solid var(--b1);flex-shrink:0;}
+.story-backup-btn{flex:1;padding:6px 2px;font-size:10px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;font-family:inherit;}
+/* ===== CLASSIFY MODAL ===== */
+.scls-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at top, #14141a 0%, #050508 70%);z-index:700;display:none;flex-direction:column;align-items:center;padding:18px 14px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.scls-overlay.show{display:flex;}
+.scls-card{width:100%;max-width:1200px;display:flex;flex-direction:column;min-height:0;flex:1;}
+.scls-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-shrink:0;}
+.scls-title{font-size:16px;font-weight:800;color:#fff;}
+.scls-close{margin-left:auto;padding:7px 18px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.scls-back{padding:7px 14px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;}
+.scls-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;flex-shrink:0;align-items:center;}
+.scls-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:16px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font-size:11px;font-weight:700;cursor:pointer;user-select:none;}
+.scls-chip.on{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.scls-chip-x{width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;}
+.scls-chip-x:hover{background:#ef4444;}
+.scls-newfolder{padding:5px 11px;border-radius:16px;border:1px dashed var(--b2);background:transparent;color:var(--t3);font-size:11px;cursor:pointer;font-family:inherit;}
+.scls-page{flex:1;min-height:0;display:none;flex-direction:column;}
+.scls-page.show{display:flex;}
+.scls-list{flex:1;min-height:0;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:10px;}
+.scls-day-hdr{font-size:11px;font-weight:800;color:#facc15;padding:8px 2px 6px;letter-spacing:.5px;}
+.scls-note-row{display:flex;align-items:flex-start;gap:8px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+.scls-note-main{flex:1;min-width:0;cursor:pointer;}
+.scls-note-side{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
+.scls-folder-sel{height:24px;font-size:10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t1);font-family:inherit;max-width:120px;}
+.scls-chart-btn{padding:4px 10px;font-size:10px;border-radius:5px;border:1px solid #7c3aed;background:rgba(124,58,237,.2);color:#c4b5fd;cursor:pointer;font-family:inherit;font-weight:700;}
+/* ===== 行情 layout (mirror treplay) ===== */
+.smkt-layout{display:grid;grid-template-columns:230px 1fr;gap:12px;flex:1;min-height:0;}
+.smkt-left{display:flex;flex-direction:column;min-height:0;}
+.smkt-list{flex:1;min-height:0;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:6px;}
+.smkt-item{padding:7px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:10px;background:transparent;}
+.smkt-item:hover{background:rgba(255,255,255,.04);}
+.smkt-item.sel{background:rgba(124,58,237,.25);border:1px solid #7c3aed;}
+.smkt-item-meta{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.smkt-item-text{color:var(--t2);font-size:9.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.smkt-detail{min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;min-height:0;}
+.smkt-note-info{background:var(--bg3);border-left:3px solid #facc15;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:var(--t1);line-height:1.5;flex-shrink:0;white-space:pre-wrap;max-height:72px;overflow-y:auto;}
+
 </style>
 </head>
 <body>
@@ -325,6 +397,8 @@ canvas.cross{pointer-events:none;}
 <div class="app" style="display:none" id="appRoot">
   <div class="topbar">
     <span class="app-title">NQ 複盤</span>
+    <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
+    <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnRefreshData" onclick="manualRefreshData()" title="強制重新抓取最新資料" style="font-size:12px;padding:0 8px;width:auto;">🔄 更新資料</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
@@ -390,6 +464,35 @@ canvas.cross{pointer-events:none;}
       <button class="cbtn dim" id="btnSkip5b">◀◀ -5</button>
       <button class="cbtn dim" id="btnReset">↺ 重置</button>
     </div>
+    <div class="story-col" id="storyCol">
+      <div class="story-hdr">
+        <span class="story-hdr-title">📖 交易故事線</span>
+        <div class="story-scope">
+          <button class="story-scope-btn on" id="scopeDay" onclick="setStoryScope('day')">本日</button>
+          <button class="story-scope-btn" id="scopeAll" onclick="setStoryScope('all')">全部</button>
+        </div>
+      </div>
+      <div class="story-input-area">
+        <div class="story-now-bar">
+          <span class="story-now-chip" id="storyNowTime">—</span>
+          <span class="story-now-chip price" id="storyNowPrice">—</span>
+          <select class="story-tf-sel" id="storyTfSel" title="這則想法是看哪個格局產生的">
+            <option value="1k">1分K</option>
+            <option value="5k">5分K</option>
+            <option value="15k">15分K</option>
+            <option value="60k">60分K</option>
+          </select>
+        </div>
+        <textarea class="story-textarea" id="storyInput" placeholder="價格走到這裡，你在想什麼？&#10;(Ctrl+Enter 快速儲存)"></textarea>
+        <button class="story-save-btn" onclick="saveStoryNote()">📌 記下這一刻</button>
+      </div>
+      <div class="story-timeline" id="storyTimeline"></div>
+      <div class="story-backup-bar">
+        <button class="story-backup-btn" onclick="exportStoryNotes()">⬇ 備份</button>
+        <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()">⬆ 匯入</button>
+        <input type="file" id="storyImportFile" accept=".json" style="display:none;" onchange="importStoryNotes(this)">
+      </div>
+    </div>
   </div>
 </div>
 <div class="cpopup" id="cpopup">
@@ -418,6 +521,39 @@ canvas.cross{pointer-events:none;}
   </div>
   <div style="display:flex;gap:8px;width:100%;max-width:1200px;">
     <button class="tresult-close-btn" onclick="closeTradeResult()" style="flex:1;">關閉</button>
+  </div>
+</div>
+<div class="scls-overlay" id="sclsOverlay">
+  <div class="scls-card">
+    <div class="scls-top">
+      <button class="scls-back" id="sclsBack" onclick="storyClsShowList()">‹ 返回分類清單</button>
+      <span class="scls-title" id="sclsTitle">🗂 故事線分類</span>
+      <button class="scls-close" onclick="closeStoryCls()">✕ 關閉</button>
+    </div>
+    <div class="scls-chips" id="sclsChips"></div>
+    <div class="scls-page show" id="sclsPageList">
+      <div class="scls-list" id="sclsList"></div>
+    </div>
+    <div class="scls-page" id="sclsPageMkt">
+      <div class="smkt-layout">
+        <div class="smkt-left">
+          <div class="smkt-list" id="smktList"></div>
+        </div>
+        <div class="smkt-detail">
+          <div class="tresult-tabs" style="margin-bottom:8px;justify-content:space-between;">
+            <div class="treplay-detail-hdr" id="smktHdr">—</div>
+            <div style="display:flex;gap:6px;" id="smktTFButtons">
+              <div class="tresult-tab" id="stf-1k" onclick="toggleStoryMktTF('1k')" style="padding:5px 12px;font-size:11px;">1K</div>
+              <div class="tresult-tab on" id="stf-5k" onclick="toggleStoryMktTF('5k')" style="padding:5px 12px;font-size:11px;">5K</div>
+              <div class="tresult-tab" id="stf-15k" onclick="toggleStoryMktTF('15k')" style="padding:5px 12px;font-size:11px;">15K</div>
+              <div class="tresult-tab on" id="stf-60k" onclick="toggleStoryMktTF('60k')" style="padding:5px 12px;font-size:11px;">60K</div>
+            </div>
+          </div>
+          <div class="smkt-note-info" id="smktNoteInfo" style="display:none;"></div>
+          <div class="treplay-canvas-multi" id="smktCanvasMulti"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
@@ -834,6 +970,22 @@ function drawChart(id,bars,cursor,timeStep,pan){
       }
     });
   }
+
+  // 📌 故事線筆記圖釘（有筆記的K棒上方顯示圖釘）
+  if(typeof storyNotes!=='undefined' && storyNotes[currentDay] && storyNotes[currentDay].length){
+    const stf = id.replace('cv_','');
+    const drawn = new Set();
+    storyNotes[currentDay].forEach(n=>{
+      let vi=-1;
+      if(stf==='1k') vi=view.findIndex(b=>b.idx===n.idx);
+      else vi=view.findIndex(b=>b.idx<=n.idx && n.idx<=(b.idx_end||b.idx));
+      if(vi<0 || drawn.has(vi)) return;
+      drawn.add(vi);
+      const bar=view[vi], x=X(vi), py=Y(bar.h)-6;
+      ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#facc15';
+      ctx.fillText('📌',x,py);
+    });
+  }
 }
 
 function drawCrossOnChart(cvId,bi){
@@ -1168,6 +1320,8 @@ document.getElementById('btnSkip5f').addEventListener('click',()=>moveNext(5));
 document.getElementById('btnSkip5b').addEventListener('click',()=>movePrev(5));
 document.getElementById('btnReset').addEventListener('click',()=>{resetToModeStart();renderAll();});
 document.addEventListener('keydown',e=>{
+  if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if(document.getElementById('sclsOverlay') && document.getElementById('sclsOverlay').classList.contains('show')) return;
   if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();if(mode1kBars.length&&cur1<mode1kBars.length-1){cur1++;hoverBar=null;renderAll();}}
   else if(e.key==='ArrowLeft'){e.preventDefault();if(cur1>0){cur1--;hoverBar=null;renderAll();}}
 });
@@ -3246,6 +3400,609 @@ window.addEventListener('resize',()=>{
   if(mode1kBars.length)setTimeout(renderAll,50);
   if(document.querySelector('.treplay-layout')) syncReplayListHeight();
 });
+
+// ============================================================
+// 📖 交易故事線（時間點筆記 + 分類）
+// ============================================================
+function escapeHtml(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+let storyNotes = {};   // {date:[{id,idx,ts,price,tf,text,folder}]}  分類單位＝單一時間點
+let storyFolders = [];
+let storyScope = 'day';
+(function loadStoryStorage(){
+  try{ storyNotes = JSON.parse(localStorage.getItem('nqStoryNotes')||'{}'); }catch(e){ storyNotes={}; }
+  try{ storyFolders = JSON.parse(localStorage.getItem('nqStoryFolders')||'[]'); }catch(e){ storyFolders=[]; }
+  if(typeof storyNotes!=='object'||Array.isArray(storyNotes)||!storyNotes) storyNotes={};
+  if(!Array.isArray(storyFolders)) storyFolders=[];
+})();
+function saveStoryStorage(){
+  try{
+    localStorage.setItem('nqStoryNotes', JSON.stringify(storyNotes));
+    localStorage.setItem('nqStoryFolders', JSON.stringify(storyFolders));
+  }catch(e){ console.error('儲存失敗', e); }
+}
+
+function toggleStoryPanel(){
+  const col=document.getElementById('storyCol'), btn=document.getElementById('btnToggleStory');
+  const hidden=col.classList.toggle('hidden');
+  btn.style.opacity = hidden?'0.5':'1';
+  localStorage.setItem('nqStoryPanelOpen', hidden?'0':'1');
+  requestAnimationFrame(()=>renderAll());
+}
+(function initStoryPanelState(){
+  if(localStorage.getItem('nqStoryPanelOpen')==='0'){
+    document.getElementById('storyCol').classList.add('hidden');
+    document.getElementById('btnToggleStory').style.opacity='0.5';
+  }
+})();
+
+function updateStoryNowBar(){
+  const tEl=document.getElementById('storyNowTime'), pEl=document.getElementById('storyNowPrice');
+  if(!tEl||!pEl) return;
+  const b=mode1kBars[cur1];
+  if(!b){tEl.textContent='—';pEl.textContent='—';return;}
+  tEl.textContent = (currentDay||'').slice(5)+' '+b.ts;
+  pEl.textContent = b.c.toFixed(1);
+}
+
+function saveStoryNote(){
+  const inp=document.getElementById('storyInput');
+  const text=inp.value.trim();
+  if(!text){inp.focus();return;}
+  const b=mode1kBars[cur1];
+  if(!b){alert('尚未載入K棒資料');return;}
+  const tf=document.getElementById('storyTfSel').value;
+  if(!storyNotes[currentDay]) storyNotes[currentDay]=[];
+  storyNotes[currentDay].push({
+    id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    idx: b.idx, ts: b.ts, price: b.c, tf, text, folder:''
+  });
+  storyNotes[currentDay].sort((a,b2)=>a.idx-b2.idx);
+  saveStoryStorage();
+  inp.value='';
+  renderStoryTimeline();
+  renderAll();
+}
+document.getElementById('storyInput').addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveStoryNote();}
+  e.stopPropagation();
+});
+
+function setStoryScope(s){
+  storyScope=s;
+  document.getElementById('scopeDay').classList.toggle('on',s==='day');
+  document.getElementById('scopeAll').classList.toggle('on',s==='all');
+  renderStoryTimeline();
+}
+function tfBadgeHtml(tf){return '<span class="story-tf-badge">'+String(tf||'1k').toUpperCase()+'</span>';}
+function folderTagHtml(n){return n.folder?'<span class="story-note-folder-tag">📁 '+escapeHtml(n.folder)+'</span>':'';}
+
+function renderStoryTimeline(){
+  const tl=document.getElementById('storyTimeline');
+  if(!tl) return;
+  let dates = storyScope==='day' ? [currentDay] : Object.keys(storyNotes).sort().reverse();
+  dates = dates.filter(d=>storyNotes[d]&&storyNotes[d].length);
+  if(!dates.length){
+    tl.innerHTML='<div class="story-empty">還沒有筆記<br><span style="font-size:10px;">一根一根看盤時，把當下的想法記下來</span></div>';
+    return;
+  }
+  tl.innerHTML = dates.map(d=>{
+    const notes=storyNotes[d].slice().sort((a,b)=>a.idx-b.idx);
+    const hdr = storyScope==='all' ? '<div class="story-day-lbl">📅 '+d+'</div>' : '';
+    return hdr + notes.map(n=>`
+      <div class="story-note">
+        <div class="story-note-card" onclick="jumpToStoryNote('${d}','${n.id}')">
+          <div class="story-note-meta">
+            <span class="story-note-time">${n.ts}</span>
+            ${tfBadgeHtml(n.tf)}
+            <span class="story-note-price">${(+n.price).toFixed(1)}</span>
+            ${folderTagHtml(n)}
+            <span class="story-note-acts">
+              <button class="story-note-act" onclick="event.stopPropagation();editStoryNote('${d}','${n.id}')" title="編輯">✏</button>
+              <button class="story-note-act" onclick="event.stopPropagation();deleteStoryNote('${d}','${n.id}')" title="刪除">🗑</button>
+            </span>
+          </div>
+          <div class="story-note-text">${escapeHtml(n.text)}</div>
+        </div>
+      </div>`).join('');
+  }).join('');
+}
+
+function findStoryNote(d,id){return (storyNotes[d]||[]).find(n=>n.id===id);}
+function jumpToStoryNote(d,id){
+  const n=findStoryNote(d,id); if(!n) return;
+  if(currentDay!==d && DAYS_SET.has(d)) loadDay(d);
+  let pos=mode1kBars.findIndex(b=>b.idx===n.idx);
+  if(pos<0){for(let i=mode1kBars.length-1;i>=0;i--){if(mode1kBars[i].idx<=n.idx){pos=i;break;}}}
+  if(pos>=0){cur1=pos;hoverBar=null;renderAll();}
+}
+function editStoryNote(d,id){
+  const n=findStoryNote(d,id); if(!n) return;
+  const t=prompt('編輯筆記內容：',n.text);
+  if(t===null) return;
+  const tt=t.trim(); if(!tt) return;
+  n.text=tt; saveStoryStorage(); renderStoryTimeline();
+  refreshStoryClsIfOpen();
+}
+function deleteStoryNote(d,id){
+  if(!confirm('確定刪除這則筆記？')) return;
+  storyNotes[d]=(storyNotes[d]||[]).filter(n=>n.id!==id);
+  if(!storyNotes[d].length) delete storyNotes[d];
+  saveStoryStorage(); renderStoryTimeline(); renderAll();
+  refreshStoryClsIfOpen();
+}
+
+// ---- 備份 / 匯入 ----
+function exportStoryNotes(){
+  const payload={type:'nq-story-backup',version:2,exportedAt:new Date().toISOString(),notes:storyNotes,folders:storyFolders};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='NQ故事線備份_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function importStoryNotes(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const p=JSON.parse(r.result);
+      const notes=p.notes||{}; const folders=p.folders||[];
+      let added=0;
+      Object.keys(notes).forEach(d=>{
+        if(!Array.isArray(notes[d])) return;
+        if(!storyNotes[d]) storyNotes[d]=[];
+        const ids=new Set(storyNotes[d].map(n=>n.id));
+        notes[d].forEach(n=>{ if(n&&n.id&&!ids.has(n.id)){storyNotes[d].push(n);added++;} });
+        storyNotes[d].sort((a,b)=>a.idx-b.idx);
+      });
+      (folders||[]).forEach(f2=>{ if(f2&&!storyFolders.includes(f2)) storyFolders.push(f2); });
+      saveStoryStorage(); renderStoryTimeline(); renderAll();
+      alert('匯入完成：新增 '+added+' 則筆記');
+    }catch(e){ alert('匯入失敗：'+e.message); }
+    input.value='';
+  };
+  r.readAsText(f);
+}
+
+// hooks：切日 / 前進K棒 時同步右側面板
+const _origRenderAllForStory = renderAll;
+renderAll = function(){ _origRenderAllForStory(); updateStoryNowBar(); };
+const _origLoadDayForStory = loadDay;
+loadDay = function(d){ _origLoadDayForStory(d); renderStoryTimeline(); };
+
+
+// ============================================================
+// 🗂 故事線分類（分類單位＝時間點）＋ 📈 行情檢視（上下兩格局）
+// ============================================================
+let sclsFilter = '__all__'; // '__all__' | '__none__' | 'f:INDEX'
+let smktSelNote = null;     // {d,id}
+let selectedSmktTFs = ['5k','60k'];
+let smktZoomByTF = {'1k':1,'5k':1,'15k':1,'60k':1};
+
+function openStoryCls(){
+  document.getElementById('sclsOverlay').classList.add('show');
+  storyClsShowList();
+}
+function closeStoryCls(){
+  document.getElementById('sclsOverlay').classList.remove('show');
+}
+function refreshStoryClsIfOpen(){
+  const ov=document.getElementById('sclsOverlay');
+  if(!ov || !ov.classList.contains('show')) return;
+  if(document.getElementById('sclsPageMkt').classList.contains('show')) renderSmktList();
+  else renderStoryClsList();
+  renderStoryClsChips();
+}
+
+// ---- 分類（資料夾）管理 ----
+function addStoryFolder(){
+  const name=prompt('新分類名稱（例如：開盤急殺V轉）：');
+  if(name===null) return;
+  const nn=name.trim();
+  if(!nn) return;
+  if(storyFolders.includes(nn)){alert('已有同名分類');return;}
+  storyFolders.push(nn);
+  saveStoryStorage();
+  renderStoryClsChips(); renderStoryClsList();
+}
+function deleteStoryFolderByIdx(i){
+  const name=storyFolders[i];
+  if(name===undefined) return;
+  let cnt=0;
+  Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(n.folder===name)cnt++;}));
+  if(!confirm('確定刪除分類「'+name+'」？\n裡面的 '+cnt+' 個時間點會變回「未分類」（筆記本身不會被刪除）')) return;
+  Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(n.folder===name)n.folder='';}));
+  storyFolders.splice(i,1);
+  if(sclsFilter==='f:'+i) sclsFilter='__all__';
+  else if(sclsFilter.startsWith('f:')){
+    const fi=parseInt(sclsFilter.slice(2));
+    if(fi>i) sclsFilter='f:'+(fi-1);
+  }
+  saveStoryStorage();
+  renderStoryClsChips(); renderStoryClsList(); renderSmktList(); renderStoryTimeline();
+}
+function setSclsFilter(v){
+  sclsFilter=v;
+  renderStoryClsChips();
+  if(document.getElementById('sclsPageMkt').classList.contains('show')) renderSmktList();
+  else renderStoryClsList();
+}
+function renderStoryClsChips(){
+  const el=document.getElementById('sclsChips');
+  if(!el) return;
+  let h='';
+  h+='<div class="scls-chip'+(sclsFilter==='__all__'?' on':'')+'" onclick="setSclsFilter(\'__all__\')">全部</div>';
+  h+='<div class="scls-chip'+(sclsFilter==='__none__'?' on':'')+'" onclick="setSclsFilter(\'__none__\')">未分類</div>';
+  storyFolders.forEach((f,i)=>{
+    h+='<div class="scls-chip'+(sclsFilter==='f:'+i?' on':'')+'" onclick="setSclsFilter(\'f:'+i+'\')">📁 '+escapeHtml(f)
+      +'<span class="scls-chip-x" title="刪除此分類" onclick="event.stopPropagation();deleteStoryFolderByIdx('+i+')">✕</span></div>';
+  });
+  h+='<button class="scls-newfolder" onclick="addStoryFolder()">＋ 新增分類</button>';
+  el.innerHTML=h;
+}
+
+// ---- 篩選後的時間點清單 ----
+function getFilteredStoryNotes(){
+  const out=[];
+  Object.keys(storyNotes).sort().reverse().forEach(d=>{
+    storyNotes[d].slice().sort((a,b)=>a.idx-b.idx).forEach(n=>{
+      if(sclsFilter==='__none__' && n.folder) return;
+      if(sclsFilter.startsWith('f:')){
+        const f=storyFolders[parseInt(sclsFilter.slice(2))];
+        if(n.folder!==f) return;
+      }
+      out.push({d, n});
+    });
+  });
+  return out;
+}
+
+// ---- 分類清單頁 ----
+function storyClsShowList(){
+  document.getElementById('sclsPageList').classList.add('show');
+  document.getElementById('sclsPageMkt').classList.remove('show');
+  document.getElementById('sclsBack').style.display='none';
+  document.getElementById('sclsTitle').textContent='🗂 故事線分類';
+  renderStoryClsChips();
+  renderStoryClsList();
+}
+function folderSelHtml(d,n){
+  let o='<option value=""'+(!n.folder?' selected':'')+'>未分類</option>';
+  storyFolders.forEach((f,i)=>{
+    o+='<option value="'+i+'"'+(n.folder===f?' selected':'')+'>📁 '+escapeHtml(f)+'</option>';
+  });
+  o+='<option value="__new__">＋新增分類…</option>';
+  return '<select class="scls-folder-sel" onchange="setNoteFolder(\''+d+'\',\''+n.id+'\',this)" onclick="event.stopPropagation()">'+o+'</select>';
+}
+function setNoteFolder(d,id,sel){
+  const n=findStoryNote(d,id); if(!n) return;
+  const v=sel.value;
+  if(v==='__new__'){
+    const name=prompt('新分類名稱：');
+    if(name===null || !name.trim()){ sel.value = n.folder ? String(storyFolders.indexOf(n.folder)) : ''; return; }
+    const nn=name.trim();
+    if(!storyFolders.includes(nn)) storyFolders.push(nn);
+    n.folder=nn;
+  } else if(v===''){
+    n.folder='';
+  } else {
+    n.folder=storyFolders[parseInt(v)]||'';
+  }
+  saveStoryStorage();
+  renderStoryClsChips(); renderStoryClsList(); renderStoryTimeline();
+}
+function renderStoryClsList(){
+  const el=document.getElementById('sclsList');
+  if(!el) return;
+  const items=getFilteredStoryNotes();
+  if(!items.length){
+    el.innerHTML='<div class="treplay-empty">這個分類下還沒有時間點<br><span style="font-size:10px;">在主畫面右側的故事線記下想法，再回來把每個時間點分到不同分類</span></div>';
+    return;
+  }
+  let h='', lastD='';
+  items.forEach(({d,n})=>{
+    if(d!==lastD){ h+='<div class="scls-day-hdr">📅 '+d+'</div>'; lastD=d; }
+    h+=`
+    <div class="scls-note-row">
+      <div class="scls-note-main" onclick="storyClsShowMkt('${d}','${n.id}')" title="點一下看這個時間點的行情">
+        <div class="story-note-meta" style="margin-bottom:4px;">
+          <span class="story-note-time">${n.ts}</span>
+          ${tfBadgeHtml(n.tf)}
+          <span class="story-note-price">${(+n.price).toFixed(1)}</span>
+        </div>
+        <div class="story-note-text">${escapeHtml(n.text)}</div>
+      </div>
+      <div class="scls-note-side">
+        ${folderSelHtml(d,n)}
+        <button class="scls-chart-btn" onclick="storyClsShowMkt('${d}','${n.id}')">📈 行情</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+// ---- 📈 行情頁（左：故事線清單／右：上下兩個格局K棒） ----
+function storyClsShowMkt(d,id){
+  document.getElementById('sclsPageList').classList.remove('show');
+  document.getElementById('sclsPageMkt').classList.add('show');
+  document.getElementById('sclsBack').style.display='block';
+  document.getElementById('sclsTitle').textContent='📈 行情檢視';
+  smktSelNote={d,id};
+  renderSmktList();
+  buildSmktCanvases();
+  selectSmktNote(d,id);
+}
+function renderSmktList(){
+  const el=document.getElementById('smktList');
+  if(!el) return;
+  const items=getFilteredStoryNotes();
+  if(!items.length){ el.innerHTML='<div class="treplay-empty" style="padding:40px 8px;">此分類下沒有時間點</div>'; return; }
+  let h='', lastD='';
+  items.forEach(({d,n})=>{
+    if(d!==lastD){ h+='<div class="scls-day-hdr" style="font-size:10px;padding:6px 2px 4px;">📅 '+d+'</div>'; lastD=d; }
+    const sel = smktSelNote && smktSelNote.d===d && smktSelNote.id===n.id;
+    h+=`
+    <div class="smkt-item${sel?' sel':''}" id="smktItem_${n.id}" onclick="selectSmktNote('${d}','${n.id}')">
+      <div class="smkt-item-meta">
+        <span class="story-note-time">${n.ts}</span>
+        ${tfBadgeHtml(n.tf)}
+        <span class="story-note-price">${(+n.price).toFixed(1)}</span>
+      </div>
+      <div class="smkt-item-text">${escapeHtml(n.text)}</div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+function selectSmktNote(d,id){
+  const n=findStoryNote(d,id); if(!n) return;
+  smktSelNote={d,id};
+  document.querySelectorAll('.smkt-item').forEach(e=>e.classList.remove('sel'));
+  const item=document.getElementById('smktItem_'+id);
+  if(item){ item.classList.add('sel'); if(item.scrollIntoView) item.scrollIntoView({block:'nearest'}); }
+  document.getElementById('smktHdr').innerHTML='📅 '+d+' <span style="color:#facc15">'+n.ts+'</span> ・ '+(+n.price).toFixed(1);
+  const info=document.getElementById('smktNoteInfo');
+  info.style.display='block';
+  info.textContent=n.text;
+  renderSmktCharts();
+}
+function toggleStoryMktTF(tf){
+  if(selectedSmktTFs.includes(tf)){
+    if(selectedSmktTFs.length===1) return;
+    selectedSmktTFs=selectedSmktTFs.filter(x=>x!==tf);
+  } else {
+    if(selectedSmktTFs.length>=2) return; // 最多上下兩個格局
+    selectedSmktTFs.push(tf);
+  }
+  selectedSmktTFs.sort((a,b)=>TF_ORDER.indexOf(a)-TF_ORDER.indexOf(b));
+  document.querySelectorAll('#smktTFButtons .tresult-tab').forEach(el=>{
+    el.classList.toggle('on', selectedSmktTFs.includes(el.id.replace('stf-','')));
+  });
+  buildSmktCanvases();
+  renderSmktCharts();
+}
+function zoomSmktTF(tf,dir){
+  let z=smktZoomByTF[tf]||1;
+  z = dir===1 ? z*1.3 : z/1.3;
+  smktZoomByTF[tf]=Math.max(0.25,Math.min(z,4));
+  if(smktSelNote){
+    const n=findStoryNote(smktSelNote.d,smktSelNote.id);
+    if(n) renderSmktChartOnCanvas('smktCanvas_'+tf, smktSelNote.d, n, tf);
+  }
+}
+function buildSmktCanvases(){
+  const wrap=document.getElementById('smktCanvasMulti');
+  if(!wrap) return;
+  wrap.innerHTML = selectedSmktTFs.map(tf=>`
+    <div class="treplay-canvas-wrap">
+      <div class="treplay-canvas-hdr">
+        <span class="chdr-l">${TF_LABELS[tf]||tf.toUpperCase()}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="chdr-price" id="sprice_${tf}">
+            <span class="chdr-price-lbl">漲跌</span>
+            <span class="chdr-price-val" id="spriceVal_${tf}">—</span>
+          </span>
+          <div class="treplay-canvas-zoom">
+            <button class="zoom-btn" onclick="zoomSmktTF('${tf}',-1)" title="顯示更多K棒">小</button>
+            <button class="zoom-btn" onclick="zoomSmktTF('${tf}',1)" title="顯示較少K棒">大</button>
+          </div>
+        </div>
+      </div>
+      <div class="treplay-canvas-body" id="smktCanvasBody_${tf}">
+        <canvas id="smktCanvas_${tf}" style="width:100%;height:100%;"></canvas>
+        <canvas id="smktCanvas_${tf}_cross" class="cross"></canvas>
+      </div>
+    </div>`).join('');
+  selectedSmktTFs.forEach(tf=>attachSmktCrosshair(tf));
+}
+function renderSmktCharts(){
+  if(!smktSelNote) return;
+  const n=findStoryNote(smktSelNote.d,smktSelNote.id);
+  if(!n) return;
+  requestAnimationFrame(()=>{
+    selectedSmktTFs.forEach(tf=>renderSmktChartOnCanvas('smktCanvas_'+tf, smktSelNote.d, n, tf));
+  });
+}
+function renderSmktChartOnCanvas(canvasId, date, note, tf){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+  const dayData=DATA[date];
+  const paint=(msg)=>{
+    const ctx=canvas.getContext('2d');
+    canvas.width=canvas.clientWidth||300; canvas.height=canvas.clientHeight||150;
+    ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#666';ctx.font='12px sans-serif';ctx.textAlign='center';
+    ctx.fillText(msg, canvas.width/2, canvas.height/2);
+  };
+  if(!dayData){ paint('此日無資料'); return; }
+  const dayBars=dayData[tf];
+  if(!dayBars||!dayBars.length){ paint('此日無 '+tf.toUpperCase()+' 資料'); return; }
+
+  // 找到筆記時間點對應的K棒
+  let pos;
+  if(tf==='1k') pos=dayBars.findIndex(b=>b.idx===note.idx);
+  else {
+    pos=dayBars.findIndex(b=>b.idx<=note.idx && note.idx<=(b.idx_end||b.idx));
+    if(pos<0) pos=dayBars.findIndex(b=>b.idx>=note.idx);
+  }
+  if(pos<0) pos=dayBars.length-1;
+
+  const basePadBars = tf==='1k' ? 150 : (tf==='5k' ? 100 : (tf==='15k' ? 70 : 150));
+  const padBars=Math.max(2, Math.round(basePadBars/(smktZoomByTF[tf]||1)));
+  const startPos=Math.max(0,pos-padBars);
+  const endPos=Math.min(dayBars.length-1,pos+padBars);
+  const segment=dayBars.slice(startPos,endPos+1);
+
+  const wrapEl=canvas.parentElement;
+  const dpr=window.devicePixelRatio||2;
+  const W=wrapEl.clientWidth,H=wrapEl.clientHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
+
+  const P={t:16,r:60,b:24,l:4};
+  const cw=(W-P.l-P.r)/segment.length;
+  const allP=segment.flatMap(b=>[b.h,b.l]);
+  let lo=Math.min(...allP),hi=Math.max(...allP);
+  const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;
+  const rng=hi-lo||1;
+  const Y2=p=>P.t+(H-P.t-P.b)*(1-(p-lo)/rng);
+  const X2=i=>P.l+i*cw+cw/2;
+  canvas._layout={P,W,H,segment,X:X2,Y:Y2};
+
+  for(let i=0;i<=4;i++){
+    const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
+  }
+
+  segment.forEach((b,i)=>{
+    const x=X2(i),up=b.c>=b.o,col=up?UP:DN;
+    ctx.strokeStyle=col;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,Y2(b.h));ctx.lineTo(x,Y2(b.l));ctx.stroke();
+    const ty=Math.min(Y2(b.o),Y2(b.c)),bh=Math.max(Math.abs(Y2(b.c)-Y2(b.o)),1.2);
+    ctx.fillStyle=col;ctx.fillRect(x-Math.max(cw*0.35,2),ty,Math.max(cw*0.7,4),bh);
+  });
+
+  const rmk=['m5','m10','m20','m60'];
+  maConfig.forEach((ma,mi)=>{
+    if(!ma.on) return;
+    ctx.strokeStyle=ma.c;ctx.lineWidth=mi===3?1.8:1.2;ctx.beginPath();
+    let st=false;
+    segment.forEach((b,i)=>{
+      const v=b[rmk[mi]]??null;if(v==null)return;
+      st?(ctx.lineTo(X2(i),Y2(v))):(ctx.moveTo(X2(i),Y2(v)),st=true);
+    });
+    ctx.stroke();
+  });
+
+  // 📌 筆記時間點標記：金黃虛線 + 圖釘 + 價格點
+  const relPos=pos-startPos;
+  if(relPos>=0 && relPos<segment.length){
+    const b=segment[relPos], x=X2(relPos);
+    ctx.strokeStyle='rgba(250,204,21,0.55)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();
+    ctx.setLineDash([]);
+    const py=Y2(+note.price);
+    ctx.fillStyle='#facc15';
+    ctx.beginPath();ctx.arc(x,py,3.5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.stroke();
+    ctx.font='12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('📌',x,Y2(b.h)-6);
+    const lblW=44,lblX=Math.max(lblW/2+P.l,Math.min(W-P.r-lblW/2,x));
+    ctx.fillStyle='rgba(250,204,21,0.95)';ctx.fillRect(lblX-lblW/2,H-P.b,lblW,14);
+    ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';
+    ctx.fillText(note.ts,lblX,H-P.b+10);
+  }
+}
+function attachSmktCrosshair(tf){
+  const bodyEl=document.getElementById('smktCanvasBody_'+tf);
+  if(!bodyEl) return;
+  bodyEl.addEventListener('mousemove',e=>{
+    const r=bodyEl.getBoundingClientRect();
+    handleSmktCross(tf,(e.clientX-r.left)/r.width);
+  });
+  bodyEl.addEventListener('mouseleave',()=>clearAllSmktCross());
+  bodyEl.addEventListener('touchmove',e=>{
+    if(e.touches.length!==1) return;
+    e.preventDefault();
+    const t=e.touches[0],r=bodyEl.getBoundingClientRect();
+    handleSmktCross(tf,(t.clientX-r.left)/r.width);
+  },{passive:false});
+  bodyEl.addEventListener('touchend',()=>clearAllSmktCross());
+}
+function handleSmktCross(tf,xFrac){
+  const main=document.getElementById('smktCanvas_'+tf);
+  if(!main||!main._layout) return;
+  const {W,segment,X}=main._layout;
+  const mx=xFrac*W;
+  let bi=0,bd=1e9;
+  segment.forEach((_,i)=>{const dd=Math.abs(X(i)-mx);if(dd<bd){bd=dd;bi=i;}});
+  const bar=segment[bi];
+  if(!bar) return;
+  syncSmktCrossFromIdx(bar.idx);
+}
+function syncSmktCrossFromIdx(idx){
+  selectedSmktTFs.forEach(tf=>{
+    const main=document.getElementById('smktCanvas_'+tf);
+    if(!main||!main._layout) return;
+    const {segment}=main._layout;
+    if(!segment.length) return;
+    let best=segment.length-1;
+    for(let i=0;i<segment.length;i++){
+      const b=segment[i], bEnd=b.idx_end||b.idx;
+      if(b.idx<=idx && idx<=bEnd){best=i;break;}
+      if(b.idx>idx){best=Math.max(0,i-1);break;}
+    }
+    drawSmktCross(tf,best);
+    updateSmktChdrPrice(tf,segment[best]);
+  });
+}
+function drawSmktCross(tf,bi){
+  const main=document.getElementById('smktCanvas_'+tf);
+  const cv=document.getElementById('smktCanvas_'+tf+'_cross');
+  if(!cv||!main||!main._layout) return;
+  const L=main._layout,dpr=window.devicePixelRatio||2;
+  cv.width=main.width;cv.height=main.height;cv.style.width=main.style.width;cv.style.height=main.style.height;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,L.W,L.H);
+  const {P,W,H,segment,X,Y}=L;
+  if(bi<0||bi>=segment.length) return;
+  const bar=segment[bi],sx=X(bi),closeY=Y(bar.c);
+  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
+  ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
+  ctx.fillText(bar.c.toFixed(1),W-P.r+4,closeY+4);
+  const tlW=36,tlH=14,tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx));
+  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
+  ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+  ctx.fillText(bar.ts,tlX,H-P.b+10);
+}
+function clearAllSmktCross(){
+  selectedSmktTFs.forEach(tf=>{
+    const cv=document.getElementById('smktCanvas_'+tf+'_cross');
+    if(cv) cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+    const main=document.getElementById('smktCanvas_'+tf);
+    if(main&&main._layout&&main._layout.segment.length){
+      updateSmktChdrPrice(tf,main._layout.segment[main._layout.segment.length-1]);
+    }
+  });
+}
+function updateSmktChdrPrice(tf,bar){
+  const priceEl=document.getElementById('sprice_'+tf);
+  const priceValEl=document.getElementById('spriceVal_'+tf);
+  if(!priceEl||!priceValEl||!bar) return;
+  const chg=bar.c-bar.o,up=chg>=0;
+  priceEl.className='chdr-price '+(up?'up':'dn');
+  priceValEl.textContent=(up?'+':'')+chg.toFixed(2);
+  priceValEl.style.color=up?'var(--up)':'var(--dn)';
+}
+
 </script>
 </body>
 </html>
