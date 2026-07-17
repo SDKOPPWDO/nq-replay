@@ -1,0 +1,6 @@
+apiKey: "AIzaSyC_i3DnF-FgRSTkhz19KHNM69wOlVbWViA",
+  authDomain: "nqreplay-f370b.firebaseapp.com",
+  projectId: "nqreplay-f370b",
+  storageBucket: "nqreplay-f370b.firebasestorage.app",
+  messagingSenderId: "392420456353",
+  appId: "1:392420456353:web:f507104ab6b3931e3f7de0"
