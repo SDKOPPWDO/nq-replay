@@ -390,27 +390,6 @@ canvas.cross{pointer-events:none;}
 .smkt-detail{min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;min-height:0;}
 .smkt-note-info{background:var(--bg3);border-left:3px solid #facc15;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:var(--t1);line-height:1.5;flex-shrink:0;white-space:pre-wrap;max-height:72px;overflow-y:auto;}
 
-
-/* ===== 跨裝置同步 ===== */
-.story-sync-status{font-size:9px;color:var(--t3);text-align:center;padding:3px 6px 6px;flex-shrink:0;cursor:pointer;}
-.story-sync-status.err{color:#f87171;}
-.story-sync-status.ok{color:#4ade80;}
-.sync-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;display:none;align-items:center;justify-content:center;padding:16px;}
-.sync-overlay.show{display:flex;}
-.sync-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--b2);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 16px 60px rgba(0,0,0,.8);max-height:90dvh;overflow-y:auto;}
-.sync-title{font-size:15px;font-weight:800;color:#fff;}
-.sync-desc{font-size:11px;color:var(--t2);line-height:1.6;}
-.sync-steps{font-size:10.5px;color:var(--t3);line-height:1.7;background:var(--bg3);border-radius:8px;padding:8px 10px;}
-.sync-lbl{font-size:10px;color:var(--t3);margin-bottom:-6px;}
-.sync-inp{width:100%;height:34px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;font-size:12px;padding:0 10px;}
-.sync-inp:focus{outline:none;border-color:#38bdf8;}
-.sync-warn{font-size:10px;color:#fbbf24;line-height:1.6;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:7px 10px;}
-.sync-btns{display:flex;gap:8px;margin-top:4px;}
-.sync-btn{flex:1;padding:9px 4px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
-.sync-btn.pri{background:#2563eb;color:#fff;}
-.sync-btn.sec{background:var(--bg3);border:1px solid var(--b2);color:var(--t2);}
-.sync-btn.danger{background:transparent;border:1px solid rgba(239,68,68,.5);color:#f87171;}
-
 </style>
 </head>
 <body>
@@ -511,11 +490,8 @@ canvas.cross{pointer-events:none;}
       <div class="story-backup-bar">
         <button class="story-backup-btn" onclick="exportStoryNotes()">⬇ 備份</button>
         <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()">⬆ 匯入</button>
-        <button class="story-backup-btn" onclick="syncStoryNow(false)" title="立即與雲端同步" style="color:#7dd3fc;">☁ 同步</button>
-        <button class="story-backup-btn" onclick="openSyncSettings()" title="登入雲端帳號" style="flex:0 0 30px;">👤</button>
         <input type="file" id="storyImportFile" accept=".json" style="display:none;" onchange="importStoryNotes(this)">
       </div>
-      <div class="story-sync-status" id="storySyncStatus" onclick="syncStoryNow(false)">—</div>
     </div>
   </div>
 </div>
@@ -578,65 +554,6 @@ canvas.cross{pointer-events:none;}
         </div>
       </div>
     </div>
-  </div>
-</div>
-<div class="sync-overlay" id="syncOverlay">
-  <div class="sync-card">
-    <div class="sync-title">👤 雲端帳號（跨裝置儲存）</div>
-
-    <div id="syncViewLoading" style="display:none;">
-      <div class="sync-desc">檢查雲端設定中…</div>
-    </div>
-
-    <div id="syncViewLogin" style="display:none;flex-direction:column;gap:10px;">
-      <div class="sync-desc">輸入你自己設定的帳號密碼，登入後：你打的筆記會自動存到雲端，換到電腦或平板登入同一組帳密，看到的就是同一份內容。每個人的帳號各自獨立，別人看不到你的筆記。</div>
-      <div class="sync-lbl">帳號（英文/數字，自己取一個）</div>
-      <input class="sync-inp" id="syncAccInp" placeholder="例：trader01" autocomplete="off" autocapitalize="off">
-      <div class="sync-lbl">密碼（至少6碼）</div>
-      <input class="sync-inp" id="syncPwdInp" type="password" placeholder="••••••" autocomplete="off">
-      <div class="sync-btns">
-        <button class="sync-btn sec" onclick="closeSyncSettings()">取消</button>
-        <button class="sync-btn sec" onclick="doSyncLogin(true)">📝 註冊新帳號</button>
-        <button class="sync-btn pri" onclick="doSyncLogin(false)">🔑 登入</button>
-      </div>
-      <div class="sync-desc" style="font-size:10px;color:var(--t3);">第一次使用先按「註冊新帳號」；之後在任何裝置都用「登入」。密碼忘了沒辦法找回，請記好。</div>
-    </div>
-
-    <div id="syncViewUser" style="display:none;flex-direction:column;gap:10px;">
-      <div class="sync-desc">目前登入：<b id="syncLoggedName" style="color:#7dd3fc;">—</b><br>筆記會在你儲存後幾秒自動上傳；切換裝置打開App時自動下載合併。</div>
-      <div class="sync-btns">
-        <button class="sync-btn sec" onclick="closeSyncSettings()">關閉</button>
-        <button class="sync-btn danger" onclick="doSyncLogout()">登出</button>
-        <button class="sync-btn pri" onclick="closeSyncSettings();syncStoryNow(false)">☁ 立即同步</button>
-      </div>
-    </div>
-
-    <div id="syncViewSetup" style="display:none;flex-direction:column;gap:10px;">
-      <div class="sync-desc">雲端還沒設定。這部分<b>只有App的主人要做一次</b>（用免費的 Google Firebase 當雲端），設定完之後，所有拿到網址的人都可以各自註冊帳密、各自儲存，互相看不到彼此的內容。</div>
-      <div class="sync-steps">
-        1️⃣ 開 <b>console.firebase.google.com</b> → 建立專案（Analytics 可關閉）<br>
-        2️⃣ 左側 <b>Build → Authentication</b> → 開始使用 → Sign-in method 啟用「<b>電子郵件/密碼</b>」<br>
-        3️⃣ 左側 <b>Build → Firestore Database</b> → 建立資料庫（正式版模式）→ 上方「<b>規則 Rules</b>」分頁，全部換成下面這段後按「發布」：
-      </div>
-      <textarea class="sync-inp" readonly style="height:120px;font-family:monospace;font-size:10px;padding:8px;resize:none;" onclick="this.select()">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /nq_users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-  }
-}</textarea>
-      <div class="sync-steps">
-        4️⃣ 左上齒輪 → <b>專案設定</b> → 往下「你的應用程式」→ 點 <b>&lt;/&gt;（網頁）</b> 註冊App → 複製畫面上 <b>firebaseConfig = { ... }</b> 大括號那一段<br>
-        5️⃣ 把它存成檔名 <b>sync_config.json</b>，上傳到你放 data.bin 的 GitHub 倉庫（同一層）。內容直接貼那段 {apiKey: "..."} 就可以，格式不用改
-      </div>
-      <div class="sync-warn">⚠ firebaseConfig 是公開資訊放公開倉庫沒關係（安全性由步驟3的規則把關），但規則一定要照貼，別人才讀不到你的筆記。</div>
-      <div class="sync-btns">
-        <button class="sync-btn sec" onclick="closeSyncSettings()">關閉</button>
-        <button class="sync-btn pri" onclick="recheckSyncConfig()">我上傳好了，重新檢查</button>
-      </div>
-    </div>
-
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
@@ -3491,37 +3408,17 @@ function escapeHtml(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'
 let storyNotes = {};   // {date:[{id,idx,ts,price,tf,text,folder}]}  分類單位＝單一時間點
 let storyFolders = [];
 let storyScope = 'day';
-let storyNoteTomb = {};   // {noteId: 刪除時間ms}（讓「刪除」也能同步到其他裝置）
-let storyFolderMeta = {}; // {分類名: 建立時間ms}
-let storyFolderTomb = {}; // {分類名: 刪除時間ms}
 (function loadStoryStorage(){
-  const rd=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||d); return v&&typeof v==='object'?v:JSON.parse(d); }catch(e){ return JSON.parse(d); } };
-  storyNotes = rd('nqStoryNotes','{}');
-  storyFolders = rd('nqStoryFolders','[]');
-  storyNoteTomb = rd('nqStoryNoteTomb','{}');
-  storyFolderMeta = rd('nqStoryFolderMeta','{}');
-  storyFolderTomb = rd('nqStoryFolderTomb','{}');
-  if(Array.isArray(storyNotes)) storyNotes={};
+  try{ storyNotes = JSON.parse(localStorage.getItem('nqStoryNotes')||'{}'); }catch(e){ storyNotes={}; }
+  try{ storyFolders = JSON.parse(localStorage.getItem('nqStoryFolders')||'[]'); }catch(e){ storyFolders=[]; }
+  if(typeof storyNotes!=='object'||Array.isArray(storyNotes)||!storyNotes) storyNotes={};
   if(!Array.isArray(storyFolders)) storyFolders=[];
-  // 舊資料遷移：補 updatedAt / folderMeta
-  Object.keys(storyNotes).forEach(d=>{
-    if(!Array.isArray(storyNotes[d])){ delete storyNotes[d]; return; }
-    storyNotes[d].forEach(n=>{ if(!n.updatedAt) n.updatedAt=1; });
-  });
-  storyFolders.forEach(f=>{ if(!storyFolderMeta[f]) storyFolderMeta[f]=1; });
 })();
-function _persistStory(){
+function saveStoryStorage(){
   try{
     localStorage.setItem('nqStoryNotes', JSON.stringify(storyNotes));
     localStorage.setItem('nqStoryFolders', JSON.stringify(storyFolders));
-    localStorage.setItem('nqStoryNoteTomb', JSON.stringify(storyNoteTomb));
-    localStorage.setItem('nqStoryFolderMeta', JSON.stringify(storyFolderMeta));
-    localStorage.setItem('nqStoryFolderTomb', JSON.stringify(storyFolderTomb));
   }catch(e){ console.error('儲存失敗', e); }
-}
-function saveStoryStorage(){
-  _persistStory();
-  scheduleStorySync(); // 有設定雲端同步時，改動後幾秒自動上傳
 }
 
 function toggleStoryPanel(){
@@ -3557,7 +3454,7 @@ function saveStoryNote(){
   if(!storyNotes[currentDay]) storyNotes[currentDay]=[];
   storyNotes[currentDay].push({
     id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    idx: b.idx, ts: b.ts, price: b.c, tf, text, folder:'', updatedAt: Date.now()
+    idx: b.idx, ts: b.ts, price: b.c, tf, text, folder:''
   });
   storyNotes[currentDay].sort((a,b2)=>a.idx-b2.idx);
   saveStoryStorage();
@@ -3623,12 +3520,11 @@ function editStoryNote(d,id){
   const t=prompt('編輯筆記內容：',n.text);
   if(t===null) return;
   const tt=t.trim(); if(!tt) return;
-  n.text=tt; n.updatedAt=Date.now(); saveStoryStorage(); renderStoryTimeline();
+  n.text=tt; saveStoryStorage(); renderStoryTimeline();
   refreshStoryClsIfOpen();
 }
 function deleteStoryNote(d,id){
   if(!confirm('確定刪除這則筆記？')) return;
-  storyNoteTomb[id]=Date.now();
   storyNotes[d]=(storyNotes[d]||[]).filter(n=>n.id!==id);
   if(!storyNotes[d].length) delete storyNotes[d];
   saveStoryStorage(); renderStoryTimeline(); renderAll();
@@ -3637,7 +3533,7 @@ function deleteStoryNote(d,id){
 
 // ---- 備份 / 匯入 ----
 function exportStoryNotes(){
-  const payload={type:'nq-story-backup',version:3,exportedAt:new Date().toISOString(),notes:storyNotes,folders:storyFolders,folderMeta:storyFolderMeta,folderTomb:storyFolderTomb,noteTomb:storyNoteTomb};
+  const payload={type:'nq-story-backup',version:2,exportedAt:new Date().toISOString(),notes:storyNotes,folders:storyFolders};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -3650,11 +3546,18 @@ function importStoryNotes(input){
   r.onload=()=>{
     try{
       const p=JSON.parse(r.result);
-      const before=Object.values(storyNotes).reduce((a,arr)=>a+arr.length,0);
-      mergeStoryStates(p);
-      const after=Object.values(storyNotes).reduce((a,arr)=>a+arr.length,0);
-      saveStoryStorage(); renderStoryTimeline(); renderAll(); refreshStoryClsIfOpen();
-      alert('匯入完成：新增 '+Math.max(0,after-before)+' 則筆記');
+      const notes=p.notes||{}; const folders=p.folders||[];
+      let added=0;
+      Object.keys(notes).forEach(d=>{
+        if(!Array.isArray(notes[d])) return;
+        if(!storyNotes[d]) storyNotes[d]=[];
+        const ids=new Set(storyNotes[d].map(n=>n.id));
+        notes[d].forEach(n=>{ if(n&&n.id&&!ids.has(n.id)){storyNotes[d].push(n);added++;} });
+        storyNotes[d].sort((a,b)=>a.idx-b.idx);
+      });
+      (folders||[]).forEach(f2=>{ if(f2&&!storyFolders.includes(f2)) storyFolders.push(f2); });
+      saveStoryStorage(); renderStoryTimeline(); renderAll();
+      alert('匯入完成：新增 '+added+' 則筆記');
     }catch(e){ alert('匯入失敗：'+e.message); }
     input.value='';
   };
@@ -3699,7 +3602,6 @@ function addStoryFolder(){
   if(!nn) return;
   if(storyFolders.includes(nn)){alert('已有同名分類');return;}
   storyFolders.push(nn);
-  storyFolderMeta[nn]=Date.now();
   saveStoryStorage();
   renderStoryClsChips(); renderStoryClsList();
 }
@@ -3709,9 +3611,7 @@ function deleteStoryFolderByIdx(i){
   let cnt=0;
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(n.folder===name)cnt++;}));
   if(!confirm('確定刪除分類「'+name+'」？\n裡面的 '+cnt+' 個時間點會變回「未分類」（筆記本身不會被刪除）')) return;
-  const _t=Date.now();
-  Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(n.folder===name){n.folder='';n.updatedAt=_t;}}));
-  storyFolderTomb[name]=_t;
+  Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(n.folder===name)n.folder='';}));
   storyFolders.splice(i,1);
   if(sclsFilter==='f:'+i) sclsFilter='__all__';
   else if(sclsFilter.startsWith('f:')){
@@ -3782,14 +3682,12 @@ function setNoteFolder(d,id,sel){
     if(name===null || !name.trim()){ sel.value = n.folder ? String(storyFolders.indexOf(n.folder)) : ''; return; }
     const nn=name.trim();
     if(!storyFolders.includes(nn)) storyFolders.push(nn);
-    storyFolderMeta[nn]=Date.now();
     n.folder=nn;
   } else if(v===''){
     n.folder='';
   } else {
     n.folder=storyFolders[parseInt(v)]||'';
   }
-  n.updatedAt=Date.now();
   saveStoryStorage();
   renderStoryClsChips(); renderStoryClsList(); renderStoryTimeline();
 }
@@ -4104,273 +4002,6 @@ function updateSmktChdrPrice(tf,bar){
   priceValEl.textContent=(up?'+':'')+chg.toFixed(2);
   priceValEl.style.color=up?'var(--up)':'var(--dn)';
 }
-
-
-// ============================================================
-// ☁ 雲端帳號同步（Firebase：輸入自己設定的帳密 → 筆記跨裝置儲存）
-// 每個帳號一份獨立資料，多人共用同一個網址也互相看不到彼此內容。
-// 合併規則：每則筆記比「最後修改時間」新的贏；刪除用墓碑記錄，
-// 所以在平板刪掉的筆記，電腦同步後也會消失，不會死而復生。
-// ============================================================
-const SYNC_CONFIG_URL = DATA_REPO_BASE + 'sync_config.json';
-let fbConfig=null, fbApp=null, fbAuth=null, fbDb=null, fbUser=null;
-let fbInitPromise=null;
-let syncBusy=false, syncTimer=null, syncQueued=false;
-
-function scheduleStorySync(){
-  if(!fbUser) return;
-  clearTimeout(syncTimer);
-  syncTimer=setTimeout(()=>syncStoryNow(true), 4000);
-}
-function setSyncStatus(msg, cls){
-  const el=document.getElementById('storySyncStatus');
-  if(!el) return;
-  el.textContent=msg;
-  el.className='story-sync-status'+(cls?' '+cls:'');
-}
-function refreshSyncStatusIdle(){
-  if(!fbConfig){ setSyncStatus('☁ 雲端尚未設定（點 👤 看教學）'); return; }
-  if(!fbUser){ setSyncStatus('👤 尚未登入（點 👤 登入後自動跨裝置儲存）'); return; }
-  const acc=localStorage.getItem('nqAccName')||'';
-  const last=parseInt(localStorage.getItem('nqLastSync')||'0');
-  setSyncStatus(last
-    ? '☁ '+acc+' ・ 上次同步 '+new Date(last).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
-    : '☁ 已登入 '+acc+'，點「☁ 同步」', 'ok');
-}
-
-// ---- 合併：本機狀態 + 另一份狀態（雲端或匯入的備份檔）----
-function _flattenStoryNotes(byDate){
-  const out={};
-  Object.keys(byDate||{}).forEach(d=>{
-    (byDate[d]||[]).forEach(n=>{
-      if(!n||!n.id) return;
-      out[n.id]={...n, date:d, updatedAt:n.updatedAt||1};
-    });
-  });
-  return out;
-}
-function mergeStoryStates(other){
-  other = other||{};
-  const lN=_flattenStoryNotes(storyNotes), rN=_flattenStoryNotes(other.notes);
-  const nTomb={...(other.noteTomb||{})};
-  Object.keys(storyNoteTomb).forEach(id=>{ nTomb[id]=Math.max(nTomb[id]||0, storyNoteTomb[id]); });
-  const fMeta={...(other.folderMeta||{})};
-  Object.keys(storyFolderMeta).forEach(f=>{ fMeta[f]=Math.max(fMeta[f]||0, storyFolderMeta[f]); });
-  (other.folders||[]).forEach(f=>{ if(f && !fMeta[f]) fMeta[f]=1; }); // 舊版備份檔相容
-  const fTomb={...(other.folderTomb||{})};
-  Object.keys(storyFolderTomb).forEach(f=>{ fTomb[f]=Math.max(fTomb[f]||0, storyFolderTomb[f]); });
-
-  const merged={};
-  new Set([...Object.keys(lN), ...Object.keys(rN)]).forEach(id=>{
-    const a=lN[id], b=rN[id];
-    const pick = (a&&b) ? ((b.updatedAt>a.updatedAt)?b:a) : (a||b);
-    if(nTomb[id] && nTomb[id] >= pick.updatedAt) return; // 已刪除
-    merged[id]=pick;
-  });
-  const byDate={};
-  Object.values(merged).forEach(n=>{
-    const {date, ...rest}=n;
-    if(!byDate[date]) byDate[date]=[];
-    byDate[date].push(rest);
-  });
-  Object.keys(byDate).forEach(d=>byDate[d].sort((a,b)=>a.idx-b.idx));
-
-  storyNotes=byDate;
-  storyNoteTomb=nTomb;
-  storyFolderMeta=fMeta;
-  storyFolderTomb=fTomb;
-  storyFolders=Object.keys(fMeta)
-    .filter(f=>(fMeta[f]||0) > (fTomb[f]||0))
-    .sort((a,b)=>(fMeta[a]||0)-(fMeta[b]||0));
-}
-function buildSyncPayload(){
-  return {type:'nq-story-sync',version:3,updatedAt:Date.now(),
-    notes:storyNotes,folders:storyFolders,
-    folderMeta:storyFolderMeta,folderTomb:storyFolderTomb,noteTomb:storyNoteTomb};
-}
-function _syncStatesEqual(a,b){
-  const norm=s=>JSON.stringify({n:s.notes||{},fm:s.folderMeta||{},ft:s.folderTomb||{},nt:s.noteTomb||{}});
-  return norm(a)===norm(b);
-}
-
-// ---- 雲端初始化 ----
-function _parseLooseConfig(txt){
-  try{ return JSON.parse(txt); }catch(e){}
-  const m=String(txt).match(/\{[\s\S]*\}/);
-  if(!m) return null;
-  try{ return (new Function('return ('+m[0]+')'))(); }catch(e){ return null; }
-}
-function _loadScriptOnce(src){
-  return new Promise((res,rej)=>{
-    const s=document.createElement('script');
-    s.src=src; s.onload=res; s.onerror=()=>rej(new Error('雲端元件載入失敗，請檢查網路'));
-    document.head.appendChild(s);
-  });
-}
-function initCloud(){
-  if(fbInitPromise) return fbInitPromise;
-  fbInitPromise=(async()=>{
-    try{
-      const r=await fetch(SYNC_CONFIG_URL+'?t='+Date.now(), {cache:'no-store'});
-      if(r && r.ok) fbConfig=_parseLooseConfig(await r.text());
-    }catch(e){ fbConfig=null; }
-    if(!fbConfig || !fbConfig.apiKey){ fbConfig=null; refreshSyncStatusIdle(); return false; }
-    if(typeof firebase==='undefined'){
-      const V='10.12.2';
-      await _loadScriptOnce('https://www.gstatic.com/firebasejs/'+V+'/firebase-app-compat.js');
-      await _loadScriptOnce('https://www.gstatic.com/firebasejs/'+V+'/firebase-auth-compat.js');
-      await _loadScriptOnce('https://www.gstatic.com/firebasejs/'+V+'/firebase-firestore-compat.js');
-    }
-    if(!fbApp){
-      fbApp=firebase.initializeApp(fbConfig);
-      fbAuth=firebase.auth();
-      fbDb=firebase.firestore();
-      await new Promise(res=>{ const un=fbAuth.onAuthStateChanged(u=>{ fbUser=u; un(); res(); }); });
-      fbAuth.onAuthStateChanged(u=>{ fbUser=u; refreshSyncStatusIdle(); });
-    }
-    if(fbUser){ _handleUidSwitch(); syncStoryNow(true); }
-    refreshSyncStatusIdle();
-    return true;
-  })();
-  return fbInitPromise;
-}
-function recheckSyncConfig(){
-  fbInitPromise=null;
-  openSyncSettings();
-}
-function _handleUidSwitch(){
-  if(!fbUser) return;
-  const last=localStorage.getItem('nqLastUid');
-  if(last && last!==fbUser.uid){
-    const hasLocal=Object.keys(storyNotes).length>0 || storyFolders.length>0;
-    if(hasLocal){
-      const keep=confirm('偵測到用「不同帳號」登入。\n\n要把目前這台裝置上的本機筆記「併入」這個帳號嗎？\n\n確定＝併入（本機筆記加進這個帳號）\n取消＝清空本機筆記，改用這個帳號雲端上的內容');
-      if(!keep){
-        storyNotes={};storyFolders=[];storyNoteTomb={};storyFolderMeta={};storyFolderTomb={};
-        _persistStory(); renderStoryTimeline(); renderAll(); refreshStoryClsIfOpen();
-      }
-    }
-  }
-  localStorage.setItem('nqLastUid', fbUser.uid);
-}
-
-// ---- 登入 / 註冊 / 登出 ----
-function _accToEmail(a){ return a.toLowerCase()+'@nq-sync.app'; }
-function _mapAuthErr(e){
-  const c=(e&&e.code)||'';
-  if(c.includes('user-not-found')) return '帳號不存在。第一次使用請按「註冊新帳號」';
-  if(c.includes('wrong-password')||c.includes('invalid-credential')||c.includes('invalid-login')) return '帳號或密碼錯誤（或帳號還沒註冊）';
-  if(c.includes('email-already-in-use')) return '這個帳號名已被別人註冊，請直接「登入」，或換一個帳號名';
-  if(c.includes('weak-password')) return '密碼太簡單，至少要6碼';
-  if(c.includes('too-many-requests')) return '嘗試太多次被暫時鎖定，請稍後再試';
-  if(c.includes('network')) return '網路連線失敗，請檢查網路';
-  if(c.includes('operation-not-allowed')) return '雲端還沒啟用「電子郵件/密碼」登入（設定教學步驟2）';
-  return '失敗：'+(e&&e.message||c||e);
-}
-async function doSyncLogin(register){
-  const a=document.getElementById('syncAccInp').value.trim();
-  const p=document.getElementById('syncPwdInp').value;
-  if(!/^[a-z0-9_.\-]{2,30}$/i.test(a)){ alert('帳號請用 2~30 個英文字母或數字（可含 _ - .），不能有空格或中文'); return; }
-  if((p||'').length<6){ alert('密碼至少要6碼'); return; }
-  try{
-    setSyncStatus('☁ 登入中…');
-    if(register) await fbAuth.createUserWithEmailAndPassword(_accToEmail(a), p);
-    else await fbAuth.signInWithEmailAndPassword(_accToEmail(a), p);
-    fbUser=fbAuth.currentUser;
-    localStorage.setItem('nqAccName', a);
-    _handleUidSwitch();
-    closeSyncSettings();
-    await syncStoryNow(false);
-  }catch(e){
-    console.error('[登入失敗]', e);
-    alert(_mapAuthErr(e));
-    refreshSyncStatusIdle();
-  }
-}
-async function doSyncLogout(){
-  try{ await fbAuth.signOut(); }catch(e){}
-  fbUser=null;
-  clearTimeout(syncTimer);
-  refreshSyncStatusIdle();
-  openSyncSettings();
-}
-
-// ---- 同步本體（讀雲端 → 合併 → 寫回，全部在交易中完成避免互蓋）----
-async function syncStoryNow(silent){
-  const ok=await initCloud();
-  if(!ok){ if(!silent) openSyncSettings(); return; }
-  if(!fbUser){ if(!silent) openSyncSettings(); else refreshSyncStatusIdle(); return; }
-  if(syncBusy){ syncQueued=true; return; }
-  syncBusy=true; clearTimeout(syncTimer);
-  setSyncStatus('☁ 同步中…');
-  try{
-    const ref=fbDb.collection('nq_users').doc(fbUser.uid);
-    await fbDb.runTransaction(async tx=>{
-      const snap=await tx.get(ref);
-      let remote=null;
-      if(snap.exists){
-        try{ remote=JSON.parse(snap.data().payload||'null'); }catch(e){ remote=null; }
-      }
-      if(remote) mergeStoryStates(remote);
-      const payload=buildSyncPayload();
-      if(!remote || !_syncStatesEqual(remote, payload)){
-        tx.set(ref, {payload: JSON.stringify(payload), updatedAt: Date.now(), acc: localStorage.getItem('nqAccName')||''});
-      }
-    });
-    _persistStory();
-    renderStoryTimeline(); renderAll(); refreshStoryClsIfOpen();
-    localStorage.setItem('nqLastSync', String(Date.now()));
-    setSyncStatus('☁ 已同步 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})+'（'+(localStorage.getItem('nqAccName')||'')+'）','ok');
-  }catch(e){
-    console.error('[同步失敗]', e);
-    const msg=(e&&e.code==='permission-denied')
-      ? '雲端權限被拒：請確認 Firestore 規則已照教學步驟3貼上並「發布」'
-      : (e&&e.message||String(e));
-    setSyncStatus('⚠ 同步失敗（點我重試）','err');
-    if(!silent) alert('同步失敗：'+msg);
-  }
-  syncBusy=false;
-  if(syncQueued){ syncQueued=false; scheduleStorySync(); }
-}
-
-// ---- 設定/登入視窗 ----
-function _showSyncView(name){
-  ['Loading','Login','User','Setup'].forEach(v=>{
-    const el=document.getElementById('syncView'+v);
-    if(el) el.style.display = (v===name) ? 'flex' : 'none';
-  });
-  const l=document.getElementById('syncViewLoading');
-  if(l && name==='Loading') l.style.display='block';
-}
-async function openSyncSettings(){
-  document.getElementById('syncOverlay').classList.add('show');
-  _showSyncView('Loading');
-  await initCloud();
-  if(!fbConfig){ _showSyncView('Setup'); return; }
-  if(!fbUser){
-    document.getElementById('syncAccInp').value=localStorage.getItem('nqAccName')||'';
-    document.getElementById('syncPwdInp').value='';
-    _showSyncView('Login');
-    return;
-  }
-  document.getElementById('syncLoggedName').textContent=localStorage.getItem('nqAccName')||(fbUser.email||'').split('@')[0];
-  _showSyncView('User');
-}
-function closeSyncSettings(){ document.getElementById('syncOverlay').classList.remove('show'); }
-
-// ---- 自動時機：開App同步一次；切回App（電腦↔平板互換）也同步 ----
-refreshSyncStatusIdle();
-setTimeout(()=>{ initCloud(); }, 900);
-document.addEventListener('visibilitychange', ()=>{
-  if(!fbUser) return;
-  if(document.visibilityState==='visible'){
-    const last=parseInt(localStorage.getItem('nqLastSync')||'0');
-    if(Date.now()-last > 20000) syncStoryNow(true); // 切回來且超過20秒沒同步 → 拉最新
-  } else {
-    clearTimeout(syncTimer);
-    syncStoryNow(true); // 離開前把最後的改動推上去
-  }
-});
 
 </script>
 </body>
