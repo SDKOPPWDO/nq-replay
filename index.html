@@ -971,7 +971,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
     });
   }
 
-  // 📌 故事線筆記圖釘（有筆記的K棒上方顯示圖釘）
+  // ✨ 故事線筆記（有筆記的K棒發亮）
   if(typeof storyNotes!=='undefined' && storyNotes[currentDay] && storyNotes[currentDay].length){
     const stf = id.replace('cv_','');
     const drawn = new Set();
@@ -981,9 +981,23 @@ function drawChart(id,bars,cursor,timeStep,pan){
       else vi=view.findIndex(b=>b.idx<=n.idx && n.idx<=(b.idx_end||b.idx));
       if(vi<0 || drawn.has(vi)) return;
       drawn.add(vi);
-      const bar=view[vi], x=X(vi), py=Y(bar.h)-6;
-      ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#facc15';
-      ctx.fillText('📌',x,py);
+      const bar=view[vi], x=X(vi);
+      const up=bar.c>=bar.o, col=up?UP:DN;
+      const t=Math.min(Y(bar.o),Y(bar.c)), bh=Math.max(Math.abs(Y(bar.c)-Y(bar.o)),1.5);
+      ctx.save();
+      // 金色光暈：重繪這根K棒並加上發光效果（畫兩次讓光暈更明顯）
+      ctx.shadowColor='#facc15';
+      ctx.shadowBlur=14;
+      for(let g=0; g<2; g++){
+        ctx.strokeStyle=col;ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(x,Y(bar.h));ctx.lineTo(x,Y(bar.l));ctx.stroke();
+        ctx.fillStyle=col;ctx.fillRect(x-CW2/2,t,CW2,bh);
+      }
+      // 外框描一圈金色，讓亮起的K棒更清楚
+      ctx.shadowBlur=8;
+      ctx.strokeStyle='rgba(250,204,21,0.9)';ctx.lineWidth=1.2;
+      ctx.strokeRect(x-CW2/2-1,t-1,CW2+2,bh+2);
+      ctx.restore();
     });
   }
 }
@@ -1338,6 +1352,7 @@ setTimeout(async ()=>{
     setLoadingText('沒有可用的資料，請確認 data.bin 是否已正確上傳');
     return;
   }
+  if(typeof migrateStoryNoteTs==='function') migrateStoryNoteTs();
   const last=DAYS[DAYS.length-1];
   const d=new Date(last+'T12:00:00');calYear=d.getFullYear();calMonth=d.getMonth();
   document.getElementById('loading').style.display='none';
@@ -3421,6 +3436,25 @@ function saveStoryStorage(){
   }catch(e){ console.error('儲存失敗', e); }
 }
 
+// 一次性遷移：舊筆記的時間是「bucket最後一根1K」的時間(x9結尾)，
+// 依筆記所屬格局換算成該K棒的起始時間。需在 DATA 載入後呼叫。
+function migrateStoryNoteTs(){
+  if(localStorage.getItem('nqStoryTsMigrated')==='1') return;
+  let changed=false;
+  Object.keys(storyNotes).forEach(day=>{
+    const d=DATA[day];
+    if(!d) return;
+    (storyNotes[day]||[]).forEach(n=>{
+      const tf=n.tf||'1k';
+      if(tf==='1k'||!d[tf]||!d[tf].length) return;
+      const bucket=d[tf].find(k=>k.idx<=n.idx && n.idx<=(k.idx_end||k.idx));
+      if(bucket && bucket.ts && n.ts!==bucket.ts){ n.ts=bucket.ts; changed=true; }
+    });
+  });
+  if(changed) saveStoryStorage();
+  localStorage.setItem('nqStoryTsMigrated','1');
+}
+
 function toggleStoryPanel(){
   const col=document.getElementById('storyCol'), btn=document.getElementById('btnToggleStory');
   const hidden=col.classList.toggle('hidden');
@@ -3435,14 +3469,24 @@ function toggleStoryPanel(){
   }
 })();
 
+// 依所選格局取得該1K bar所屬bucket的起始時間(避免顯示bucket最後一根的x9結尾時間)
+function getStoryNoteTs(b, tf){
+  if(!b) return '—';
+  if(tf==='1k' || !allBars[tf] || !allBars[tf].length) return b.ts;
+  const bucket = allBars[tf].find(k => k.idx <= b.idx && b.idx <= (k.idx_end||k.idx));
+  return bucket ? bucket.ts : b.ts;
+}
+
 function updateStoryNowBar(){
   const tEl=document.getElementById('storyNowTime'), pEl=document.getElementById('storyNowPrice');
   if(!tEl||!pEl) return;
   const b=mode1kBars[cur1];
   if(!b){tEl.textContent='—';pEl.textContent='—';return;}
-  tEl.textContent = (currentDay||'').slice(5)+' '+b.ts;
+  const tf=document.getElementById('storyTfSel')?.value || '1k';
+  tEl.textContent = (currentDay||'').slice(5)+' '+getStoryNoteTs(b, tf);
   pEl.textContent = b.c.toFixed(1);
 }
+document.getElementById('storyTfSel').addEventListener('change', updateStoryNowBar);
 
 function saveStoryNote(){
   const inp=document.getElementById('storyInput');
@@ -3454,7 +3498,7 @@ function saveStoryNote(){
   if(!storyNotes[currentDay]) storyNotes[currentDay]=[];
   storyNotes[currentDay].push({
     id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    idx: b.idx, ts: b.ts, price: b.c, tf, text, folder:''
+    idx: b.idx, ts: getStoryNoteTs(b, tf), price: b.c, tf, text, folder:''
   });
   storyNotes[currentDay].sort((a,b2)=>a.idx-b2.idx);
   saveStoryStorage();
