@@ -403,6 +403,17 @@ canvas.cross{pointer-events:none;}
 .sne-status.lock{color:#facc15;border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.12);}
 .sne-status.edit{color:#a78bfa;border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.12);}
 .sne-btn.sm{padding:4px 10px;font-size:10.5px;}
+.sne-plan-wrap{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;}
+.sne-plan{display:flex;flex-direction:column;flex:1;min-height:130px;}
+.sne-plan+.sne-plan{border-top:1px solid var(--b1);}
+.sne-plan-hdr{display:flex;align-items:center;gap:7px;padding:8px 13px 3px;flex-shrink:0;}
+.sne-plan-tag{width:20px;height:20px;border-radius:6px;background:rgba(167,139,250,.22);color:#a78bfa;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.sne-plan-name{font-size:12px;font-weight:800;color:#a78bfa;}
+.sne-plan-del{margin-left:auto;width:21px;height:21px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t3);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.sne-plan-del:hover{color:#fb7185;border-color:#fb7185;}
+.sne-plan-add{margin:7px 13px 11px;padding:8px;border-radius:8px;border:1px dashed rgba(167,139,250,.55);background:transparent;color:#a78bfa;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.sne-plan-add:hover{background:rgba(167,139,250,.12);}
+.sne-plan-count{margin-left:auto;font-size:10.5px;font-weight:700;color:#a78bfa;}
 .story-open-btn{width:100%;padding:9px 4px;border-radius:7px;border:1px solid #facc15;background:rgba(250,204,21,.14);color:#facc15;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
 .story-open-btn.on{background:#facc15;color:#000;}
 .story-open-btn:active{opacity:.7;}
@@ -986,8 +997,30 @@ function drawChart(id,bars,cursor,timeStep,pan){
   }
 
   // time labels
-  ctx.fillStyle='#d0d0e0';ctx.font='10px sans-serif';ctx.textAlign='center';
-  view.forEach((b,i)=>{if((startIdx+i)%timeStep===0)ctx.fillText(b.ts,X(i),H-3);});
+  const drawStepLabels=()=>{
+    ctx.fillStyle='#d0d0e0';ctx.font='10px sans-serif';ctx.textAlign='center';
+    view.forEach((b,i)=>{if((startIdx+i)%timeStep===0)ctx.fillText(b.ts,X(i),H-3);});
+  };
+  if(tfKey==='60k'){
+    // 60K 橫跨多天，每小時都標會太密 → 只標每天的美股盤前
+    const preTW=getPreOpenTW(currentDay);
+    const hits=[];
+    view.forEach((b,i)=>{ if(b.ts===preTW) hits.push(i); });
+    if(hits.length){
+      ctx.fillStyle='#f5a623';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      hits.forEach(i=>{
+        const x=X(i);
+        ctx.strokeStyle='rgba(245,166,35,0.25)';ctx.lineWidth=1;ctx.setLineDash([2,4]);
+        ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#f5a623';
+        ctx.fillText('盤前 '+preTW,x,H-3);
+      });
+    } else {
+      drawStepLabels();
+    }
+  } else {
+    drawStepLabels();
+  }
 
   // 交易進出場箭頭 (所有格局都顯示)
   if(tradeSystemOn && typeof getDayMarkers==='function'){
@@ -3635,71 +3668,90 @@ function importStoryNotes(input){
 
 // ============================================================
 // 📖 故事線 · 常駐輸入視窗
-// 開網頁就自動跳出；時間／價格跟著目前K棒走（以1分K為準）
+// 左：盤面（均線／價格）　右：計畫（可 A、B、C 多個）
 // ============================================================
-const SNE_GROUPS = [
-  {title:'盤面發生什麼事？', c:'#38bdf8', subs:[
-    {k:'ma', mark:'均線', label:'均線', c:'#38bdf8',
-     ph:'例：\n60MA 由平轉上彎，5MA 與 20MA 黃金交叉後開口擴大。\n第一次回測 20MA 沒有跌破，收在均線上方。'},
-    {k:'ps', mark:'價格', label:'價格', c:'#facc15',
-     ph:'例：\n前高被帶量突破，回測突破點不破，形成更高的低點。\n日內從箱型震盪轉為上升結構，但量能沒有同步放大。'}
-  ]},
-  {title:'計畫是什麼？', c:'#a78bfa', subs:[
-    {k:'plan', mark:'計畫', label:'', c:'#a78bfa',
-     ph:'例：\n回測 20MA 分兩批進場，停損放前低下方。\n第一目標前高，到價先出一半，剩下移動停利。\n若跳空直接過高就不追。'}
-  ]},
-  {title:'反向的看法是什麼？', c:'#fb7185', subs:[
-    {k:'rev', mark:'反向', label:'', c:'#fb7185',
-     ph:'例：\n量其實是縮的，這個突破可能是誘多。\n跌回突破點之下就代表失敗，計畫直接作廢。\n空方會說這只是反彈到大格局的壓力區。'}
-  ]}
+const SNE_TOP = [
+  {k:'ma', mark:'均線', label:'均線', c:'#38bdf8',
+   ph:'例：\n60MA 由平轉上彎，5MA 與 20MA 黃金交叉後開口擴大。\n第一次回測 20MA 沒有跌破，收在均線上方。'},
+  {k:'ps', mark:'價格', label:'價格', c:'#facc15',
+   ph:'例：\n前高被帶量突破，回測突破點不破，形成更高的低點。\n日內從箱型震盪轉為上升結構，但量能沒有同步放大。'}
 ];
-const SNE_FIELDS = [];
-SNE_GROUPS.forEach(g=>g.subs.forEach(s=>SNE_FIELDS.push(s)));
-const SNE_MARK_TO_KEY = {'均線':'ma','價格':'ps','結構':'ps','計畫':'plan','反向':'rev','補充':'legacy'};
+const SNE_PLAN_C = '#a78bfa';
+const SNE_PLAN_LETTERS = ['A','B','C','D','E','F'];
+const SNE_PLAN_MAX = SNE_PLAN_LETTERS.length;
+const SNE_PLAN_PH = [
+  '例：\n主要計畫。回測 20MA 分兩批進場，停損放前低下方。\n第一目標前高，到價先出一半。',
+  '例：\n如果沒有回測直接噴出，改成等第一根縮量紅K再進，停損放那根低點。',
+  '例：\n如果跌破前低，計畫作廢，反手或當天不再做。'
+];
+const SNE_MARK_TO_KEY = {'均線':'ma','價格':'ps','結構':'ps','反向':'legacy','補充':'legacy'};
 
-function sneEmpty(){ return {ma:'',ps:'',plan:'',rev:''}; }
-function sneSerialize(f){
-  const out=[];
-  SNE_FIELDS.forEach(fd=>{
-    const v=String(f[fd.k]||'').trim();
-    if(v) out.push('【'+fd.mark+'】\n'+v);
+function sneEmpty(){ return {ma:'', ps:'', plans:['']}; }
+function sneFix(f){
+  const o={ma:String(f&&f.ma||''), ps:String(f&&f.ps||''), plans:[]};
+  const p=(f&&f.plans);
+  if(Array.isArray(p)) p.forEach(v=>{ if(o.plans.length<SNE_PLAN_MAX) o.plans.push(String(v||'')); });
+  if(!o.plans.length) o.plans=[''];
+  return o;
+}
+function snePlanList(f){ return sneFix(f).plans.map(v=>String(v||'').trim()).filter(Boolean); }
+
+function sneSerialize(f0){
+  const f=sneFix(f0), out=[];
+  if(f.ma.trim()) out.push('【均線】\n'+f.ma.trim());
+  if(f.ps.trim()) out.push('【價格】\n'+f.ps.trim());
+  let n=0;
+  f.plans.forEach(v=>{
+    const t=String(v||'').trim();
+    if(!t) return;
+    out.push('【計畫'+SNE_PLAN_LETTERS[n]+'】\n'+t);
+    n++;
   });
   return out.join('\n\n');
 }
 function sneParse(text){
-  const f={ma:'',ps:'',plan:'',rev:'',legacy:''};
+  const f={ma:'', ps:'', plans:[], legacy:''};
   const s=String(text||'');
-  const re=/【(均線|價格|結構|計畫|反向|補充)】/g;
+  const re=/【(均線|價格|結構|計畫[A-F]?|反向|補充)】/g;
   const hits=[]; let m;
-  while((m=re.exec(s))!==null) hits.push({k:SNE_MARK_TO_KEY[m[1]], i:m.index, len:m[0].length});
-  if(!hits.length){ f.legacy=s.trim(); return f; }
+  while((m=re.exec(s))!==null) hits.push({tag:m[1], i:m.index, len:m[0].length});
+  if(!hits.length){ f.legacy=s.trim(); f.plans=['']; return f; }
   const pre=s.slice(0,hits[0].i).trim();
   if(pre) f.legacy=pre;
   hits.forEach((h,i)=>{
     const end=(i+1<hits.length)?hits[i+1].i:s.length;
     const val=s.slice(h.i+h.len,end).trim();
     if(!val) return;
-    f[h.k]= f[h.k] ? (f[h.k]+'\n'+val) : val;
+    if(h.tag.indexOf('計畫')===0){
+      if(f.plans.length<SNE_PLAN_MAX) f.plans.push(val);
+      return;
+    }
+    const k=SNE_MARK_TO_KEY[h.tag];
+    if(!k) return;
+    f[k]= f[k] ? (f[k]+'\n'+val) : val;
   });
+  if(!f.plans.length) f.plans=[''];
   return f;
 }
-function sneIsStructured(text){ return /【(均線|價格|結構|計畫|反向)】/.test(String(text||'')); }
+function sneIsStructured(text){ return /【(均線|價格|結構|計畫[A-F]?|反向)】/.test(String(text||'')); }
+// 舊筆記：沒分段的自由文字、以及舊的【反向】【補充】→ 併入「價格」，不會掉字
 function sneLoad(text){
   const p=sneParse(text);
   const had=!!p.legacy;
   if(p.legacy) p.ps = p.ps ? (p.legacy+'\n'+p.ps) : p.legacy;
   delete p.legacy;
-  return {fields:p, hadLegacy:had};
+  return {fields:sneFix(p), hadLegacy:had};
 }
+
+// 時間軸／清單上的縮圖預覽
 function storyNotePreviewHtml(n, full){
   if(!sneIsStructured(n.text)) return '<div class="story-note-text">'+escapeHtml(n.text)+'</div>';
   const f=sneLoad(n.text).fields;
+  const row=(mark,c,txt)=>'<div class="sne-mini-row"><span class="sne-mini-tag" style="color:'+c
+    +';border-color:'+c+'55;background:'+c+'1a;">'+mark+'</span><span class="sne-mini-txt">'+escapeHtml(txt)+'</span></div>';
   let h='<div class="sne-mini'+(full?' full':'')+'">';
-  SNE_FIELDS.forEach(fd=>{
-    if(!f[fd.k]) return;
-    h+='<div class="sne-mini-row"><span class="sne-mini-tag" style="color:'+fd.c+';border-color:'+fd.c+'55;background:'+fd.c+'1a;">'+fd.mark+'</span>'
-      +'<span class="sne-mini-txt">'+escapeHtml(f[fd.k])+'</span></div>';
-  });
+  SNE_TOP.forEach(fd=>{ if(f[fd.k]) h+=row(fd.mark, fd.c, f[fd.k]); });
+  snePlanList(f).forEach((t,i)=>{ h+=row('計畫'+SNE_PLAN_LETTERS[i], SNE_PLAN_C, t); });
   return h+'</div>';
 }
 
@@ -3721,7 +3773,7 @@ function sneSaveDraft(){ if(sneState) try{ localStorage.setItem(sneDraftKey(), J
 function sneClearDraft(){ try{ localStorage.removeItem(sneDraftKey()); }catch(e){} }
 function sneDirty(){ return !!sneState && sneSerialize(sneState.fields)!==sneState.orig && !!sneSerialize(sneState.fields).trim(); }
 
-// 記住視窗的螢幕位置與大小 → 每次都固定開在同一個地方
+// 記住視窗的螢幕位置與大小
 function sneGeo(){
   const g={w:1500,h:900,x:null,y:null};
   try{
@@ -3738,9 +3790,8 @@ function sneRememberGeo(){
   }catch(e){}
 }
 
-// ---- 目前K棒（一律以1分K為準）----
+// ---- 目前K棒（時間依主圖格局捨去）----
 const SNE_TF_MIN = {'1k':1,'5k':5,'15k':15,'60k':60};
-// 主畫面現在看的是哪個格局 → 取最小的那個當基準
 function sneTfUnit(){
   try{
     if(typeof selectedTFs!=='undefined' && selectedTFs && selectedTFs.length){
@@ -3755,7 +3806,6 @@ function sneTfKey(u){
   Object.keys(SNE_TF_MIN).forEach(x=>{ if(SNE_TF_MIN[x]===u) k=x; });
   return k;
 }
-// 1分K的時間 → 捨去到所屬格局的開盤分鐘（5分K：23:14 → 23:10）
 function sneSnapTs(ts, unit){
   const m=/^(\d{1,2}):(\d{2})/.exec(String(ts||''));
   if(!m || unit<=1) return ts;
@@ -3852,7 +3902,7 @@ function sneUpdateOpenBtn(blocked){
   b.classList.toggle('on', open);
 }
 
-// ---- 主畫面換K棒時，視窗標題跟著動 ----
+// ---- 主畫面換K棒 / 換格局時同步 ----
 function sneSyncBar(){
   sneUpdateOpenBtn();
   if(!sneWin || sneWin.closed || !sneDoc || !sneState) return;
@@ -3867,11 +3917,11 @@ function sneRenderHead(){
   const st=sneState;
   const t=sneDoc.getElementById('sneChipTime');
   const p=sneDoc.getElementById('sneChipPrice');
+  const k=sneDoc.getElementById('sneChipTf');
   const s=sneDoc.getElementById('sneStatus');
   const r=sneDoc.getElementById('sneResetBtn');
   if(t) t.textContent=(st.d||'').slice(5)+' '+st.meta.ts;
   if(p) p.textContent=(+st.meta.price).toFixed(1);
-  const k=sneDoc.getElementById('sneChipTf');
   if(k) k.textContent=String(st.meta.tf||'1k').toUpperCase();
   if(s){
     if(st.mode==='edit'){ s.textContent='編輯舊筆記'; s.className='sne-status edit'; }
@@ -3882,22 +3932,32 @@ function sneRenderHead(){
 }
 
 // ---- UI ----
-function sneGroupHtml(g){
-  const subs=g.subs.map(s=>
+function sneTopGroupHtml(){
+  const subs=SNE_TOP.map(s=>
     '<div class="sne-sub">'
-    +(s.label?'<div class="sne-sub-lbl" style="color:'+s.c+';">'+s.label+'</div>':'')
+    +'<div class="sne-sub-lbl" style="color:'+s.c+';">'+s.label+'</div>'
     +'<textarea class="sne-ta" id="sne_ta_'+s.k+'" data-k="'+s.k+'" spellcheck="false" placeholder="'+escapeHtml(s.ph)+'"></textarea>'
     +'</div>').join('');
-  return '<div class="sne-group" style="border-top-color:'+g.c+';">'
-    +'<div class="sne-group-hdr"><span class="sne-group-title">'+g.title+'</span></div>'
+  return '<div class="sne-group" style="border-top-color:#38bdf8;">'
+    +'<div class="sne-group-hdr"><span class="sne-group-title">盤面發生什麼事？</span></div>'
     +subs+'</div>';
+}
+function snePlanGroupHtml(){
+  return '<div class="sne-group" style="border-top-color:'+SNE_PLAN_C+';">'
+    +'<div class="sne-group-hdr"><span class="sne-group-title">計畫是什麼？</span>'
+      +'<span class="sne-plan-count" id="snePlanCount"></span></div>'
+    +'<div class="sne-plan-wrap" id="snePlanWrap"></div>'
+    +'<button class="sne-plan-add" id="snePlanAdd">＋ 新增計畫</button>'
+  +'</div>';
 }
 function sneMarkup(){
   const st=sneState;
   let folderOpts='<option value="">未分類</option>';
   storyFolders.forEach((f,i)=>{ folderOpts+='<option value="'+i+'"'+(st.folder===f?' selected':'')+'>📁 '+escapeHtml(f)+'</option>'; });
   folderOpts+='<option value="__new__">＋新增分類…</option>';
-  const dots=SNE_FIELDS.map(fd=>'<span class="sne-dot" id="sne_dot_'+fd.k+'" title="'+fd.mark+'"></span>').join('');
+  const dots='<span class="sne-dot" id="sne_dot_ma" title="均線"></span>'
+    +'<span class="sne-dot" id="sne_dot_ps" title="價格"></span>'
+    +'<span class="sne-dot" id="sne_dot_plan" title="計畫"></span>';
 
   return '<div class="sne-shell">'
     +'<div class="sne-hdr">'
@@ -3917,8 +3977,8 @@ function sneMarkup(){
       +'<button class="sne-draftbtn" id="sneDraftUse">還原草稿</button>'
       +'<button class="sne-draftbtn" id="sneDraftDrop">捨棄</button></div>'
     +'<div class="sne-body"><div class="sne-grid">'
-      +'<div class="sne-col">'+sneGroupHtml(SNE_GROUPS[0])+'</div>'
-      +'<div class="sne-col">'+sneGroupHtml(SNE_GROUPS[1])+sneGroupHtml(SNE_GROUPS[2])+'</div>'
+      +'<div class="sne-col">'+sneTopGroupHtml()+'</div>'
+      +'<div class="sne-col">'+snePlanGroupHtml()+'</div>'
     +'</div></div>'
     +'<div class="sne-ftr">'
       +'<span class="sne-count" id="sneCount">0 字</span>'
@@ -3928,30 +3988,93 @@ function sneMarkup(){
   +'</div>';
 }
 
-function sneMount(doc, container){
-  sneDoc=doc;
-  container.innerHTML=sneMarkup();
-  const $ = id => doc.getElementById(id);
+// 計畫區塊（可增可減）
+function sneRenderPlans(focusIdx){
+  if(!sneDoc||!sneState) return;
+  const f=sneState.fields=sneFix(sneState.fields);
+  const wrap=sneDoc.getElementById('snePlanWrap');
+  if(!wrap) return;
+  const many=f.plans.length>1;
+  wrap.innerHTML=f.plans.map((v,i)=>
+    '<div class="sne-plan">'
+    +'<div class="sne-plan-hdr"><span class="sne-plan-tag">'+SNE_PLAN_LETTERS[i]+'</span>'
+      +'<span class="sne-plan-name">計畫 '+SNE_PLAN_LETTERS[i]+'</span>'
+      +(many?'<button class="sne-plan-del" data-i="'+i+'" title="刪掉這個計畫">✕</button>':'')
+    +'</div>'
+    +'<textarea class="sne-ta sne-plan-ta" data-i="'+i+'" spellcheck="false" placeholder="'
+      +escapeHtml(SNE_PLAN_PH[i]||'例：\n再寫一個備案。')+'"></textarea>'
+    +'</div>').join('');
 
-  SNE_FIELDS.forEach(fd=>{
-    const ta=$('sne_ta_'+fd.k);
-    ta.value=sneState.fields[fd.k]||'';
-    ta.addEventListener('input', ()=>{
-      sneState.fields[fd.k]=ta.value;
-      if(sneState.mode==='new'){
-        const any=SNE_FIELDS.some(x=>String(sneState.fields[x.k]||'').trim());
-        if(any && !sneState.locked){ sneState.locked=true; sneRenderHead(); }
-        else if(!any && sneState.locked){ sneState.locked=false; sneSyncBar(); }
-      }
-      sneRefreshMeters();
-      const sb=$('sneSavedBar'); if(sb) sb.classList.remove('show');
-      clearTimeout(sneDraftTimer);
-      sneDraftTimer=setTimeout(sneSaveDraft, 400);
-    });
+  Array.prototype.forEach.call(wrap.querySelectorAll('.sne-plan-ta'), ta=>{
+    const i=+ta.getAttribute('data-i');
+    ta.value=f.plans[i]||'';
+    ta.addEventListener('input', ()=>{ sneState.fields.plans[i]=ta.value; sneOnInput(); });
     ta.addEventListener('keydown', e=>{
       e.stopPropagation();
       if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); sneCommit(); }
     });
+  });
+  Array.prototype.forEach.call(wrap.querySelectorAll('.sne-plan-del'), b=>{
+    b.addEventListener('click', ()=>{
+      const i=+b.getAttribute('data-i');
+      const w=(sneDoc&&sneDoc.defaultView)||window;
+      if(String(sneState.fields.plans[i]||'').trim() && !w.confirm('刪掉計畫 '+SNE_PLAN_LETTERS[i]+'？')) return;
+      sneState.fields.plans.splice(i,1);
+      sneRenderPlans();
+      sneOnInput();
+    });
+  });
+
+  const add=sneDoc.getElementById('snePlanAdd');
+  if(add){
+    const n=f.plans.length;
+    add.style.display = n>=SNE_PLAN_MAX ? 'none' : 'block';
+    add.textContent='＋ 新增計畫 '+SNE_PLAN_LETTERS[n];
+  }
+  const cnt=sneDoc.getElementById('snePlanCount');
+  if(cnt){
+    const filled=snePlanList(f).length;
+    cnt.textContent = filled>1 ? (filled+' 個計畫') : '';
+  }
+  if(focusIdx!=null){
+    const t=wrap.querySelector('.sne-plan-ta[data-i="'+focusIdx+'"]');
+    if(t) t.focus();
+  }
+}
+
+function sneOnInput(){
+  if(!sneState) return;
+  if(sneState.mode==='new'){
+    const any=!!sneSerialize(sneState.fields).trim();
+    if(any && !sneState.locked){ sneState.locked=true; sneRenderHead(); }
+    else if(!any && sneState.locked){ sneState.locked=false; sneSyncBar(); }
+  }
+  sneRefreshMeters();
+  const sb=sneDoc&&sneDoc.getElementById('sneSavedBar');
+  if(sb) sb.classList.remove('show');
+  clearTimeout(sneDraftTimer);
+  sneDraftTimer=setTimeout(sneSaveDraft, 400);
+}
+
+function sneMount(doc, container){
+  sneDoc=doc;
+  sneState.fields=sneFix(sneState.fields);
+  container.innerHTML=sneMarkup();
+  const $ = id => doc.getElementById(id);
+
+  SNE_TOP.forEach(fd=>{
+    const ta=$('sne_ta_'+fd.k);
+    ta.value=sneState.fields[fd.k]||'';
+    ta.addEventListener('input', ()=>{ sneState.fields[fd.k]=ta.value; sneOnInput(); });
+    ta.addEventListener('keydown', e=>{
+      e.stopPropagation();
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); sneCommit(); }
+    });
+  });
+  $('snePlanAdd').addEventListener('click', ()=>{
+    if(sneState.fields.plans.length>=SNE_PLAN_MAX) return;
+    sneState.fields.plans.push('');
+    sneRenderPlans(sneState.fields.plans.length-1);
   });
   $('sneFolder').addEventListener('change', e=>{
     const v=e.target.value;
@@ -3982,12 +4105,13 @@ function sneMount(doc, container){
   try{
     const raw=localStorage.getItem(sneDraftKey());
     if(raw){
-      const dft=JSON.parse(raw);
+      const dft=sneFix(JSON.parse(raw));
       if(sneSerialize(dft) && sneSerialize(dft)!==sneSerialize(sneState.fields)){
         $('sneDraftBar').classList.add('show');
         $('sneDraftUse').addEventListener('click', ()=>{
-          sneState.fields=Object.assign(sneEmpty(),dft);
-          SNE_FIELDS.forEach(fd=>{ $('sne_ta_'+fd.k).value=sneState.fields[fd.k]||''; });
+          sneState.fields=dft;
+          SNE_TOP.forEach(fd=>{ $('sne_ta_'+fd.k).value=sneState.fields[fd.k]||''; });
+          sneRenderPlans();
           if(sneState.mode==='new') sneState.locked=true;
           $('sneDraftBar').classList.remove('show');
           sneRefreshMeters(); sneRenderHead();
@@ -3997,6 +4121,7 @@ function sneMount(doc, container){
     }
   }catch(e){}
 
+  sneRenderPlans();
   sneRenderHead();
   sneRefreshMeters();
 }
@@ -4007,22 +4132,27 @@ function sneKeyHandler(e){
 }
 function sneRefreshMeters(){
   if(!sneDoc||!sneState) return;
-  let total=0;
-  SNE_FIELDS.forEach(fd=>{ total += String(sneState.fields[fd.k]||'').replace(/\s/g,'').length; });
-  const done=SNE_FIELDS.filter(fd=>String(sneState.fields[fd.k]||'').trim()).length;
+  const f=sneFix(sneState.fields);
+  const plans=snePlanList(f);
+  let total=(f.ma+f.ps).replace(/\s/g,'').length;
+  plans.forEach(t=>{ total+=t.replace(/\s/g,'').length; });
+  const done=(f.ma.trim()?1:0)+(f.ps.trim()?1:0)+(plans.length?1:0);
   const c=sneDoc.getElementById('sneCount');
-  if(c) c.textContent=total+' 字 · 已寫 '+done+'/'+SNE_FIELDS.length;
-  SNE_FIELDS.forEach(fd=>{
-    const d=sneDoc.getElementById('sne_dot_'+fd.k);
+  if(c) c.textContent=total+' 字 · 已寫 '+done+'/3'+(plans.length>1?(' · 計畫 '+plans.length+' 個'):'');
+  const set=(id,on,col)=>{
+    const d=sneDoc.getElementById(id);
     if(!d) return;
-    const on=!!String(sneState.fields[fd.k]||'').trim();
-    d.style.background=on?fd.c:'transparent';
-    d.style.borderColor=on?fd.c:'var(--b2)';
-    d.style.boxShadow=on?('0 0 7px '+fd.c+'88'):'none';
-  });
+    d.style.background=on?col:'transparent';
+    d.style.borderColor=on?col:'var(--b2)';
+    d.style.boxShadow=on?('0 0 7px '+col+'88'):'none';
+  };
+  set('sne_dot_ma', !!f.ma.trim(), SNE_TOP[0].c);
+  set('sne_dot_ps', !!f.ps.trim(), SNE_TOP[1].c);
+  set('sne_dot_plan', plans.length>0, SNE_PLAN_C);
+  const cnt=sneDoc.getElementById('snePlanCount');
+  if(cnt) cnt.textContent = plans.length>1 ? (plans.length+' 個計畫') : '';
 }
 
-// ---- 回到「跟著K棒的新筆記」----
 function sneBackToLive(){
   const w=(sneDoc&&sneDoc.defaultView)||window;
   if(sneDirty() && !w.confirm('目前的內容還沒儲存，要清掉並回到目前K棒嗎？\n（會先存成草稿）')) return;
@@ -4031,20 +4161,18 @@ function sneBackToLive(){
   sneRemount();
 }
 
-// ---- 從時間軸點「✏ 編輯」----
 function editStoryNote(d,id){
   const n=findStoryNote(d,id); if(!n) return;
   if(sneDirty()) sneSaveDraft();
   const ld=sneLoad(n.text);
   sneState={mode:'edit', d:d, id:id,
-    meta:{idx:n.idx, ts:n.ts, price:n.price},
+    meta:{idx:n.idx, ts:n.ts, price:n.price, tf:n.tf||'1k'},
     fields:ld.fields, folder:n.folder||'',
     orig:String(n.text||''), locked:true, hadLegacy:ld.hadLegacy};
   if(sneWin && !sneWin.closed){ sneRemount(); try{ sneWin.focus(); }catch(e){} }
   else sneOpenWindow();
 }
 
-// ---- 關閉視窗 ----
 function sneUnbindDocs(){
   sneBoundDocs.forEach(d=>{ try{ d.removeEventListener('keydown', sneKeyHandler, true); }catch(e){} });
   sneBoundDocs=[];
@@ -4064,7 +4192,6 @@ function sneCloseWin(force){
   sneUpdateOpenBtn();
 }
 
-// ---- 儲存 ----
 function sneCommit(){
   if(!sneState) return;
   const txt=sneSerialize(sneState.fields);
@@ -4091,7 +4218,6 @@ function sneCommit(){
   renderAll();
   refreshStoryClsIfOpen();
 
-  // 存完自動回到「跟著K棒的新筆記」，視窗留著繼續寫
   const folder=sneState.folder;
   sneState=sneNewState();
   sneState.folder=folder;
