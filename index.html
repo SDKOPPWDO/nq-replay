@@ -3538,7 +3538,7 @@ function updateStoryNowBar(){
   if(!tEl||!pEl) return;
   const b=mode1kBars[cur1];
   if(!b){tEl.textContent='—';pEl.textContent='—';return;}
-  tEl.textContent=(currentDay||'').slice(5)+' '+b.ts;
+  tEl.textContent=(currentDay||'').slice(5)+' '+sneSnapTs(b.ts, sneTfUnit());
   pEl.textContent=b.c.toFixed(1);
 }
 
@@ -3739,13 +3739,39 @@ function sneRememberGeo(){
 }
 
 // ---- 目前K棒（一律以1分K為準）----
+const SNE_TF_MIN = {'1k':1,'5k':5,'15k':15,'60k':60};
+// 主畫面現在看的是哪個格局 → 取最小的那個當基準
+function sneTfUnit(){
+  try{
+    if(typeof selectedTFs!=='undefined' && selectedTFs && selectedTFs.length){
+      const u=Math.min.apply(null, selectedTFs.map(t=>SNE_TF_MIN[t]||1));
+      if(u>0) return u;
+    }
+  }catch(e){}
+  return 1;
+}
+function sneTfKey(u){
+  let k='1k';
+  Object.keys(SNE_TF_MIN).forEach(x=>{ if(SNE_TF_MIN[x]===u) k=x; });
+  return k;
+}
+// 1分K的時間 → 捨去到所屬格局的開盤分鐘（5分K：23:14 → 23:10）
+function sneSnapTs(ts, unit){
+  const m=/^(\d{1,2}):(\d{2})/.exec(String(ts||''));
+  if(!m || unit<=1) return ts;
+  let h=+m[1], mi=Math.floor((+m[2])/unit)*unit;
+  if(mi>=60){ h+=Math.floor(mi/60); mi=mi%60; }
+  h=h%24;
+  return String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0');
+}
 function sneCurrentMeta(){
   const b=(typeof mode1kBars!=='undefined') ? mode1kBars[cur1] : null;
   if(!b) return null;
-  return {idx:b.idx, ts:b.ts, price:b.c};
+  const u=sneTfUnit();
+  return {idx:b.idx, ts:sneSnapTs(b.ts,u), price:b.c, tf:sneTfKey(u)};
 }
 function sneNewState(){
-  const m=sneCurrentMeta()||{idx:0, ts:'—', price:0};
+  const m=sneCurrentMeta()||{idx:0, ts:'—', price:0, tf:'1k'};
   return {mode:'new', d:currentDay, id:null, meta:m,
     fields:sneEmpty(), folder:'', orig:'', locked:false, hadLegacy:false};
 }
@@ -3845,6 +3871,8 @@ function sneRenderHead(){
   const r=sneDoc.getElementById('sneResetBtn');
   if(t) t.textContent=(st.d||'').slice(5)+' '+st.meta.ts;
   if(p) p.textContent=(+st.meta.price).toFixed(1);
+  const k=sneDoc.getElementById('sneChipTf');
+  if(k) k.textContent=String(st.meta.tf||'1k').toUpperCase();
   if(s){
     if(st.mode==='edit'){ s.textContent='編輯舊筆記'; s.className='sne-status edit'; }
     else if(st.locked){ s.textContent='🔒 已鎖定這一根'; s.className='sne-status lock'; }
@@ -3876,6 +3904,7 @@ function sneMarkup(){
       +'<span class="sne-hdr-title">📖 交易故事線</span>'
       +'<span class="sne-chip" id="sneChipTime">—</span>'
       +'<span class="sne-chip price" id="sneChipPrice">—</span>'
+      +'<span class="sne-chip" id="sneChipTf">1K</span>'
       +'<span class="sne-status live" id="sneStatus">跟著K棒</span>'
       +'<button class="sne-btn sm" id="sneResetBtn" style="display:none;">↻ 跟上目前K棒</button>'
       +'<span class="sne-lbl-sm">分類</span><select class="sne-sel" id="sneFolder">'+folderOpts+'</select>'
@@ -4051,7 +4080,7 @@ function sneCommit(){
     storyNotes[d].push({
       id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
       idx: sneState.meta.idx, ts: sneState.meta.ts, price: sneState.meta.price,
-      tf: '1k', text: txt, folder: sneState.folder
+      tf: sneState.meta.tf||'1k', text: txt, folder: sneState.folder
     });
     storyNotes[d].sort((a,b)=>a.idx-b.idx);
   }
