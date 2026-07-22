@@ -378,6 +378,67 @@ canvas.cross{pointer-events:none;}
 .scls-note-side{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
 .scls-folder-sel{height:24px;font-size:10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t1);font-family:inherit;max-width:120px;}
 .scls-chart-btn{padding:4px 10px;font-size:10px;border-radius:5px;border:1px solid #7c3aed;background:rgba(124,58,237,.2);color:#c4b5fd;cursor:pointer;font-family:inherit;font-weight:700;}
+/* ===== 📖 故事線 · 詳細編輯視窗 ===== */
+.sne-ov{position:fixed;inset:0;z-index:900;display:none;flex-direction:column;background:rgba(4,4,8,.78);backdrop-filter:blur(5px);padding:14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.sne-ov.show{display:flex;}
+.sne-shell{flex:1;min-height:0;width:100%;max-width:2200px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--b1);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.8);overflow:hidden;}
+.sne-hdr{display:flex;align-items:center;gap:9px;padding:10px 14px;background:linear-gradient(90deg,rgba(250,204,21,.10),transparent 55%);border-bottom:1px solid var(--b1);flex-shrink:0;flex-wrap:wrap;}
+.sne-hdr-title{font-size:14px;font-weight:800;color:#facc15;letter-spacing:.5px;}
+.sne-chip{font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--bg3);border:1px solid var(--b2);color:#fff;font-variant-numeric:tabular-nums;}
+.sne-chip.price{color:#facc15;}
+.sne-sel{height:26px;font-size:11px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;padding:0 4px;max-width:150px;}
+.sne-lbl-sm{font-size:10px;color:var(--t3);}
+.sne-dots{display:flex;gap:5px;align-items:center;}
+.sne-dot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--b2);background:transparent;transition:background .15s,border-color .15s,box-shadow .15s;}
+.sne-hdr-acts{margin-left:auto;display:flex;gap:6px;}
+.sne-btn{padding:6px 13px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.sne-btn:hover{border-color:#facc15;}
+.sne-btn.primary{background:#facc15;border-color:#facc15;color:#000;}
+.sne-btn.primary:hover{filter:brightness(1.08);}
+.sne-bar{display:none;align-items:center;gap:9px;padding:7px 14px;background:rgba(250,204,21,.09);border-bottom:1px solid var(--b1);font-size:11px;color:#facc15;flex-shrink:0;}
+.sne-bar.show{display:flex;}
+.sne-bar.ok{background:rgba(56,189,248,.12);color:#38bdf8;}
+.sne-status{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:20px;border:1px solid;letter-spacing:.3px;}
+.sne-status.live{color:#38bdf8;border-color:rgba(56,189,248,.45);background:rgba(56,189,248,.12);}
+.sne-status.lock{color:#facc15;border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.12);}
+.sne-status.edit{color:#a78bfa;border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.12);}
+.sne-btn.sm{padding:4px 10px;font-size:10.5px;}
+.story-open-btn{width:100%;padding:9px 4px;border-radius:7px;border:1px solid #facc15;background:rgba(250,204,21,.14);color:#facc15;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.story-open-btn.on{background:#facc15;color:#000;}
+.story-open-btn:active{opacity:.7;}
+.sne-draftbtn{padding:3px 10px;border-radius:5px;border:1px solid rgba(250,204,21,.5);background:transparent;color:#facc15;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sne-body{flex:1;min-height:0;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;}
+.sne-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;flex:1;min-height:420px;}
+@media(max-width:900px){.sne-grid{grid-template-columns:1fr;}}
+.sne-col{display:flex;flex-direction:column;gap:11px;min-height:0;}
+.sne-group{display:flex;flex-direction:column;flex:1;min-height:0;background:var(--bg3);border:1px solid var(--b2);border-top-width:2px;border-radius:11px;overflow:hidden;}
+.sne-group-hdr{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.sne-group-title{font-size:15px;font-weight:800;color:var(--t1);letter-spacing:.5px;}
+.sne-sub{display:flex;flex-direction:column;flex:1;min-height:0;}
+.sne-sub+.sne-sub{border-top:1px solid var(--b1);}
+.sne-sub-lbl{display:flex;align-items:center;gap:6px;padding:7px 13px 3px;font-size:12px;font-weight:800;flex-shrink:0;}
+.sne-sub-lbl::before{content:'';width:3px;height:12px;border-radius:2px;background:currentColor;}
+.sne-ta{flex:1;min-height:120px;width:100%;resize:none;border:none;background:transparent;color:var(--t1);font-family:inherit;font-size:13.5px;line-height:1.75;padding:4px 13px 12px;}
+.sne-ta:focus{outline:none;background:rgba(255,255,255,.028);}
+.sne-ta::placeholder{color:#4d4d57;font-size:12px;line-height:1.6;}
+.sne-ftr{display:flex;align-items:center;gap:12px;padding:9px 14px;border-top:1px solid var(--b1);background:var(--bg2);flex-shrink:0;flex-wrap:wrap;}
+.sne-count{font-size:10.5px;color:var(--t3);font-variant-numeric:tabular-nums;}
+.sne-kbd{font-size:10px;color:var(--t3);}
+.sne-ftr-acts{margin-left:auto;display:flex;gap:8px;}
+body.sne-popup{overflow:hidden;height:100%;background:var(--bg);}
+body.sne-popup .sne-ov{position:fixed;inset:0;display:flex;background:var(--bg);backdrop-filter:none;padding:8px;}
+body.sne-popup .sne-shell{max-width:none;}
+.sne-mini{display:flex;flex-direction:column;gap:3px;}
+.sne-mini-row{display:flex;gap:5px;align-items:flex-start;}
+.sne-mini-tag{flex-shrink:0;font-size:8.5px;font-weight:800;padding:1px 4px;border-radius:4px;border:1px solid;line-height:1.5;margin-top:1px;}
+.sne-mini-txt{font-size:11px;color:var(--t1);line-height:1.5;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sne-mini.full .sne-mini-txt{display:block;white-space:pre-wrap;overflow:visible;}
+.smkt-item-text .sne-mini-txt{font-size:9.5px;color:var(--t2);-webkit-line-clamp:1;}
+.story-btn-row{display:flex;gap:5px;}
+.story-btn-row .story-save-btn{flex:1;width:auto;}
+.story-detail-btn{flex-shrink:0;padding:8px 11px;border-radius:7px;border:1px solid #facc15;background:rgba(250,204,21,.14);color:#facc15;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.story-detail-btn:active{opacity:.7;}
+
 /* ===== 行情 layout (mirror treplay) ===== */
 .smkt-layout{display:grid;grid-template-columns:230px 1fr;gap:12px;flex:1;min-height:0;}
 .smkt-left{display:flex;flex-direction:column;min-height:0;}
@@ -476,15 +537,8 @@ canvas.cross{pointer-events:none;}
         <div class="story-now-bar">
           <span class="story-now-chip" id="storyNowTime">—</span>
           <span class="story-now-chip price" id="storyNowPrice">—</span>
-          <select class="story-tf-sel" id="storyTfSel" title="這則想法是看哪個格局產生的">
-            <option value="1k">1分K</option>
-            <option value="5k">5分K</option>
-            <option value="15k">15分K</option>
-            <option value="60k">60分K</option>
-          </select>
         </div>
-        <textarea class="story-textarea" id="storyInput" placeholder="價格走到這裡，你在想什麼？&#10;(Ctrl+Enter 快速儲存)"></textarea>
-        <button class="story-save-btn" onclick="saveStoryNote()">📌 記下這一刻</button>
+        <button class="story-open-btn" id="storyOpenBtn" onclick="sneFocusOrOpen()">🗗 開啟輸入視窗</button>
       </div>
       <div class="story-timeline" id="storyTimeline"></div>
       <div class="story-backup-bar">
@@ -556,6 +610,7 @@ canvas.cross{pointer-events:none;}
     </div>
   </div>
 </div>
+<div class="sne-ov" id="sneOv"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
 // ============================================================
@@ -1336,6 +1391,7 @@ document.getElementById('btnReset').addEventListener('click',()=>{resetToModeSta
 document.addEventListener('keydown',e=>{
   if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if(document.getElementById('sclsOverlay') && document.getElementById('sclsOverlay').classList.contains('show')) return;
+  if(document.getElementById('sneOv') && document.getElementById('sneOv').classList.contains('show')) return;
   if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();if(mode1kBars.length&&cur1<mode1kBars.length-1){cur1++;hoverBar=null;renderAll();}}
   else if(e.key==='ArrowLeft'){e.preventDefault();if(cur1>0){cur1--;hoverBar=null;renderAll();}}
 });
@@ -3482,34 +3538,9 @@ function updateStoryNowBar(){
   if(!tEl||!pEl) return;
   const b=mode1kBars[cur1];
   if(!b){tEl.textContent='—';pEl.textContent='—';return;}
-  const tf=document.getElementById('storyTfSel')?.value || '1k';
-  tEl.textContent = (currentDay||'').slice(5)+' '+getStoryNoteTs(b, tf);
-  pEl.textContent = b.c.toFixed(1);
+  tEl.textContent=(currentDay||'').slice(5)+' '+b.ts;
+  pEl.textContent=b.c.toFixed(1);
 }
-document.getElementById('storyTfSel').addEventListener('change', updateStoryNowBar);
-
-function saveStoryNote(){
-  const inp=document.getElementById('storyInput');
-  const text=inp.value.trim();
-  if(!text){inp.focus();return;}
-  const b=mode1kBars[cur1];
-  if(!b){alert('尚未載入K棒資料');return;}
-  const tf=document.getElementById('storyTfSel').value;
-  if(!storyNotes[currentDay]) storyNotes[currentDay]=[];
-  storyNotes[currentDay].push({
-    id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    idx: b.idx, ts: getStoryNoteTs(b, tf), price: b.c, tf, text, folder:''
-  });
-  storyNotes[currentDay].sort((a,b2)=>a.idx-b2.idx);
-  saveStoryStorage();
-  inp.value='';
-  renderStoryTimeline();
-  renderAll();
-}
-document.getElementById('storyInput').addEventListener('keydown',e=>{
-  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();saveStoryNote();}
-  e.stopPropagation();
-});
 
 function setStoryScope(s){
   storyScope=s;
@@ -3545,7 +3576,7 @@ function renderStoryTimeline(){
               <button class="story-note-act" onclick="event.stopPropagation();deleteStoryNote('${d}','${n.id}')" title="刪除">🗑</button>
             </span>
           </div>
-          <div class="story-note-text">${escapeHtml(n.text)}</div>
+          ${storyNotePreviewHtml(n)}
         </div>
       </div>`).join('');
   }).join('');
@@ -3559,14 +3590,7 @@ function jumpToStoryNote(d,id){
   if(pos<0){for(let i=mode1kBars.length-1;i>=0;i--){if(mode1kBars[i].idx<=n.idx){pos=i;break;}}}
   if(pos>=0){cur1=pos;hoverBar=null;renderAll();}
 }
-function editStoryNote(d,id){
-  const n=findStoryNote(d,id); if(!n) return;
-  const t=prompt('編輯筆記內容：',n.text);
-  if(t===null) return;
-  const tt=t.trim(); if(!tt) return;
-  n.text=tt; saveStoryStorage(); renderStoryTimeline();
-  refreshStoryClsIfOpen();
-}
+// editStoryNote() 已改用下方的「故事線詳細編輯視窗」
 function deleteStoryNote(d,id){
   if(!confirm('確定刪除這則筆記？')) return;
   storyNotes[d]=(storyNotes[d]||[]).filter(n=>n.id!==id);
@@ -3608,9 +3632,467 @@ function importStoryNotes(input){
   r.readAsText(f);
 }
 
+
+// ============================================================
+// 📖 故事線 · 常駐輸入視窗
+// 開網頁就自動跳出；時間／價格跟著目前K棒走（以1分K為準）
+// ============================================================
+const SNE_GROUPS = [
+  {title:'盤面發生什麼事？', c:'#38bdf8', subs:[
+    {k:'ma', mark:'均線', label:'均線', c:'#38bdf8',
+     ph:'例：\n60MA 由平轉上彎，5MA 與 20MA 黃金交叉後開口擴大。\n第一次回測 20MA 沒有跌破，收在均線上方。'},
+    {k:'ps', mark:'價格', label:'價格', c:'#facc15',
+     ph:'例：\n前高被帶量突破，回測突破點不破，形成更高的低點。\n日內從箱型震盪轉為上升結構，但量能沒有同步放大。'}
+  ]},
+  {title:'計畫是什麼？', c:'#a78bfa', subs:[
+    {k:'plan', mark:'計畫', label:'', c:'#a78bfa',
+     ph:'例：\n回測 20MA 分兩批進場，停損放前低下方。\n第一目標前高，到價先出一半，剩下移動停利。\n若跳空直接過高就不追。'}
+  ]},
+  {title:'反向的看法是什麼？', c:'#fb7185', subs:[
+    {k:'rev', mark:'反向', label:'', c:'#fb7185',
+     ph:'例：\n量其實是縮的，這個突破可能是誘多。\n跌回突破點之下就代表失敗，計畫直接作廢。\n空方會說這只是反彈到大格局的壓力區。'}
+  ]}
+];
+const SNE_FIELDS = [];
+SNE_GROUPS.forEach(g=>g.subs.forEach(s=>SNE_FIELDS.push(s)));
+const SNE_MARK_TO_KEY = {'均線':'ma','價格':'ps','結構':'ps','計畫':'plan','反向':'rev','補充':'legacy'};
+
+function sneEmpty(){ return {ma:'',ps:'',plan:'',rev:''}; }
+function sneSerialize(f){
+  const out=[];
+  SNE_FIELDS.forEach(fd=>{
+    const v=String(f[fd.k]||'').trim();
+    if(v) out.push('【'+fd.mark+'】\n'+v);
+  });
+  return out.join('\n\n');
+}
+function sneParse(text){
+  const f={ma:'',ps:'',plan:'',rev:'',legacy:''};
+  const s=String(text||'');
+  const re=/【(均線|價格|結構|計畫|反向|補充)】/g;
+  const hits=[]; let m;
+  while((m=re.exec(s))!==null) hits.push({k:SNE_MARK_TO_KEY[m[1]], i:m.index, len:m[0].length});
+  if(!hits.length){ f.legacy=s.trim(); return f; }
+  const pre=s.slice(0,hits[0].i).trim();
+  if(pre) f.legacy=pre;
+  hits.forEach((h,i)=>{
+    const end=(i+1<hits.length)?hits[i+1].i:s.length;
+    const val=s.slice(h.i+h.len,end).trim();
+    if(!val) return;
+    f[h.k]= f[h.k] ? (f[h.k]+'\n'+val) : val;
+  });
+  return f;
+}
+function sneIsStructured(text){ return /【(均線|價格|結構|計畫|反向)】/.test(String(text||'')); }
+function sneLoad(text){
+  const p=sneParse(text);
+  const had=!!p.legacy;
+  if(p.legacy) p.ps = p.ps ? (p.legacy+'\n'+p.ps) : p.legacy;
+  delete p.legacy;
+  return {fields:p, hadLegacy:had};
+}
+function storyNotePreviewHtml(n, full){
+  if(!sneIsStructured(n.text)) return '<div class="story-note-text">'+escapeHtml(n.text)+'</div>';
+  const f=sneLoad(n.text).fields;
+  let h='<div class="sne-mini'+(full?' full':'')+'">';
+  SNE_FIELDS.forEach(fd=>{
+    if(!f[fd.k]) return;
+    h+='<div class="sne-mini-row"><span class="sne-mini-tag" style="color:'+fd.c+';border-color:'+fd.c+'55;background:'+fd.c+'1a;">'+fd.mark+'</span>'
+      +'<span class="sne-mini-txt">'+escapeHtml(f[fd.k])+'</span></div>';
+  });
+  return h+'</div>';
+}
+
+// ---- 狀態 ----
+let sneState = null;
+let sneWin = null;
+let sneDoc = null;
+let sneDraftTimer = null;
+let sneBoundDocs = [];
+let sneWatch = null;
+let sneSavedTimer = null;
+const SNE_GEO_KEY = 'nqSneWinGeo';
+
+function sneDraftKey(){
+  if(!sneState) return 'nqSneDraft:none';
+  return 'nqSneDraft:'+sneState.mode+':'+(sneState.d||'')+':'+(sneState.id||sneState.meta.idx);
+}
+function sneSaveDraft(){ if(sneState) try{ localStorage.setItem(sneDraftKey(), JSON.stringify(sneState.fields)); }catch(e){} }
+function sneClearDraft(){ try{ localStorage.removeItem(sneDraftKey()); }catch(e){} }
+function sneDirty(){ return !!sneState && sneSerialize(sneState.fields)!==sneState.orig && !!sneSerialize(sneState.fields).trim(); }
+
+// 記住視窗的螢幕位置與大小 → 每次都固定開在同一個地方
+function sneGeo(){
+  const g={w:1500,h:900,x:null,y:null};
+  try{
+    const r=JSON.parse(localStorage.getItem(SNE_GEO_KEY)||'null');
+    if(r && r.w>400 && r.h>300){ g.w=r.w; g.h=r.h; g.x=r.x; g.y=r.y; }
+  }catch(e){}
+  return g;
+}
+function sneRememberGeo(){
+  if(!sneWin || sneWin.closed) return;
+  try{
+    const w=sneWin.outerWidth, h=sneWin.outerHeight, x=sneWin.screenX, y=sneWin.screenY;
+    if(w>400 && h>300) localStorage.setItem(SNE_GEO_KEY, JSON.stringify({w:w,h:h,x:x,y:y}));
+  }catch(e){}
+}
+
+// ---- 目前K棒（一律以1分K為準）----
+function sneCurrentMeta(){
+  const b=(typeof mode1kBars!=='undefined') ? mode1kBars[cur1] : null;
+  if(!b) return null;
+  return {idx:b.idx, ts:b.ts, price:b.c};
+}
+function sneNewState(){
+  const m=sneCurrentMeta()||{idx:0, ts:'—', price:0};
+  return {mode:'new', d:currentDay, id:null, meta:m,
+    fields:sneEmpty(), folder:'', orig:'', locked:false, hadLegacy:false};
+}
+
+// ---- 開窗 / 聚焦 ----
+function sneFocusOrOpen(){
+  if(sneWin && !sneWin.closed){
+    if(!sneState){ sneState=sneNewState(); sneRemount(); }
+    try{ sneWin.focus(); }catch(e){}
+    return;
+  }
+  if(!sneState) sneState=sneNewState();
+  sneOpenWindow();
+}
+function sneAutoOpen(){
+  if(sneWin && !sneWin.closed) return;
+  sneState=sneNewState();
+  sneOpenWindow(true);
+}
+function sneOpenWindow(silent){
+  const g=sneGeo();
+  let feat='width='+g.w+',height='+g.h+',menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes';
+  if(g.x!==null && g.y!==null) feat+=',left='+g.x+',top='+g.y;
+  let w=null;
+  try{ w=window.open('','nqStoryEditor',feat); }catch(e){ w=null; }
+  if(!w){ sneBlocked(silent); return; }
+  sneWin=w;
+  const cssEl=document.querySelector('style');
+  const css=cssEl?cssEl.textContent:'';
+  w.document.open();
+  w.document.write('<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>📖 交易故事線 · 輸入</title><style>'
+    +css+'</style></head><body class="sne-popup"><div class="sne-ov show" id="sneOv"></div></body></html>');
+  w.document.close();
+  const boot=()=>{
+    if(!sneWin || sneWin.closed) return;
+    const ov=w.document.getElementById('sneOv');
+    if(!ov){ setTimeout(boot,40); return; }
+    sneMount(w.document, ov);
+    try{ w.focus(); }catch(e){}
+    const ta=w.document.getElementById('sne_ta_ma'); if(ta) ta.focus();
+    sneUpdateOpenBtn();
+  };
+  setTimeout(boot, 40);
+  sneStartWatch(w);
+  sneUpdateOpenBtn();
+}
+function sneRemount(){
+  if(!sneWin || sneWin.closed) return;
+  const ov=sneWin.document.getElementById('sneOv');
+  if(ov) sneMount(sneWin.document, ov);
+}
+function sneBlocked(silent){
+  sneWin=null; sneDoc=null;
+  sneUpdateOpenBtn(true);
+  if(!silent) alert('瀏覽器擋掉了輸入視窗。\n請按網址列右側的圖示，選「一律允許快顯視窗」，再點一次「開啟輸入視窗」。');
+}
+function sneStartWatch(w){
+  clearInterval(sneWatch);
+  sneWatch=setInterval(()=>{
+    if(w.closed){
+      clearInterval(sneWatch); sneWatch=null;
+      if(sneWin===w){
+        if(sneDirty()) sneSaveDraft();
+        sneWin=null; sneUnbindDocs(); sneDoc=null; sneState=null;
+        sneUpdateOpenBtn();
+      }
+      return;
+    }
+    if(sneWin===w) sneRememberGeo();
+  }, 1000);
+}
+function sneUpdateOpenBtn(blocked){
+  const b=document.getElementById('storyOpenBtn');
+  if(!b) return;
+  const open = !!(sneWin && !sneWin.closed);
+  b.textContent = blocked ? '⚠ 被擋住了，點我開啟輸入視窗'
+                : (open ? '🗗 輸入視窗（點我切過去）' : '🗗 開啟輸入視窗');
+  b.classList.toggle('on', open);
+}
+
+// ---- 主畫面換K棒時，視窗標題跟著動 ----
+function sneSyncBar(){
+  sneUpdateOpenBtn();
+  if(!sneWin || sneWin.closed || !sneDoc || !sneState) return;
+  if(sneState.mode==='new' && !sneState.locked){
+    const m=sneCurrentMeta();
+    if(m){ sneState.d=currentDay; sneState.meta=m; }
+  }
+  sneRenderHead();
+}
+function sneRenderHead(){
+  if(!sneDoc||!sneState) return;
+  const st=sneState;
+  const t=sneDoc.getElementById('sneChipTime');
+  const p=sneDoc.getElementById('sneChipPrice');
+  const s=sneDoc.getElementById('sneStatus');
+  const r=sneDoc.getElementById('sneResetBtn');
+  if(t) t.textContent=(st.d||'').slice(5)+' '+st.meta.ts;
+  if(p) p.textContent=(+st.meta.price).toFixed(1);
+  if(s){
+    if(st.mode==='edit'){ s.textContent='編輯舊筆記'; s.className='sne-status edit'; }
+    else if(st.locked){ s.textContent='🔒 已鎖定這一根'; s.className='sne-status lock'; }
+    else { s.textContent='跟著K棒'; s.className='sne-status live'; }
+  }
+  if(r) r.style.display=(st.mode==='edit'||st.locked)?'inline-block':'none';
+}
+
+// ---- UI ----
+function sneGroupHtml(g){
+  const subs=g.subs.map(s=>
+    '<div class="sne-sub">'
+    +(s.label?'<div class="sne-sub-lbl" style="color:'+s.c+';">'+s.label+'</div>':'')
+    +'<textarea class="sne-ta" id="sne_ta_'+s.k+'" data-k="'+s.k+'" spellcheck="false" placeholder="'+escapeHtml(s.ph)+'"></textarea>'
+    +'</div>').join('');
+  return '<div class="sne-group" style="border-top-color:'+g.c+';">'
+    +'<div class="sne-group-hdr"><span class="sne-group-title">'+g.title+'</span></div>'
+    +subs+'</div>';
+}
+function sneMarkup(){
+  const st=sneState;
+  let folderOpts='<option value="">未分類</option>';
+  storyFolders.forEach((f,i)=>{ folderOpts+='<option value="'+i+'"'+(st.folder===f?' selected':'')+'>📁 '+escapeHtml(f)+'</option>'; });
+  folderOpts+='<option value="__new__">＋新增分類…</option>';
+  const dots=SNE_FIELDS.map(fd=>'<span class="sne-dot" id="sne_dot_'+fd.k+'" title="'+fd.mark+'"></span>').join('');
+
+  return '<div class="sne-shell">'
+    +'<div class="sne-hdr">'
+      +'<span class="sne-hdr-title">📖 交易故事線</span>'
+      +'<span class="sne-chip" id="sneChipTime">—</span>'
+      +'<span class="sne-chip price" id="sneChipPrice">—</span>'
+      +'<span class="sne-status live" id="sneStatus">跟著K棒</span>'
+      +'<button class="sne-btn sm" id="sneResetBtn" style="display:none;">↻ 跟上目前K棒</button>'
+      +'<span class="sne-lbl-sm">分類</span><select class="sne-sel" id="sneFolder">'+folderOpts+'</select>'
+      +'<span class="sne-dots">'+dots+'</span>'
+      +'<span class="sne-hdr-acts"><button class="sne-btn" id="sneCancel">✕ 關閉視窗</button></span>'
+    +'</div>'
+    +'<div class="sne-bar ok" id="sneSavedBar"><span>已儲存 ✓ 主畫面的時間軸已更新，可以繼續寫下一則</span></div>'
+    +'<div class="sne-bar" id="sneLegacyBar"><span>這是舊筆記，原本沒有分段的文字已放進「價格」，確認後再儲存</span></div>'
+    +'<div class="sne-bar" id="sneDraftBar"><span>偵測到上次未儲存的草稿</span>'
+      +'<button class="sne-draftbtn" id="sneDraftUse">還原草稿</button>'
+      +'<button class="sne-draftbtn" id="sneDraftDrop">捨棄</button></div>'
+    +'<div class="sne-body"><div class="sne-grid">'
+      +'<div class="sne-col">'+sneGroupHtml(SNE_GROUPS[0])+'</div>'
+      +'<div class="sne-col">'+sneGroupHtml(SNE_GROUPS[1])+sneGroupHtml(SNE_GROUPS[2])+'</div>'
+    +'</div></div>'
+    +'<div class="sne-ftr">'
+      +'<span class="sne-count" id="sneCount">0 字</span>'
+      +'<span class="sne-kbd">開始打字就會鎖住這一根K棒 · Ctrl+Enter 儲存</span>'
+      +'<span class="sne-ftr-acts"><button class="sne-btn primary" id="sneSave">💾 儲存這一刻</button></span>'
+    +'</div>'
+  +'</div>';
+}
+
+function sneMount(doc, container){
+  sneDoc=doc;
+  container.innerHTML=sneMarkup();
+  const $ = id => doc.getElementById(id);
+
+  SNE_FIELDS.forEach(fd=>{
+    const ta=$('sne_ta_'+fd.k);
+    ta.value=sneState.fields[fd.k]||'';
+    ta.addEventListener('input', ()=>{
+      sneState.fields[fd.k]=ta.value;
+      if(sneState.mode==='new'){
+        const any=SNE_FIELDS.some(x=>String(sneState.fields[x.k]||'').trim());
+        if(any && !sneState.locked){ sneState.locked=true; sneRenderHead(); }
+        else if(!any && sneState.locked){ sneState.locked=false; sneSyncBar(); }
+      }
+      sneRefreshMeters();
+      const sb=$('sneSavedBar'); if(sb) sb.classList.remove('show');
+      clearTimeout(sneDraftTimer);
+      sneDraftTimer=setTimeout(sneSaveDraft, 400);
+    });
+    ta.addEventListener('keydown', e=>{
+      e.stopPropagation();
+      if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); sneCommit(); }
+    });
+  });
+  $('sneFolder').addEventListener('change', e=>{
+    const v=e.target.value;
+    if(v==='__new__'){
+      const name=(doc.defaultView||window).prompt('新分類名稱：');
+      if(name&&name.trim()){
+        const nn=name.trim();
+        if(!storyFolders.includes(nn)) storyFolders.push(nn);
+        sneState.folder=nn; saveStoryStorage();
+        let o='<option value="">未分類</option>';
+        storyFolders.forEach((f,i)=>{ o+='<option value="'+i+'"'+(sneState.folder===f?' selected':'')+'>📁 '+escapeHtml(f)+'</option>'; });
+        o+='<option value="__new__">＋新增分類…</option>';
+        e.target.innerHTML=o;
+      } else {
+        e.target.value = sneState.folder ? String(storyFolders.indexOf(sneState.folder)) : '';
+      }
+    } else if(v===''){ sneState.folder=''; }
+    else { sneState.folder=storyFolders[parseInt(v)]||''; }
+  });
+  $('sneSave').addEventListener('click', sneCommit);
+  $('sneResetBtn').addEventListener('click', sneBackToLive);
+  $('sneCancel').addEventListener('click', ()=>sneCloseWin(false));
+
+  doc.addEventListener('keydown', sneKeyHandler, true);
+  if(sneBoundDocs.indexOf(doc)<0) sneBoundDocs.push(doc);
+
+  if(sneState.hadLegacy) $('sneLegacyBar').classList.add('show');
+  try{
+    const raw=localStorage.getItem(sneDraftKey());
+    if(raw){
+      const dft=JSON.parse(raw);
+      if(sneSerialize(dft) && sneSerialize(dft)!==sneSerialize(sneState.fields)){
+        $('sneDraftBar').classList.add('show');
+        $('sneDraftUse').addEventListener('click', ()=>{
+          sneState.fields=Object.assign(sneEmpty(),dft);
+          SNE_FIELDS.forEach(fd=>{ $('sne_ta_'+fd.k).value=sneState.fields[fd.k]||''; });
+          if(sneState.mode==='new') sneState.locked=true;
+          $('sneDraftBar').classList.remove('show');
+          sneRefreshMeters(); sneRenderHead();
+        });
+        $('sneDraftDrop').addEventListener('click', ()=>{ sneClearDraft(); $('sneDraftBar').classList.remove('show'); });
+      }
+    }
+  }catch(e){}
+
+  sneRenderHead();
+  sneRefreshMeters();
+}
+
+function sneKeyHandler(e){
+  if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); sneCloseWin(false); }
+  else if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); sneCommit(); }
+}
+function sneRefreshMeters(){
+  if(!sneDoc||!sneState) return;
+  let total=0;
+  SNE_FIELDS.forEach(fd=>{ total += String(sneState.fields[fd.k]||'').replace(/\s/g,'').length; });
+  const done=SNE_FIELDS.filter(fd=>String(sneState.fields[fd.k]||'').trim()).length;
+  const c=sneDoc.getElementById('sneCount');
+  if(c) c.textContent=total+' 字 · 已寫 '+done+'/'+SNE_FIELDS.length;
+  SNE_FIELDS.forEach(fd=>{
+    const d=sneDoc.getElementById('sne_dot_'+fd.k);
+    if(!d) return;
+    const on=!!String(sneState.fields[fd.k]||'').trim();
+    d.style.background=on?fd.c:'transparent';
+    d.style.borderColor=on?fd.c:'var(--b2)';
+    d.style.boxShadow=on?('0 0 7px '+fd.c+'88'):'none';
+  });
+}
+
+// ---- 回到「跟著K棒的新筆記」----
+function sneBackToLive(){
+  const w=(sneDoc&&sneDoc.defaultView)||window;
+  if(sneDirty() && !w.confirm('目前的內容還沒儲存，要清掉並回到目前K棒嗎？\n（會先存成草稿）')) return;
+  if(sneDirty()) sneSaveDraft();
+  sneState=sneNewState();
+  sneRemount();
+}
+
+// ---- 從時間軸點「✏ 編輯」----
+function editStoryNote(d,id){
+  const n=findStoryNote(d,id); if(!n) return;
+  if(sneDirty()) sneSaveDraft();
+  const ld=sneLoad(n.text);
+  sneState={mode:'edit', d:d, id:id,
+    meta:{idx:n.idx, ts:n.ts, price:n.price},
+    fields:ld.fields, folder:n.folder||'',
+    orig:String(n.text||''), locked:true, hadLegacy:ld.hadLegacy};
+  if(sneWin && !sneWin.closed){ sneRemount(); try{ sneWin.focus(); }catch(e){} }
+  else sneOpenWindow();
+}
+
+// ---- 關閉視窗 ----
+function sneUnbindDocs(){
+  sneBoundDocs.forEach(d=>{ try{ d.removeEventListener('keydown', sneKeyHandler, true); }catch(e){} });
+  sneBoundDocs=[];
+}
+function sneCloseWin(force){
+  const w=(sneDoc&&sneDoc.defaultView)||window;
+  if(!force && sneDirty()){
+    if(!w.confirm('有還沒儲存的修改，確定要關閉嗎？\n（內容已存成草稿，下次開啟可以還原）')) return;
+    sneSaveDraft();
+  }
+  sneRememberGeo();
+  clearInterval(sneWatch); sneWatch=null;
+  sneUnbindDocs();
+  const win=sneWin;
+  sneWin=null; sneDoc=null; sneState=null;
+  if(win && !win.closed){ try{ win.close(); }catch(e){} }
+  sneUpdateOpenBtn();
+}
+
+// ---- 儲存 ----
+function sneCommit(){
+  if(!sneState) return;
+  const txt=sneSerialize(sneState.fields);
+  const w=(sneDoc&&sneDoc.defaultView)||window;
+  if(!txt.trim()){ w.alert('至少要寫一段內容再儲存。'); return; }
+  if(sneState.mode==='edit'){
+    const n=findStoryNote(sneState.d, sneState.id);
+    if(!n){ w.alert('找不到這則筆記（可能已被刪除）'); }
+    else { n.text=txt; n.folder=sneState.folder; }
+  } else {
+    const d=sneState.d;
+    if(!storyNotes[d]) storyNotes[d]=[];
+    storyNotes[d].push({
+      id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      idx: sneState.meta.idx, ts: sneState.meta.ts, price: sneState.meta.price,
+      tf: '1k', text: txt, folder: sneState.folder
+    });
+    storyNotes[d].sort((a,b)=>a.idx-b.idx);
+  }
+  saveStoryStorage();
+  sneClearDraft();
+
+  renderStoryTimeline();
+  renderAll();
+  refreshStoryClsIfOpen();
+
+  // 存完自動回到「跟著K棒的新筆記」，視窗留著繼續寫
+  const folder=sneState.folder;
+  sneState=sneNewState();
+  sneState.folder=folder;
+  sneRemount();
+  if(sneDoc){
+    const sb=sneDoc.getElementById('sneSavedBar');
+    if(sb){
+      sb.classList.add('show');
+      clearTimeout(sneSavedTimer);
+      sneSavedTimer=setTimeout(()=>{ try{ sb.classList.remove('show'); }catch(e){} }, 2600);
+    }
+  }
+}
+
+// ---- 開網頁就自動跳出輸入視窗 ----
+(function sneAutoBoot(){
+  let n=0;
+  const t=setInterval(()=>{
+    n++;
+    if(typeof mode1kBars!=='undefined' && mode1kBars && mode1kBars.length){
+      clearInterval(t);
+      sneUpdateOpenBtn();
+      sneAutoOpen();
+    } else if(n>60){ clearInterval(t); sneUpdateOpenBtn(); }
+  }, 300);
+})();
+
 // hooks：切日 / 前進K棒 時同步右側面板
 const _origRenderAllForStory = renderAll;
-renderAll = function(){ _origRenderAllForStory(); updateStoryNowBar(); };
+renderAll = function(){ _origRenderAllForStory(); updateStoryNowBar(); sneSyncBar(); };
 const _origLoadDayForStory = loadDay;
 loadDay = function(d){ _origLoadDayForStory(d); renderStoryTimeline(); };
 
@@ -3754,11 +4236,12 @@ function renderStoryClsList(){
           ${tfBadgeHtml(n.tf)}
           <span class="story-note-price">${(+n.price).toFixed(1)}</span>
         </div>
-        <div class="story-note-text">${escapeHtml(n.text)}</div>
+        ${storyNotePreviewHtml(n,true)}
       </div>
       <div class="scls-note-side">
         ${folderSelHtml(d,n)}
         <button class="scls-chart-btn" onclick="storyClsShowMkt('${d}','${n.id}')">📈 行情</button>
+        <button class="scls-chart-btn" style="border-color:#facc15;background:rgba(250,204,21,.15);color:#facc15;" onclick="event.stopPropagation();editStoryNote('${d}','${n.id}')">✏ 編輯</button>
       </div>
     </div>`;
   });
@@ -3792,7 +4275,7 @@ function renderSmktList(){
         ${tfBadgeHtml(n.tf)}
         <span class="story-note-price">${(+n.price).toFixed(1)}</span>
       </div>
-      <div class="smkt-item-text">${escapeHtml(n.text)}</div>
+      <div class="smkt-item-text">${storyNotePreviewHtml(n)}</div>
     </div>`;
   });
   el.innerHTML=h;
@@ -3806,7 +4289,7 @@ function selectSmktNote(d,id){
   document.getElementById('smktHdr').innerHTML='📅 '+d+' <span style="color:#facc15">'+n.ts+'</span> ・ '+(+n.price).toFixed(1);
   const info=document.getElementById('smktNoteInfo');
   info.style.display='block';
-  info.textContent=n.text;
+  info.innerHTML=storyNotePreviewHtml(n,true);
   renderSmktCharts();
 }
 function toggleStoryMktTF(tf){
