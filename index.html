@@ -442,9 +442,26 @@ body.sne-popup .sne-shell{max-width:none;}
 .sne-mini{display:flex;flex-direction:column;gap:3px;}
 .sne-mini-row{display:flex;gap:5px;align-items:flex-start;}
 .sne-mini-tag{flex-shrink:0;font-size:8.5px;font-weight:800;padding:1px 4px;border-radius:4px;border:1px solid;line-height:1.5;margin-top:1px;}
-.sne-mini-txt{font-size:11px;color:var(--t1);line-height:1.5;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.sne-mini.full .sne-mini-txt{display:block;white-space:pre-wrap;overflow:visible;}
-.smkt-item-text .sne-mini-txt{font-size:9.5px;color:var(--t2);-webkit-line-clamp:1;}
+.sne-mini-txt{font-size:11px;color:var(--t1);line-height:1.55;word-break:break-word;white-space:pre-wrap;}
+.smkt-item-text .sne-mini-txt{font-size:9.5px;color:var(--t2);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;}
+.sne-modes{display:flex;gap:0;border:1px solid var(--b2);border-radius:8px;overflow:hidden;}
+.sne-mode{padding:5px 12px;border:none;background:transparent;color:var(--t2);font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.sne-mode:hover{color:var(--t1);background:rgba(255,255,255,.05);}
+.sne-mode.on{background:#facc15;color:#000;}
+.sne-status.view{color:#4ade80;border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.12);}
+.sne-view-body{padding:16px 20px;overflow-y:auto;}
+.sne-view-card{max-width:1100px;margin:0 auto;width:100%;}
+.sne-view-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-bottom:11px;margin-bottom:14px;border-bottom:1px solid var(--b1);}
+.sne-view-time{font-size:19px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.5px;}
+.sne-view-price{font-size:19px;font-weight:800;color:#facc15;font-variant-numeric:tabular-nums;}
+.sne-view-tag{font-size:11px;font-weight:800;color:var(--t2);border:1px solid var(--b2);border-radius:5px;padding:2px 8px;}
+.sne-view-card .sne-mini{gap:14px;}
+.sne-view-card .sne-mini-row{align-items:flex-start;gap:10px;}
+.sne-view-card .sne-mini-tag{font-size:11.5px;padding:3px 9px;border-radius:6px;margin-top:3px;}
+.sne-view-card .sne-mini-txt{font-size:16px;line-height:1.95;color:var(--t1);}
+.sne-view-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:9px;color:var(--t3);font-size:13px;text-align:center;line-height:1.9;}
+.sne-view-empty b{color:#facc15;font-size:15px;}
+.story-note-card.hovering{border-color:#fff;background:rgba(255,255,255,.06);}
 .story-btn-row{display:flex;gap:5px;}
 .story-btn-row .story-save-btn{flex:1;width:auto;}
 .story-detail-btn{flex-shrink:0;padding:8px 11px;border-radius:7px;border:1px solid #facc15;background:rgba(250,204,21,.14);color:#facc15;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
@@ -1059,8 +1076,8 @@ function drawChart(id,bars,cursor,timeStep,pan){
     });
   }
 
-  // ✨ 故事線筆記（有筆記的K棒發亮）
-  if(typeof storyNotes!=='undefined' && storyNotes[currentDay] && storyNotes[currentDay].length){
+  // ✨ 故事線筆記（有筆記的K棒發亮；60K 不亮，因為一根涵蓋太多筆記）
+  if(tfKey!=='60k' && typeof storyNotes!=='undefined' && storyNotes[currentDay] && storyNotes[currentDay].length){
     const stf = id.replace('cv_','');
     const drawn = new Set();
     storyNotes[currentDay].forEach(n=>{
@@ -1073,17 +1090,17 @@ function drawChart(id,bars,cursor,timeStep,pan){
       const up=bar.c>=bar.o, col=up?UP:DN;
       const t=Math.min(Y(bar.o),Y(bar.c)), bh=Math.max(Math.abs(Y(bar.c)-Y(bar.o)),1.5);
       ctx.save();
-      // 金色光暈：重繪這根K棒並加上發光效果（畫兩次讓光暈更明顯）
-      ctx.shadowColor='#facc15';
+      // 白色光暈：重繪這根K棒並加上發光效果（畫兩次讓光暈更明顯）
+      ctx.shadowColor='#ffffff';
       ctx.shadowBlur=14;
       for(let g=0; g<2; g++){
         ctx.strokeStyle=col;ctx.lineWidth=1;
         ctx.beginPath();ctx.moveTo(x,Y(bar.h));ctx.lineTo(x,Y(bar.l));ctx.stroke();
         ctx.fillStyle=col;ctx.fillRect(x-CW2/2,t,CW2,bh);
       }
-      // 外框描一圈金色，讓亮起的K棒更清楚
+      // 外框描一圈白色，讓亮起的K棒更清楚
       ctx.shadowBlur=8;
-      ctx.strokeStyle='rgba(250,204,21,0.9)';ctx.lineWidth=1.2;
+      ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=1.2;
       ctx.strokeRect(x-CW2/2-1,t-1,CW2+2,bh+2);
       ctx.restore();
     });
@@ -1142,6 +1159,7 @@ function syncCrossFromIdx(globalIdx){
   });
 
   hoverBar=bar1;updateInfoBar(bar1);
+  if(typeof sneHoverBar==='function') sneHoverBar(bar1.idx);
 }
 
 function updateChdrPrice(tf, bar){
@@ -3598,7 +3616,7 @@ function renderStoryTimeline(){
     const hdr = storyScope==='all' ? '<div class="story-day-lbl">📅 '+d+'</div>' : '';
     return hdr + notes.map(n=>`
       <div class="story-note">
-        <div class="story-note-card" onclick="jumpToStoryNote('${d}','${n.id}')">
+        <div class="story-note-card" onclick="jumpToStoryNote('${d}','${n.id}')" onmouseenter="sneHoverNote('${d}','${n.id}');this.classList.add('hovering')" onmouseleave="this.classList.remove('hovering')">
           <div class="story-note-meta">
             <span class="story-note-time">${n.ts}</span>
             ${tfBadgeHtml(n.tf)}
@@ -3756,6 +3774,9 @@ function storyNotePreviewHtml(n, full){
 }
 
 // ---- 狀態 ----
+const SNE_MODE_KEY='nqSneMode';
+let sneMode = (function(){ try{ return localStorage.getItem(SNE_MODE_KEY)==='view'?'view':'edit'; }catch(e){ return 'edit'; } })();
+let sneViewNote = null;   // 預覽模式目前顯示的 {d,id}
 let sneState = null;
 let sneWin = null;
 let sneDoc = null;
@@ -3962,6 +3983,7 @@ function sneMarkup(){
   return '<div class="sne-shell">'
     +'<div class="sne-hdr">'
       +'<span class="sne-hdr-title">📖 交易故事線</span>'
+      +sneModesHtml()
       +'<span class="sne-chip" id="sneChipTime">—</span>'
       +'<span class="sne-chip price" id="sneChipPrice">—</span>'
       +'<span class="sne-chip" id="sneChipTf">1K</span>'
@@ -4056,10 +4078,167 @@ function sneOnInput(){
   sneDraftTimer=setTimeout(sneSaveDraft, 400);
 }
 
-function sneMount(doc, container){
+function sneSetMode(m){
+  if(sneMode===m) return;
+  if(m==='edit' && sneDirty()) sneSaveDraft();
+  sneMode=m;
+  try{ localStorage.setItem(SNE_MODE_KEY, m); }catch(e){}
+  sneRemount();
+}
+function sneBindModes(doc){
+  const e=doc.getElementById('sneModeEdit'), v=doc.getElementById('sneModeView');
+  if(e) e.addEventListener('click', ()=>sneSetMode('edit'));
+  if(v) v.addEventListener('click', ()=>sneSetMode('view'));
+}
+function sneModesHtml(){
+  return '<span class="sne-modes">'
+    +'<button class="sne-mode'+(sneMode==='edit'?' on':'')+'" id="sneModeEdit">✍ 輸入</button>'
+    +'<button class="sne-mode'+(sneMode==='view'?' on':'')+'" id="sneModeView">👁 預覽</button>'
+    +'</span>';
+}
+
+// ================== 預覽模式 ==================
+function sneDayNotes(d){
+  if(typeof storyNotes==='undefined' || !storyNotes[d]) return [];
+  return storyNotes[d].slice().sort((a,b)=>a.idx-b.idx);
+}
+function sneMarkupView(){
+  return '<div class="sne-shell">'
+    +'<div class="sne-hdr">'
+      +'<span class="sne-hdr-title">📖 交易故事線</span>'
+      +sneModesHtml()
+      +'<span class="sne-status view">滑到哪就顯示哪則</span>'
+      +'<span class="sne-hdr-acts">'
+        +'<button class="sne-btn sm" id="sneViewPrev" title="上一則">◀</button>'
+        +'<button class="sne-btn sm" id="sneViewNext" title="下一則">▶</button>'
+        +'<button class="sne-btn" id="sneCancel">✕ 關閉視窗</button>'
+      +'</span>'
+    +'</div>'
+    +'<div class="sne-body sne-view-body" id="sneViewBody"></div>'
+    +'<div class="sne-ftr">'
+      +'<span class="sne-count" id="sneViewCount"></span>'
+      +'<span class="sne-kbd">滑鼠移到主畫面右側的筆記，這裡就會顯示完整內容 · ◀ ▶ 換下一則</span>'
+      +'<span class="sne-ftr-acts"><button class="sne-btn primary" id="sneViewEdit">✏ 編輯這則</button></span>'
+    +'</div>'
+  +'</div>';
+}
+function sneViewRender(){
+  if(!sneDoc || sneMode!=='view') return;
+  const body=sneDoc.getElementById('sneViewBody');
+  const cnt=sneDoc.getElementById('sneViewCount');
+  const eb=sneDoc.getElementById('sneViewEdit');
+  if(!body) return;
+  const n = sneViewNote ? findStoryNote(sneViewNote.d, sneViewNote.id) : null;
+  if(!n){
+    body.innerHTML='<div class="sne-view-empty"><b>把滑鼠移到右側的筆記卡片</b>'
+      +'<span>這裡就會顯示那一則的完整內容<br>不會擋到你的K線圖</span></div>';
+    if(cnt) cnt.textContent='';
+    if(eb) eb.style.display='none';
+    return;
+  }
+  const d=sneViewNote.d;
+  body.innerHTML='<div class="sne-view-card">'
+    +'<div class="sne-view-meta">'
+      +'<span class="sne-view-time">'+escapeHtml((d||'').slice(5)+' '+n.ts)+'</span>'
+      +'<span class="sne-view-price">'+(+n.price).toFixed(1)+'</span>'
+      +'<span class="sne-view-tag">'+String(n.tf||'1k').toUpperCase()+'</span>'
+      +(n.folder?'<span class="sne-view-tag">📁 '+escapeHtml(n.folder)+'</span>':'')
+    +'</div>'
+    +storyNotePreviewHtml(n, true)
+  +'</div>';
+  if(eb) eb.style.display='inline-block';
+  if(cnt){
+    const list=sneDayNotes(d);
+    const i=list.findIndex(x=>x.id===n.id);
+    cnt.textContent = (i>=0?('第 '+(i+1)+' / '+list.length+' 則'):'') + '　'+d;
+  }
+}
+function sneViewStep(dir){
+  if(!sneViewNote){
+    const list=sneDayNotes(currentDay);
+    if(list.length) sneViewNote={d:currentDay, id:list[0].id};
+    sneViewRender(); return;
+  }
+  const list=sneDayNotes(sneViewNote.d);
+  let i=list.findIndex(x=>x.id===sneViewNote.id);
+  if(i<0) return;
+  i=Math.max(0, Math.min(list.length-1, i+dir));
+  sneViewNote={d:sneViewNote.d, id:list[i].id};
+  sneViewRender();
+}
+// 主畫面滑到某則筆記 → 第二個視窗顯示（只在預覽模式）
+function sneHoverNote(d,id){
+  sneViewNote={d:d,id:id};
+  if(sneWin && !sneWin.closed && sneMode==='view') sneViewRender();
+}
+// 滑鼠移到K線圖上 → 那根有筆記就顯示；沒有的話維持上一則不動
+function sneHoverBar(globalIdx){
+  if(!sneWin || sneWin.closed || sneMode!=='view') return;
+  const list=sneDayNotes(currentDay);
+  if(!list.length) return;
+  const unit=sneTfUnit();
+  let hit=null;
+  // 先找完全對上的那一根
+  for(let i=0;i<list.length;i++){ if(list[i].idx===globalIdx){ hit=list[i]; break; } }
+  // 再找同一根K棒範圍內的（5K/15K 時，一根涵蓋數根1分K）
+  if(!hit && unit>1){
+    for(let i=0;i<list.length;i++){
+      const st=Math.floor(list[i].idx/unit)*unit;
+      if(globalIdx>=st && globalIdx<st+unit){ hit=list[i]; break; }
+    }
+  }
+  if(!hit) return;                       // 沒筆記 → 保持顯示剛剛那則
+  if(sneViewNote && sneViewNote.id===hit.id) return;
+  sneViewNote={d:currentDay, id:hit.id};
+  sneViewRender();
+  sneMarkHoverCard(hit.id);
+}
+// 讓右側對應的卡片一起亮起來
+function sneMarkHoverCard(id){
+  try{
+    const tl=document.getElementById('storyTimeline');
+    if(!tl) return;
+    Array.prototype.forEach.call(tl.querySelectorAll('.story-note-card.hovering'), el=>el.classList.remove('hovering'));
+    const cards=tl.querySelectorAll('.story-note-card');
+    for(let i=0;i<cards.length;i++){
+      const h=cards[i].getAttribute('onmouseenter')||'';
+      if(h.indexOf("'"+id+"'")>=0){
+        cards[i].classList.add('hovering');
+        if(cards[i].scrollIntoView) cards[i].scrollIntoView({block:'nearest'});
+        break;
+      }
+    }
+  }catch(e){}
+}
+function sneMountView(doc, container){
   sneDoc=doc;
+  container.innerHTML=sneMarkupView();
+  sneBindModes(doc);
+  const $=id=>doc.getElementById(id);
+  $('sneCancel').addEventListener('click', ()=>sneCloseWin(false));
+  $('sneViewPrev').addEventListener('click', ()=>sneViewStep(-1));
+  $('sneViewNext').addEventListener('click', ()=>sneViewStep(1));
+  $('sneViewEdit').addEventListener('click', ()=>{
+    if(!sneViewNote) return;
+    sneSetMode('edit');
+    editStoryNote(sneViewNote.d, sneViewNote.id);
+  });
+  doc.addEventListener('keydown', sneKeyHandler, true);
+  if(sneBoundDocs.indexOf(doc)<0) sneBoundDocs.push(doc);
+  if(!sneViewNote){
+    const list=sneDayNotes(currentDay);
+    if(list.length) sneViewNote={d:currentDay, id:list[list.length-1].id};
+  }
+  sneViewRender();
+}
+
+function sneMount(doc, container){
+  if(sneMode==='view'){ sneMountView(doc, container); return; }
+  sneDoc=doc;
+  if(!sneState) sneState=sneNewState();
   sneState.fields=sneFix(sneState.fields);
   container.innerHTML=sneMarkup();
+  sneBindModes(doc);
   const $ = id => doc.getElementById(id);
 
   SNE_TOP.forEach(fd=>{
@@ -4127,8 +4306,13 @@ function sneMount(doc, container){
 }
 
 function sneKeyHandler(e){
-  if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); sneCloseWin(false); }
-  else if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); sneCommit(); }
+  if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); sneCloseWin(false); return; }
+  if(sneMode==='view'){
+    if(e.key==='ArrowLeft'){ e.preventDefault(); sneViewStep(-1); }
+    else if(e.key==='ArrowRight'){ e.preventDefault(); sneViewStep(1); }
+    return;
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); sneCommit(); }
 }
 function sneRefreshMeters(){
   if(!sneDoc||!sneState) return;
@@ -4164,6 +4348,7 @@ function sneBackToLive(){
 function editStoryNote(d,id){
   const n=findStoryNote(d,id); if(!n) return;
   if(sneDirty()) sneSaveDraft();
+  if(sneMode!=='edit'){ sneMode='edit'; try{ localStorage.setItem(SNE_MODE_KEY,'edit'); }catch(e){} }
   const ld=sneLoad(n.text);
   sneState={mode:'edit', d:d, id:id,
     meta:{idx:n.idx, ts:n.ts, price:n.price, tf:n.tf||'1k'},
@@ -4217,6 +4402,7 @@ function sneCommit(){
   renderStoryTimeline();
   renderAll();
   refreshStoryClsIfOpen();
+  if(sneMode==='view') sneViewRender();
 
   const folder=sneState.folder;
   sneState=sneNewState();
