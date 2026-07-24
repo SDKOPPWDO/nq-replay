@@ -1,9 +1,9 @@
 {
-  "version": "b56ca79d77ab",
-  "updated_at": "2026-07-18T16:02:16.870579",
+  "version": "4da7f05cf38e",
+  "updated_at": "2026-07-24T10:51:43.970750",
   "date_range": [
     "2025-05-20",
-    "2026-07-17"
+    "2026-07-24"
   ],
-  "trading_days": 302
+  "trading_days": 307
 }
