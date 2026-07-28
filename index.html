@@ -64,6 +64,9 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-sy
 .chdr-wick-item{display:flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:11px;background:rgba(255,255,255,0.05);}
 .chdr-wick-lbl{font-size:9px;color:rgba(255,255,255,0.55);font-weight:500;}
 .chdr-wick-val{font-size:11px;font-weight:800;color:#facc15;}
+.chdr-time-item{display:flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:11px;background:rgba(37,99,235,0.15);}
+.chdr-time-lbl{font-size:9px;color:rgba(255,255,255,0.55);font-weight:500;}
+.chdr-time-val{font-size:11px;font-weight:800;color:#60a5fa;font-variant-numeric:tabular-nums;}
 .zoom-btn:active{opacity:.6;}
 .cwrap{flex:1;min-height:0;position:relative;cursor:crosshair;}
 canvas{display:block;width:100%;height:100%;position:absolute;top:0;left:0;}
@@ -72,11 +75,14 @@ canvas.cross{pointer-events:none;}
 .matag{display:flex;align-items:center;gap:2px;font-size:9px;color:var(--t2);}
 .maln{width:10px;height:2px;border-radius:1px;}
 .btn-col{width:100px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--b1);display:flex;flex-direction:column;align-items:stretch;padding:8px 6px;gap:6px;overflow-y:auto;}
+.btn-col.left{order:-1;border-left:none;border-right:1px solid var(--b1);}
 .cbtn{border-radius:var(--r);border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:14px 4px;user-select:none;-webkit-user-select:none;font-family:inherit;text-align:center;width:100%;}
 .cbtn:active{opacity:.6;transform:scale(.97);}
 .cbtn.next{background:var(--blue);border-color:var(--blue);font-size:13px;}
 .cbtn.dim{color:var(--t2);font-size:11px;font-weight:500;}
 .btn-sep{height:1px;background:var(--b1);margin:2px 0;}
+.nav-grp-lbl{font-size:9px;color:var(--t3);text-align:center;letter-spacing:1px;font-weight:600;margin-bottom:-1px;}
+.nav-gap{height:28px;flex-shrink:0;border-top:1px dashed var(--b2);margin-top:6px;}
 .cfg-section{display:flex;flex-direction:column;gap:4px;}
 .cfg-lbl{font-size:9px;color:var(--t3);text-align:center;margin-top:2px;}
 .macfg{display:flex;align-items:center;gap:3px;}
@@ -494,7 +500,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <span class="app-title">NQ 複盤</span>
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
-    <button class="day-btn" id="btnRefreshData" onclick="manualRefreshData()" title="強制重新抓取最新資料" style="font-size:12px;padding:0 8px;width:auto;">🔄 更新資料</button>
+    <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -519,7 +525,7 @@ body.sne-popup .sne-shell{max-width:none;}
 <div class="prog"><div class="pbar" id="pbar" style="width:0%"></div></div>
   <div class="main-content">
     <div class="charts-col" id="chartsCol"></div>
-    <div class="btn-col">
+    <div class="btn-col" id="btnCol">
       <div class="cfg-lbl">均線設定</div>
       <div class="cfg-section" id="cfgrow"></div>
       <div class="btn-sep"></div>
@@ -550,9 +556,11 @@ body.sne-popup .sne-shell{max-width:none;}
 
       <div class="btn-sep"></div>
       <div style="flex:1;min-height:0;"></div>
+      <div class="nav-grp-lbl">換日</div>
       <button class="cbtn dim" id="btnPrevDay2">‹ 昨天</button>
       <button class="cbtn dim" id="btnNextDay2">› 明天</button>
-      <div class="btn-sep"></div>
+      <div class="nav-gap"></div>
+      <div class="nav-grp-lbl">換K棒</div>
       <button class="cbtn next" id="btnNext">▶ +1</button>
       <button class="cbtn next" id="btnSkip5f">▶▶ +5</button>
       <button class="cbtn dim" id="btnPrev">◀ -1</button>
@@ -1191,6 +1199,8 @@ function updateChdrPrice(tf, bar){
     wickUpEl.textContent=upperWick.toFixed(1);
     wickDnEl.textContent=lowerWick.toFixed(1);
   }
+  const ktimeEl=document.getElementById('ktimeVal_'+tf);
+  if(ktimeEl) ktimeEl.textContent=bar.ts||'—';
 }
 
 function handleCross(tf,xFrac){
@@ -1362,6 +1372,7 @@ function buildUI(){
             <span class="chdr-wick-item up"><span class="chdr-wick-lbl">上影</span><span class="chdr-wick-val" id="wickUp_${tf}">—</span></span>
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
           </span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
           <span class="chdr-r" id="hdr_${tf}"></span>
@@ -2081,6 +2092,7 @@ function buildReplayCanvases(){
             <span class="chdr-wick-item up"><span class="chdr-wick-lbl">上影</span><span class="chdr-wick-val" id="rwickUp_${tf}">—</span></span>
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="rwickDn_${tf}">—</span></span>
           </span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="rktimeVal_${tf}">—</span></span>
           <div class="treplay-canvas-zoom">
             <button class="zoom-btn" onclick="zoomReplayTF('${tf}',-1)" title="顯示更多K棒">小</button>
             <button class="zoom-btn" onclick="zoomReplayTF('${tf}',1)" title="顯示較少K棒">大</button>
@@ -2194,6 +2206,8 @@ function updateReplayChdrPrice(tf, bar){
     wickUpEl.textContent = upperWick.toFixed(1);
     wickDnEl.textContent = lowerWick.toFixed(1);
   }
+  const ktimeEl = document.getElementById('rktimeVal_'+tf);
+  if(ktimeEl) ktimeEl.textContent = bar.ts||'—';
 }
 
 function toggleReplayTF(tf){
@@ -3586,6 +3600,22 @@ function toggleStoryPanel(){
     document.getElementById('storyCol').classList.add('hidden');
     document.getElementById('btnToggleStory').style.opacity='0.5';
   }
+})();
+
+function toggleBtnColSide(){
+  const col=document.getElementById('btnCol'), btn=document.getElementById('btnToggleBtnSide');
+  if(!col) return;
+  const isLeft=col.classList.toggle('left');
+  if(btn) btn.textContent='⇄ 工具列：'+(isLeft?'左':'右');
+  try{ localStorage.setItem('nqBtnColSide', isLeft?'left':'right'); }catch(e){}
+  if(typeof renderAll==='function') requestAnimationFrame(()=>renderAll());
+}
+(function initBtnColSide(){
+  let side='right';
+  try{ side=localStorage.getItem('nqBtnColSide')||'right'; }catch(e){}
+  const col=document.getElementById('btnCol'), btn=document.getElementById('btnToggleBtnSide');
+  if(side==='left' && col) col.classList.add('left');
+  if(btn) btn.textContent='⇄ 工具列：'+(side==='left'?'左':'右');
 })();
 
 // 依所選格局取得該1K bar所屬bucket的起始時間(避免顯示bucket最後一根的x9結尾時間)
