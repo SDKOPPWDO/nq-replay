@@ -84,7 +84,12 @@ canvas.cross{pointer-events:none;}
 .nav-grp-lbl{font-size:9px;color:var(--t3);text-align:center;letter-spacing:1px;font-weight:600;margin-bottom:-1px;}
 .nav-gap{height:28px;flex-shrink:0;border-top:1px dashed var(--b2);margin-top:6px;}
 .cfg-section{display:flex;flex-direction:column;gap:4px;}
+.cfg-section.collapsed{display:none;}
 .cfg-lbl{font-size:9px;color:var(--t3);text-align:center;margin-top:2px;}
+.cfg-lbl.toggle{cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;user-select:none;padding:2px 0;border-radius:5px;}
+.cfg-lbl.toggle:hover{color:var(--t2);background:var(--bg3);}
+.cfg-lbl .cfg-caret{font-size:8px;transition:transform .15s;display:inline-block;}
+.cfg-lbl.collapsed .cfg-caret{transform:rotate(-90deg);}
 .macfg{display:flex;align-items:center;gap:3px;}
 .sw{width:12px;height:12px;border-radius:2px;flex-shrink:0;cursor:pointer;border:1px solid rgba(255,255,255,0.2);}
 .cinp{flex:1;height:22px;font-size:10px;text-align:center;border-radius:4px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;min-width:0;}
@@ -328,6 +333,36 @@ canvas.cross{pointer-events:none;}
 /* ===== STORY LINE PANEL ===== */
 .story-col{width:236px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--b1);display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .story-col.hidden{display:none;}
+/* ===== 📔 學習日誌（整頁分頁）===== */
+.journal-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at top,#0b1a18 0%,#050508 70%);z-index:700;display:none;flex-direction:column;align-items:center;padding:18px 14px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.journal-overlay.show{display:flex;}
+.journal-card{width:100%;max-width:820px;display:flex;flex-direction:column;min-height:0;flex:1;}
+.journal-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-shrink:0;}
+.journal-page-title{font-size:16px;font-weight:800;color:#2dd4bf;}
+.journal-page-sub{font-size:11px;color:var(--t3);}
+.journal-close{margin-left:auto;padding:7px 18px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.journal-compose{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:10px;margin-bottom:10px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;}
+.journal-compose-row{display:flex;gap:8px;align-items:center;}
+.journal-date{width:auto;flex-shrink:0;height:32px;font-size:12px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;padding:0 8px;color-scheme:dark;}
+.journal-date:focus{outline:none;border-color:#2dd4bf;}
+.journal-textarea{width:100%;min-height:88px;max-height:300px;resize:vertical;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;font-size:13px;padding:9px 10px;line-height:1.6;}
+.journal-textarea:focus{outline:none;border-color:#2dd4bf;}
+.journal-save-btn{flex:1;padding:9px 4px;border-radius:8px;border:none;background:#2dd4bf;color:#06302b;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;}
+.journal-save-btn:active{opacity:.7;}
+.journal-cancel-btn{flex-shrink:0;padding:9px 16px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;}
+.journal-timeline{flex:1;min-height:0;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px 16px;}
+.journal-empty{text-align:center;color:var(--t3);font-size:12px;padding:40px 8px;line-height:1.8;}
+.journal-day-lbl{font-size:12px;font-weight:800;color:#2dd4bf;padding:10px 2px 6px;letter-spacing:.5px;}
+.journal-entry{position:relative;padding-left:16px;margin-bottom:10px;}
+.journal-entry::before{content:'';position:absolute;left:3px;top:13px;width:8px;height:8px;border-radius:50%;background:#2dd4bf;box-shadow:0 0 6px rgba(45,212,191,.6);}
+.journal-entry::after{content:'';position:absolute;left:6.5px;top:24px;bottom:-12px;width:1px;background:var(--b2);}
+.journal-entry:last-child::after{display:none;}
+.journal-entry-card{background:var(--bg3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;}
+.journal-entry-meta{display:flex;align-items:center;gap:5px;margin-bottom:5px;}
+.journal-entry-acts{margin-left:auto;display:flex;gap:4px;}
+.journal-entry-act{width:24px;height:24px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.journal-entry-act:hover{color:var(--t1);border-color:#2dd4bf;}
+.journal-entry-text{font-size:13.5px;color:var(--t1);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
 .story-hdr{padding:7px 10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .story-hdr-title{font-size:12px;font-weight:700;color:#facc15;}
 .story-scope{display:flex;gap:3px;}
@@ -499,6 +534,7 @@ body.sne-popup .sne-shell{max-width:none;}
   <div class="topbar">
     <span class="app-title">NQ 複盤</span>
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
+    <button class="day-btn" id="btnToggleJournal" onclick="openJournal()" title="開啟學習日誌分頁" style="font-size:12px;padding:0 8px;width:auto;">📔 學習日誌</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
     <div class="day-nav">
@@ -526,7 +562,7 @@ body.sne-popup .sne-shell{max-width:none;}
   <div class="main-content">
     <div class="charts-col" id="chartsCol"></div>
     <div class="btn-col" id="btnCol">
-      <div class="cfg-lbl">均線設定</div>
+      <div class="cfg-lbl toggle" id="cfgToggle" onclick="toggleCfgSection()" title="收合／展開均線設定"><span class="cfg-caret">▼</span>均線設定</div>
       <div class="cfg-section" id="cfgrow"></div>
       <div class="btn-sep"></div>
       <div class="poslbl" id="poslbl">—</div>
@@ -584,8 +620,8 @@ body.sne-popup .sne-shell{max-width:none;}
       </div>
       <div class="story-timeline" id="storyTimeline"></div>
       <div class="story-backup-bar">
-        <button class="story-backup-btn" onclick="exportStoryNotes()">⬇ 備份</button>
-        <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()">⬆ 匯入</button>
+        <button class="story-backup-btn" onclick="exportStoryNotes()" title="備份故事線筆記＋模擬單交易紀錄＋學習日誌">⬇ 備份</button>
+        <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()" title="還原故事線筆記＋模擬單交易紀錄＋學習日誌">⬆ 匯入</button>
         <input type="file" id="storyImportFile" accept=".json" style="display:none;" onchange="importStoryNotes(this)">
       </div>
     </div>
@@ -653,6 +689,24 @@ body.sne-popup .sne-shell{max-width:none;}
   </div>
 </div>
 <div class="sne-ov" id="sneOv"></div>
+<div class="journal-overlay" id="journalOverlay">
+  <div class="journal-card">
+    <div class="journal-top">
+      <span class="journal-page-title">📔 學習日誌</span>
+      <span class="journal-page-sub">日記型式 · 依日期排序，最新在最底下</span>
+      <button class="journal-close" onclick="closeJournal()">✕ 關閉</button>
+    </div>
+    <div class="journal-compose">
+      <div class="journal-compose-row">
+        <input type="date" class="journal-date" id="journalDate">
+        <button class="journal-save-btn" id="journalSaveBtn" onclick="journalSave()">＋ 新增日誌</button>
+        <button class="journal-cancel-btn" id="journalCancelBtn" onclick="journalCancelEdit()">取消編輯</button>
+      </div>
+      <textarea class="journal-textarea" id="journalText" placeholder="寫下今天複盤的觀察與發現…&#10;例：&#10;・突破後回測不破、量縮，是好進場點&#10;・我太早出場，其實可以續抱到前高"></textarea>
+    </div>
+    <div class="journal-timeline" id="journalTimeline"></div>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
 // ============================================================
@@ -762,7 +816,7 @@ function isDST(dateStr){
   const dstEnd=new Date(y,10,(7-nov.getDay())%7+1);
   return d>=dstStart&&d<dstEnd;
 }
-function getOpenTW(dateStr){return isDST(dateStr)?'21:00':'22:00';}
+function getOpenTW(dateStr){return isDST(dateStr)?'21:30':'22:30';}
 function getPreOpenTW(dateStr){return isDST(dateStr)?'16:00':'17:00';}
 
 // Find 1K bar index for a given idx value
@@ -825,7 +879,7 @@ function findOpenIdx(bars,dateStr){
       if(diff<bestDiff){bestDiff=diff;best=i;}
     }
   });
-  // 往前一根，讓起始點停在bucket邊界的最後一根（例如21:00前一根=20:59）
+  // 往前一根，讓起始點停在bucket邊界的最後一根（例如21:30前一根=21:29）
   // 這樣60K單獨播放下一根時，剛好是完整收盤的bucket
   if(best>0) best=best-1;
   return best>=0?best:0;
@@ -1325,6 +1379,26 @@ function buildCfgRow(){
   });
 }
 
+// 均線設定收合／展開（記住狀態）
+function setCfgCollapsed(collapsed){
+  const sec=document.getElementById('cfgrow'), lbl=document.getElementById('cfgToggle');
+  if(!sec||!lbl) return;
+  sec.classList.toggle('collapsed', collapsed);
+  lbl.classList.toggle('collapsed', collapsed);
+  try{ localStorage.setItem('nqCfgCollapsed', collapsed?'1':'0'); }catch(e){}
+}
+function toggleCfgSection(){
+  const sec=document.getElementById('cfgrow');
+  setCfgCollapsed(!sec.classList.contains('collapsed'));
+}
+(function initCfgCollapsed(){
+  let c=false;
+  try{ c=localStorage.getItem('nqCfgCollapsed')==='1'; }catch(e){}
+  // 等 DOM 準備好後套用
+  document.addEventListener('DOMContentLoaded',()=>setCfgCollapsed(c));
+  setTimeout(()=>setCfgCollapsed(c),0);
+})();
+
 function openCP(idx,swEl){
   pickerIdx=idx;
   const popup=document.getElementById('cpopup');
@@ -1462,12 +1536,54 @@ document.getElementById('btnPrev').addEventListener('click',()=>movePrev(1));
 document.getElementById('btnSkip5f').addEventListener('click',()=>moveNext(5));
 document.getElementById('btnSkip5b').addEventListener('click',()=>movePrev(5));
 document.getElementById('btnReset').addEventListener('click',()=>{resetToModeStart();renderAll();});
+// 目前顯示中「最小的格局」（有開1K就是1K，否則取最小單位的那個）
+function currentMinTF(){
+  if(typeof selectedTFs==='undefined' || !selectedTFs || !selectedTFs.length) return '1k';
+  return [...selectedTFs].sort((a,b)=>(TF_UNITS_MAP[a]||1)-(TF_UNITS_MAP[b]||1))[0];
+}
+// 依「最小格局」前進/後退一根：
+//  - 最小格局是 1K → 一根1K移動
+//  - 最小格局是 5K/15K/60K → 以該格局K棒的收盤邊界(idx_end)為單位，一根一根移動
+function stepPlayback(dir){
+  if(!mode1kBars.length) return;
+  const minTF=currentMinTF();
+  if(minTF==='1k' || !allBars[minTF] || !allBars[minTF].length){
+    const nc=cur1+dir;
+    if(nc>=0 && nc<=mode1kBars.length-1){ cur1=nc; hoverBar=null; renderAll(); }
+    return;
+  }
+  const base=allBars[minTF];
+  const day0=mode1kBars[0].idx;
+  const curG=mode1kBars[cur1].idx;
+  let targetG=null;
+  if(dir>0){
+    // 下一根：第一個收盤邊界嚴格大於目前位置的K棒
+    for(let i=0;i<base.length;i++){
+      const bEnd=base[i].idx_end||base[i].idx;
+      if(bEnd>curG){ targetG=bEnd; break; }
+    }
+  }else{
+    // 前一根：最後一個收盤邊界嚴格小於目前位置的K棒
+    for(let i=base.length-1;i>=0;i--){
+      const bEnd=base[i].idx_end||base[i].idx;
+      if(bEnd<curG){ targetG=bEnd; break; }
+    }
+    // 已經在第一根之前 → 退到當天最開頭
+    if(targetG===null && curG>day0) targetG=day0;
+  }
+  if(targetG===null) return; // 已到最末/最前，不動
+  let nc=Math.max(0, Math.min(targetG-day0, mode1kBars.length-1));
+  if(nc!==cur1){ cur1=nc; hoverBar=null; renderAll(); }
+}
 document.addEventListener('keydown',e=>{
   if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if(document.getElementById('sclsOverlay') && document.getElementById('sclsOverlay').classList.contains('show')) return;
   if(document.getElementById('sneOv') && document.getElementById('sneOv').classList.contains('show')) return;
-  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();if(mode1kBars.length&&cur1<mode1kBars.length-1){cur1++;hoverBar=null;renderAll();}}
-  else if(e.key==='ArrowLeft'){e.preventDefault();if(cur1>0){cur1--;hoverBar=null;renderAll();}}
+  if(document.getElementById('journalOverlay') && document.getElementById('journalOverlay').classList.contains('show')) return;
+  if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); stepPlayback(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPlayback(-1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); if(tradeSystemOn && typeof tradeAction==='function') tradeAction('buy'); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); if(tradeSystemOn && typeof tradeAction==='function') tradeAction('sell'); }
 });
 
 setTimeout(async ()=>{
@@ -3569,6 +3685,128 @@ function saveStoryStorage(){
   }catch(e){ console.error('儲存失敗', e); }
 }
 
+// ============================================================
+// 📔 學習日誌（日記型式：日期 + 觀察/發現，舊→新、最新在最底下）
+// ============================================================
+let journalEntries = [];   // [{id, date:'YYYY-MM-DD', text, updatedAt}]
+let journalEditId = null;
+(function loadJournal(){
+  try{ journalEntries = JSON.parse(localStorage.getItem('nqJournalEntries')||'[]'); }catch(e){ journalEntries=[]; }
+  if(!Array.isArray(journalEntries)) journalEntries=[];
+})();
+function saveJournalStorage(){
+  try{ localStorage.setItem('nqJournalEntries', JSON.stringify(journalEntries)); }catch(e){ console.error('日誌儲存失敗', e); }
+}
+function journalTodayStr(){
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function journalFmtDate(ds){
+  const d=new Date(ds+'T12:00:00');
+  if(isNaN(d.getTime())) return ds;
+  const w=['日','一','二','三','四','五','六'][d.getDay()];
+  return ds.replace(/-/g,'/')+'（'+w+'）';
+}
+function renderJournal(){
+  const el=document.getElementById('journalTimeline');
+  if(!el) return;
+  if(!journalEntries.length){
+    el.innerHTML='<div class="journal-empty">還沒有學習日誌<br><span style="font-size:10px;">寫下複盤的觀察與發現，<br>幫自己累積學習軌跡</span></div>';
+    return;
+  }
+  // 日期舊→新；同日期依 updatedAt 舊→新（最新在最底下）
+  const sorted=[...journalEntries].sort((a,b)=>{
+    if(a.date!==b.date) return a.date<b.date?-1:1;
+    return (a.updatedAt||0)-(b.updatedAt||0);
+  });
+  let html='', lastDate=null;
+  sorted.forEach(en=>{
+    if(en.date!==lastDate){ html+='<div class="journal-day-lbl">'+journalFmtDate(en.date)+'</div>'; lastDate=en.date; }
+    html+='<div class="journal-entry"><div class="journal-entry-card'+(journalEditId===en.id?'" style="border-color:#2dd4bf;':'')+'">'
+      +'<div class="journal-entry-meta"><span class="journal-entry-acts">'
+        +'<button class="journal-entry-act" title="編輯" onclick="editJournal(\''+en.id+'\')">✎</button>'
+        +'<button class="journal-entry-act" title="刪除" onclick="deleteJournal(\''+en.id+'\')">🗑</button>'
+      +'</span></div>'
+      +'<div class="journal-entry-text">'+escapeHtml(en.text)+'</div>'
+    +'</div></div>';
+  });
+  el.innerHTML=html;
+  el.scrollTop=el.scrollHeight; // 捲到最底＝最新
+}
+function updateJournalSaveBtn(){
+  const btn=document.getElementById('journalSaveBtn');
+  const cancel=document.getElementById('journalCancelBtn');
+  if(btn) btn.textContent = journalEditId ? '✓ 更新這則' : '＋ 新增日誌';
+  if(cancel) cancel.style.display = journalEditId ? 'block' : 'none';
+}
+function journalSave(){
+  const dateInp=document.getElementById('journalDate');
+  const taInp=document.getElementById('journalText');
+  if(!dateInp||!taInp) return;
+  const date=(dateInp.value||journalTodayStr());
+  const text=(taInp.value||'').trim();
+  if(!text){ taInp.focus(); return; }
+  if(journalEditId){
+    const en=journalEntries.find(x=>x.id===journalEditId);
+    if(en){ en.date=date; en.text=text; en.updatedAt=Date.now(); }
+    journalEditId=null;
+  }else{
+    journalEntries.push({id:'j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), date, text, updatedAt:Date.now()});
+  }
+  saveJournalStorage();
+  taInp.value='';
+  dateInp.value=journalTodayStr();
+  updateJournalSaveBtn();
+  renderJournal();
+}
+function editJournal(id){
+  const en=journalEntries.find(x=>x.id===id);
+  if(!en) return;
+  journalEditId=id;
+  const dateInp=document.getElementById('journalDate'), taInp=document.getElementById('journalText');
+  if(dateInp) dateInp.value=en.date;
+  if(taInp){ taInp.value=en.text; taInp.focus(); }
+  updateJournalSaveBtn();
+  renderJournal();
+}
+function journalCancelEdit(){
+  journalEditId=null;
+  const dateInp=document.getElementById('journalDate'), taInp=document.getElementById('journalText');
+  if(taInp) taInp.value='';
+  if(dateInp) dateInp.value=journalTodayStr();
+  updateJournalSaveBtn();
+  renderJournal();
+}
+function deleteJournal(id){
+  if(!confirm('確定刪除這則學習日誌嗎？')) return;
+  journalEntries=journalEntries.filter(x=>x.id!==id);
+  if(journalEditId===id) journalEditId=null;
+  saveJournalStorage();
+  updateJournalSaveBtn();
+  renderJournal();
+}
+function openJournal(){
+  const ov=document.getElementById('journalOverlay');
+  if(!ov) return;
+  const dateInp=document.getElementById('journalDate');
+  if(dateInp && !dateInp.value) dateInp.value=journalTodayStr();
+  ov.classList.add('show');
+  updateJournalSaveBtn();
+  renderJournal();
+}
+function closeJournal(){
+  const ov=document.getElementById('journalOverlay');
+  if(ov) ov.classList.remove('show');
+}
+(function initJournalDate(){
+  function setDefault(){
+    const dateInp=document.getElementById('journalDate');
+    if(dateInp && !dateInp.value) dateInp.value=journalTodayStr();
+  }
+  document.addEventListener('DOMContentLoaded', setDefault);
+  setTimeout(setDefault, 0);
+})();
+
 // 一次性遷移：舊筆記的時間是「bucket最後一根1K」的時間(x9結尾)，
 // 依筆記所屬格局換算成該K棒的起始時間。需在 DATA 載入後呼叫。
 function migrateStoryNoteTs(){
@@ -3691,14 +3929,32 @@ function deleteStoryNote(d,id){
   refreshStoryClsIfOpen();
 }
 
-// ---- 備份 / 匯入 ----
+// ---- 備份 / 匯入（故事線 + 模擬單交易紀錄）----
 function exportStoryNotes(){
-  const payload={type:'nq-story-backup',version:2,exportedAt:new Date().toISOString(),notes:storyNotes,folders:storyFolders};
+  const payload={
+    type:'nq-story-backup',
+    version:4,
+    exportedAt:new Date().toISOString(),
+    notes:storyNotes,
+    folders:storyFolders,
+    trades:{
+      positions:dayPositions,
+      closed:dayClosedTrades,
+      markers:dayMarkers,
+      active:dayActiveTrade
+    },
+    journal:journalEntries
+  };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='NQ故事線備份_'+new Date().toISOString().slice(0,10)+'.json';
+  a.download='NQ故事線+交易備份_'+new Date().toISOString().slice(0,10)+'.json';
   a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+// 判斷某一天目前是否已有任何交易痕跡（避免匯入時覆蓋現有紀錄）
+function dayHasTradeFootprint(d){
+  const has=o=>Array.isArray(o&&o[d])&&o[d].length>0;
+  return has(dayPositions)||has(dayClosedTrades)||has(dayMarkers)||!!(dayActiveTrade&&dayActiveTrade[d]);
 }
 function importStoryNotes(input){
   const f=input.files[0]; if(!f) return;
@@ -3716,8 +3972,46 @@ function importStoryNotes(input){
         storyNotes[d].sort((a,b)=>a.idx-b.idx);
       });
       (folders||[]).forEach(f2=>{ if(f2&&!storyFolders.includes(f2)) storyFolders.push(f2); });
-      saveStoryStorage(); renderStoryTimeline(); renderAll();
-      alert('匯入完成：新增 '+added+' 則筆記');
+
+      // ── 還原模擬單交易紀錄（非破壞性：只補回目前沒有紀錄的日期）──
+      let tradeDaysRestored=0, tradeDaysSkipped=0;
+      const t=p.trades;
+      if(t){
+        const pos=t.positions||{}, closed=t.closed||{}, mk=t.markers||{}, act=t.active||{};
+        const allDays=new Set([
+          ...Object.keys(pos), ...Object.keys(closed),
+          ...Object.keys(mk), ...Object.keys(act)
+        ]);
+        allDays.forEach(d=>{
+          if(dayHasTradeFootprint(d)){ tradeDaysSkipped++; return; }
+          if(Array.isArray(pos[d])&&pos[d].length) dayPositions[d]=pos[d];
+          if(Array.isArray(closed[d])&&closed[d].length) dayClosedTrades[d]=closed[d];
+          if(Array.isArray(mk[d])&&mk[d].length) dayMarkers[d]=mk[d];
+          if(act[d]) dayActiveTrade[d]=act[d];
+          tradeDaysRestored++;
+        });
+      }
+
+      // ── 還原學習日誌（非破壞性：依 id 去重合併）──
+      let journalAdded=0;
+      if(Array.isArray(p.journal)){
+        const jids=new Set(journalEntries.map(x=>x.id));
+        p.journal.forEach(en=>{
+          if(en && en.id && !jids.has(en.id) && typeof en.text==='string'){
+            journalEntries.push({id:en.id, date:String(en.date||journalTodayStr()), text:en.text, updatedAt:en.updatedAt||Date.now()});
+            journalAdded++;
+          }
+        });
+        if(journalAdded){ saveJournalStorage(); if(typeof renderJournal==='function') renderJournal(); }
+      }
+
+      saveStoryStorage(); renderStoryTimeline();
+      if(typeof refreshTradePosDisplay==='function') refreshTradePosDisplay();
+      renderAll();
+      let msg='匯入完成：新增 '+added+' 則筆記';
+      if(t) msg+='；還原 '+tradeDaysRestored+' 天交易紀錄'+(tradeDaysSkipped?'（'+tradeDaysSkipped+' 天已有紀錄，略過）':'');
+      if(Array.isArray(p.journal)) msg+='；新增 '+journalAdded+' 則學習日誌';
+      alert(msg);
     }catch(e){ alert('匯入失敗：'+e.message); }
     input.value='';
   };
@@ -3727,13 +4021,13 @@ function importStoryNotes(input){
 
 // ============================================================
 // 📖 故事線 · 常駐輸入視窗
-// 左：盤面（均線／價格）　右：計畫（可 A、B、C 多個）
+// 左：盤面（5K／60K）　右：計畫（可 A、B、C 多個）
 // ============================================================
 const SNE_TOP = [
-  {k:'ma', mark:'均線', label:'均線', c:'#38bdf8',
-   ph:'例：\n60MA 由平轉上彎，5MA 與 20MA 黃金交叉後開口擴大。\n第一次回測 20MA 沒有跌破，收在均線上方。'},
-  {k:'ps', mark:'價格', label:'價格', c:'#facc15',
-   ph:'例：\n前高被帶量突破，回測突破點不破，形成更高的低點。\n日內從箱型震盪轉為上升結構，但量能沒有同步放大。'}
+  {k:'ma', mark:'5K', label:'5K', c:'#38bdf8',
+   ph:'例：\n5K 帶量長紅突破前高，回測突破點不破，形成更高的低點。\n連續實體K站上，短線由震盪轉強。'},
+  {k:'ps', mark:'60K', label:'60K', c:'#facc15',
+   ph:'例：\n60K 大格局仍在上升趨勢，接近上緣壓力區。\n這根收黑但下影長，趨勢尚未轉弱。'}
 ];
 const SNE_PLAN_C = '#a78bfa';
 const SNE_PLAN_LETTERS = ['A','B','C','D','E','F'];
@@ -3743,7 +4037,7 @@ const SNE_PLAN_PH = [
   '例：\n如果沒有回測直接噴出，改成等第一根縮量紅K再進，停損放那根低點。',
   '例：\n如果跌破前低，計畫作廢，反手或當天不再做。'
 ];
-const SNE_MARK_TO_KEY = {'均線':'ma','價格':'ps','結構':'ps','反向':'legacy','補充':'legacy'};
+const SNE_MARK_TO_KEY = {'5K':'ma','60K':'ps','均線':'ma','價格':'ps','結構':'ps','反向':'legacy','補充':'legacy'};
 
 function sneEmpty(){ return {ma:'', ps:'', plans:['']}; }
 function sneFix(f){
@@ -3757,8 +4051,8 @@ function snePlanList(f){ return sneFix(f).plans.map(v=>String(v||'').trim()).fil
 
 function sneSerialize(f0){
   const f=sneFix(f0), out=[];
-  if(f.ma.trim()) out.push('【均線】\n'+f.ma.trim());
-  if(f.ps.trim()) out.push('【價格】\n'+f.ps.trim());
+  if(f.ma.trim()) out.push('【5K】\n'+f.ma.trim());
+  if(f.ps.trim()) out.push('【60K】\n'+f.ps.trim());
   let n=0;
   f.plans.forEach(v=>{
     const t=String(v||'').trim();
@@ -3771,7 +4065,7 @@ function sneSerialize(f0){
 function sneParse(text){
   const f={ma:'', ps:'', plans:[], legacy:''};
   const s=String(text||'');
-  const re=/【(均線|價格|結構|計畫[A-F]?|反向|補充)】/g;
+  const re=/【(5K|60K|均線|價格|結構|計畫[A-F]?|反向|補充)】/g;
   const hits=[]; let m;
   while((m=re.exec(s))!==null) hits.push({tag:m[1], i:m.index, len:m[0].length});
   if(!hits.length){ f.legacy=s.trim(); f.plans=['']; return f; }
@@ -3792,8 +4086,8 @@ function sneParse(text){
   if(!f.plans.length) f.plans=[''];
   return f;
 }
-function sneIsStructured(text){ return /【(均線|價格|結構|計畫[A-F]?|反向)】/.test(String(text||'')); }
-// 舊筆記：沒分段的自由文字、以及舊的【反向】【補充】→ 併入「價格」，不會掉字
+function sneIsStructured(text){ return /【(5K|60K|均線|價格|結構|計畫[A-F]?|反向)】/.test(String(text||'')); }
+// 舊筆記：沒分段的自由文字、以及舊的【反向】【補充】→ 併入「60K」，不會掉字
 function sneLoad(text){
   const p=sneParse(text);
   const had=!!p.legacy;
@@ -4017,8 +4311,8 @@ function sneMarkup(){
   let folderOpts='<option value="">未分類</option>';
   storyFolders.forEach((f,i)=>{ folderOpts+='<option value="'+i+'"'+(st.folder===f?' selected':'')+'>📁 '+escapeHtml(f)+'</option>'; });
   folderOpts+='<option value="__new__">＋新增分類…</option>';
-  const dots='<span class="sne-dot" id="sne_dot_ma" title="均線"></span>'
-    +'<span class="sne-dot" id="sne_dot_ps" title="價格"></span>'
+  const dots='<span class="sne-dot" id="sne_dot_ma" title="5K"></span>'
+    +'<span class="sne-dot" id="sne_dot_ps" title="60K"></span>'
     +'<span class="sne-dot" id="sne_dot_plan" title="計畫"></span>';
 
   return '<div class="sne-shell">'
@@ -4035,7 +4329,7 @@ function sneMarkup(){
       +'<span class="sne-hdr-acts"><button class="sne-btn" id="sneCancel">✕ 關閉視窗</button></span>'
     +'</div>'
     +'<div class="sne-bar ok" id="sneSavedBar"><span>已儲存 ✓ 主畫面的時間軸已更新，可以繼續寫下一則</span></div>'
-    +'<div class="sne-bar" id="sneLegacyBar"><span>這是舊筆記，原本沒有分段的文字已放進「價格」，確認後再儲存</span></div>'
+    +'<div class="sne-bar" id="sneLegacyBar"><span>這是舊筆記，原本沒有分段的文字已放進「60K」，確認後再儲存</span></div>'
     +'<div class="sne-bar" id="sneDraftBar"><span>偵測到上次未儲存的草稿</span>'
       +'<button class="sne-draftbtn" id="sneDraftUse">還原草稿</button>'
       +'<button class="sne-draftbtn" id="sneDraftDrop">捨棄</button></div>'
