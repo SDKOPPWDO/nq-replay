@@ -423,6 +423,19 @@ canvas.cross{pointer-events:none;}
 .sne-folder-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;user-select:none;white-space:nowrap;}
 .sne-folder-chip.on{background:#7c3aed;border-color:#7c3aed;color:#fff;}
 .sne-folder-chip.add{border-style:dashed;color:var(--t3);}
+.sne-folder-chips{max-width:420px;}
+.sne-fchip-sel{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid #7c3aed;background:rgba(124,58,237,.28);color:#e9ddff;cursor:pointer;white-space:nowrap;user-select:none;}
+.sne-fchip-open{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px dashed var(--b2);background:var(--bg3);color:var(--t3);cursor:pointer;white-space:nowrap;user-select:none;}
+.sne-fchip-open:hover{color:var(--t1);border-color:#7c3aed;}
+.sne-fdrop{position:fixed;z-index:9999;display:none;flex-direction:column;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;box-shadow:0 16px 50px rgba(0,0,0,.7);padding:8px;width:250px;}
+.sne-fdrop-search{height:30px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-family:inherit;font-size:12px;padding:0 8px;margin-bottom:6px;}
+.sne-fdrop-search:focus{outline:none;border-color:#7c3aed;}
+.sne-fdrop-list{max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
+.sne-fdrop-item{padding:6px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sne-fdrop-item.on{border-color:#7c3aed;color:#fff;background:rgba(124,58,237,.28);}
+.sne-fdrop-empty{font-size:11px;color:var(--t3);text-align:center;padding:14px 4px;}
+.sne-fdrop-add{margin-top:6px;padding:7px;border-radius:7px;border:1px dashed var(--b2);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sne-fdrop-add:hover{color:var(--t1);border-color:#7c3aed;}
 .scls-folder-chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:220px;}
 .scls-folder-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);cursor:pointer;user-select:none;white-space:nowrap;}
 .scls-folder-chip.on{background:#7c3aed;border-color:#7c3aed;color:#fff;}
@@ -4683,39 +4696,105 @@ function sneRenderFolderChips(doc){
   if(!box || !sneState) return;
   if(!Array.isArray(sneState.folders)) sneState.folders=[];
   box.innerHTML='';
+  // 只顯示已選的分類（點一下即移除）
+  sneState.folders.forEach(f=>{
+    const tag=doc.createElement('span');
+    tag.className='sne-fchip-sel';
+    tag.textContent='📁 '+f+'  ✕';
+    tag.title='移除「'+f+'」';
+    tag.addEventListener('click', ()=>{
+      sneState.folders=sneState.folders.filter(x=>x!==f);
+      sneRenderFolderChips(doc);
+      if(doc.getElementById('sneFdrop') && doc.getElementById('sneFdrop').style.display==='flex') sneRenderFdropList(doc, (doc.getElementById('sneFdropSearch')||{}).value||'');
+    });
+    box.appendChild(tag);
+  });
+  // 開啟下拉的按鈕
+  const openBtn=doc.createElement('span');
+  openBtn.className='sne-fchip-open';
+  openBtn.textContent = sneState.folders.length ? '＋ 分類 ▾' : '＋ 加入分類 ▾';
+  openBtn.addEventListener('click', (e)=>{ e.stopPropagation(); sneOpenFdrop(doc, openBtn); });
+  box.appendChild(openBtn);
+}
+function sneOpenFdrop(doc, btn){
+  let drop=doc.getElementById('sneFdrop');
+  if(!drop){
+    drop=doc.createElement('div');
+    drop.id='sneFdrop';
+    drop.className='sne-fdrop';
+    const s=doc.createElement('input'); s.className='sne-fdrop-search'; s.id='sneFdropSearch'; s.placeholder='搜尋分類…';
+    const l=doc.createElement('div'); l.className='sne-fdrop-list'; l.id='sneFdropList';
+    const a=doc.createElement('button'); a.className='sne-fdrop-add'; a.type='button'; a.textContent='＋ 新增分類';
+    drop.appendChild(s); drop.appendChild(l); drop.appendChild(a);
+    doc.body.appendChild(drop);
+    s.addEventListener('input', e=>sneRenderFdropList(doc, e.target.value));
+    a.addEventListener('click', ()=>sneFdropAddNew(doc));
+    if(!doc.__sneFdropBound){
+      doc.__sneFdropBound=true;
+      doc.addEventListener('mousedown', e=>{
+        const d=doc.getElementById('sneFdrop');
+        if(!d || d.style.display!=='flex') return;
+        if(d.contains(e.target)) return;
+        if(e.target.closest && e.target.closest('.sne-fchip-open')) return;
+        d.style.display='none';
+      }, true);
+    }
+  }
+  const search=drop.querySelector('#sneFdropSearch');
+  search.value='';
+  sneRenderFdropList(doc, '');
+  drop.style.display='flex';
+  const r=btn.getBoundingClientRect();
+  const w=(doc.defaultView||window);
+  const dw=250;
+  let left=r.left; if(left+dw > (w.innerWidth-8)) left=Math.max(8, w.innerWidth-8-dw);
+  let top=r.bottom+4; if(top+300 > (w.innerHeight-8)) top=Math.max(8, r.top-304);
+  drop.style.left=left+'px'; drop.style.top=top+'px'; drop.style.width=dw+'px';
+  setTimeout(()=>{ try{ search.focus(); }catch(e){} }, 0);
+}
+function sneRenderFdropList(doc, q){
+  const list=doc.getElementById('sneFdropList');
+  if(!list || !sneState) return;
+  const sel=sneState.folders||[];
+  const query=(q||'').trim().toLowerCase();
+  list.innerHTML='';
+  let any=false;
   storyFolders.forEach(f=>{
-    const on=sneState.folders.indexOf(f)>=0;
-    const chip=doc.createElement('span');
-    chip.className='sne-folder-chip'+(on?' on':'');
-    chip.textContent='📁 '+f;
-    chip.title = on ? '點一下移出「'+f+'」' : '點一下加入「'+f+'」';
-    chip.addEventListener('click', ()=>{
-      const arr=sneState.folders.slice();
+    if(query && f.toLowerCase().indexOf(query)<0) return;
+    any=true;
+    const on=sel.indexOf(f)>=0;
+    const item=doc.createElement('div');
+    item.className='sne-fdrop-item'+(on?' on':'');
+    item.textContent=(on?'✓ ':'　')+'📁 '+f;
+    item.addEventListener('click', ()=>{
+      const arr=(sneState.folders||[]).slice();
       const i=arr.indexOf(f);
       if(i>=0) arr.splice(i,1); else arr.push(f);
       sneState.folders=arr;
+      sneRenderFdropList(doc, (doc.getElementById('sneFdropSearch')||{}).value||'');
       sneRenderFolderChips(doc);
     });
-    box.appendChild(chip);
+    list.appendChild(item);
   });
-  const add=doc.createElement('span');
-  add.className='sne-folder-chip add';
-  add.textContent='＋ 新增分類';
-  add.addEventListener('click', ()=>{
-    const w=(doc.defaultView||window);
-    const name=w.prompt('新分類名稱：');
-    if(name && name.trim()){
-      const nn=name.trim();
-      if(!storyFolders.includes(nn)) storyFolders.push(nn);
-      const arr=sneState.folders.slice();
-      if(arr.indexOf(nn)<0) arr.push(nn);
-      sneState.folders=arr;
-      saveStoryStorage();
-      sneRenderFolderChips(doc);
-      if(typeof refreshStoryClsIfOpen==='function') refreshStoryClsIfOpen();
-    }
-  });
-  box.appendChild(add);
+  if(!any){
+    const em=doc.createElement('div'); em.className='sne-fdrop-empty';
+    em.textContent = storyFolders.length ? '找不到符合的分類' : '還沒有分類，按下方＋新增';
+    list.appendChild(em);
+  }
+}
+function sneFdropAddNew(doc){
+  const w=(doc.defaultView||window);
+  const name=w.prompt('新分類名稱：');
+  if(name===null || !name.trim()) return;
+  const nn=name.trim();
+  if(!storyFolders.includes(nn)) storyFolders.push(nn);
+  const arr=(sneState.folders||[]).slice();
+  if(arr.indexOf(nn)<0) arr.push(nn);
+  sneState.folders=arr;
+  saveStoryStorage();
+  sneRenderFdropList(doc, (doc.getElementById('sneFdropSearch')||{}).value||'');
+  sneRenderFolderChips(doc);
+  if(typeof refreshStoryClsIfOpen==='function') refreshStoryClsIfOpen();
 }
 function sneMount(doc, container){
   if(sneMode==='view'){ sneMountView(doc, container); return; }
