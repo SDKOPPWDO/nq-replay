@@ -25,6 +25,27 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-sy
 .mode-wrap{display:flex;align-items:center;gap:3px;}
 .mode-btn{padding:4px 8px;font-size:11px;border-radius:var(--rs);border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;font-family:inherit;font-weight:500;}
 .mode-btn.on{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.day-btn.on{background:#f59e0b;border-color:#f59e0b;color:#fff;}
+/* 分類回測：模式列 + 分類挑選浮窗 */
+.clsrp-bar{display:none;align-items:center;gap:10px;padding:5px 12px;background:linear-gradient(90deg,rgba(245,158,11,.18),rgba(245,158,11,.06));border-bottom:1px solid rgba(245,158,11,.45);flex-shrink:0;}
+.clsrp-bar.show{display:flex;}
+.clsrp-bar-info{font-size:12px;font-weight:800;color:#f59e0b;white-space:nowrap;}
+.clsrp-bar-nav{display:flex;align-items:center;gap:4px;}
+.clsrp-navbtn{width:26px;height:24px;border-radius:6px;border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.12);color:#f59e0b;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.clsrp-navbtn:active{opacity:.6;}
+.clsrp-navbtn:disabled{opacity:.35;cursor:default;}
+.clsrp-bar-hint{font-size:10px;color:var(--t3);flex:1;}
+.clsrp-exit{padding:4px 10px;font-size:11px;font-weight:600;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;font-family:inherit;white-space:nowrap;}
+.clsrp-exit:active{opacity:.6;}
+.clsrp-popup{position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--b2);border-radius:12px;padding:10px;box-shadow:0 12px 40px rgba(0,0,0,.8);display:none;min-width:220px;max-width:300px;max-height:70vh;overflow-y:auto;}
+.clsrp-popup.show{display:block;}
+.clsrp-popup-title{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.clsrp-popup-sub{font-size:10px;color:var(--t3);margin-bottom:8px;line-height:1.4;}
+.clsrp-folder{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:9px 10px;margin-bottom:5px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;}
+.clsrp-folder:hover{border-color:#f59e0b;background:rgba(245,158,11,.1);}
+.clsrp-folder-cnt{font-size:10px;color:var(--t3);font-weight:600;white-space:nowrap;}
+.clsrp-popup-empty{font-size:11px;color:var(--t3);text-align:center;padding:16px 8px;line-height:1.6;}
+.clsrp-popup-close{font-size:10px;color:var(--t3);text-align:center;cursor:pointer;margin-top:6px;padding:4px;}
 .cal-popup{position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--b2);border-radius:12px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,.8);display:none;}
 .cal-popup.show{display:block;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
@@ -617,6 +638,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnToggleJournal" onclick="openJournal()" title="開啟學習日誌分頁" style="font-size:12px;padding:0 8px;width:auto;">📔 學習日誌</button>
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
+    <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類：選一個分類後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
     <button class="day-btn" id="btnSneTablet" onclick="sneTabletToggle()" title="開啟後，輸入視窗會內嵌在畫面右側，可一邊看圖一邊打字（適合平板）" style="font-size:12px;padding:0 8px;width:auto;">📱 平板輸入：關</button>
     <div class="day-nav">
@@ -632,6 +654,16 @@ body.sne-popup .sne-shell{max-width:none;}
       <button class="tf-btn" data-tf="60k" onclick="toggleTF('60k',this)">60K</button>
     </div>
   </div>
+  <div class="clsrp-bar" id="clsReplayBar">
+    <span class="clsrp-bar-info" id="clsReplayInfo">🎯</span>
+    <span class="clsrp-bar-nav">
+      <button class="clsrp-navbtn" id="clsReplayPrev" onclick="goPrevDay()" title="上一個此分類的交易日">‹</button>
+      <button class="clsrp-navbtn" id="clsReplayNext" onclick="goNextDay()" title="下一個此分類的交易日">›</button>
+    </span>
+    <span class="clsrp-bar-hint">日期只在此分類的交易日之間移動 · 盤中一樣一根一根看</span>
+    <button class="clsrp-exit" onclick="exitClsReplay()">✕ 退出分類回測</button>
+  </div>
+  <div class="clsrp-popup" id="clsReplayPicker"></div>
   <div class="cal-popup" id="calPopup">
     <div class="cal-header">
       <button class="cal-nav" id="calPrev">‹</button>
@@ -833,6 +865,9 @@ let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=
 let panOffset={};
 let calYear=0,calMonth=0;
 let selectedTFs=['1k'];
+// 分類回測模式：只在「有選定分類的交易日」之間換日，盤中一根一根照舊
+let clsReplayActive=false;
+let clsReplayFolder=null; // 選定的分類名稱
 
 function setLoadingText(msg){
   const el = document.querySelector('#loading .ltxt');
@@ -1006,9 +1041,21 @@ function loadDay(day){
 function updateDateDisplay(){
   document.getElementById('dateDisplay').textContent=
     new Date(currentDay+'T12:00:00').toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'});
+  updateClsReplayBar();
 }
-function goPrevDay(){const i=DAYS.indexOf(currentDay);if(i>0)loadDay(DAYS[i-1]);}
-function goNextDay(){const i=DAYS.indexOf(currentDay);if(i<DAYS.length-1)loadDay(DAYS[i+1]);}
+// 分類回測模式下，可換的日期只剩「這個分類底下有筆記」的交易日
+function clsReplayDayList(){
+  if(!clsReplayActive || !clsReplayFolder) return [];
+  const out=[];
+  Object.keys(storyNotes).forEach(d=>{
+    if(!DAYS_SET.has(d)) return; // 只算有K棒資料的日子
+    if(storyNotes[d].some(n=>noteInFolder(n, clsReplayFolder))) out.push(d);
+  });
+  return out.sort();
+}
+function dayNavList(){ return clsReplayActive ? clsReplayDayList() : DAYS; }
+function goPrevDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>0)loadDay(L[i-1]);}
+function goNextDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>=0&&i<L.length-1)loadDay(L[i+1]);}
 
 function toggleCal(){
   const popup=document.getElementById('calPopup');
@@ -1028,11 +1075,12 @@ function renderCal(){
   const first=new Date(calYear,calMonth,1).getDay();
   const dim=new Date(calYear,calMonth+1,0).getDate();
   for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day';grid.appendChild(el);}
+  const allowSet = clsReplayActive ? new Set(clsReplayDayList()) : DAYS_SET;
   for(let d=1;d<=dim;d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const el=document.createElement('div');el.textContent=d;
     let cls='cal-day';
-    if(DAYS_SET.has(ds)){cls+=' has-data';if(ds===currentDay)cls+=' selected';
+    if(allowSet.has(ds)){cls+=' has-data';if(ds===currentDay)cls+=' selected';
       el.addEventListener('click',()=>{loadDay(ds);document.getElementById('calPopup').classList.remove('show');});}
     el.className=cls;grid.appendChild(el);
   }
@@ -4023,7 +4071,10 @@ function renderStoryTimeline(){
     return;
   }
   tl.innerHTML = dates.map(d=>{
-    const notes=storyNotes[d].slice().sort((a,b)=>a.idx-b.idx);
+    let notes=storyNotes[d].slice().sort((a,b)=>a.idx-b.idx);
+    // 分類回測模式：右側只顯示選定分類的時間點
+    if(clsReplayActive && clsReplayFolder) notes=notes.filter(n=>noteInFolder(n, clsReplayFolder));
+    if(!notes.length) return '';
     const hdr = storyScope==='all' ? '<div class="story-day-lbl">📅 '+d+'</div>' : '';
     return hdr + notes.map(n=>`
       <div class="story-note">
@@ -5148,6 +5199,99 @@ function refreshStoryClsIfOpen(){
   renderStoryClsChips();
 }
 
+// ============================================================
+// 🎯 分類回測模式：選一個分類，只在這個分類的交易日之間換日回測
+// ============================================================
+function clsReplayFolderDayCount(name){
+  let c=0;
+  Object.keys(storyNotes).forEach(d=>{
+    if(!DAYS_SET.has(d)) return;
+    if(storyNotes[d].some(n=>noteInFolder(n, name))) c++;
+  });
+  return c;
+}
+function openClsReplayPicker(anchor){
+  const pop=document.getElementById('clsReplayPicker');
+  if(!pop) return;
+  // 已經在回測中 → 直接退出
+  if(clsReplayActive){ exitClsReplay(); return; }
+  if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  let html='<div class="clsrp-popup-title">🎯 選一個分類來回測</div>'
+    +'<div class="clsrp-popup-sub">選好之後，日期的 ‹ › 只會停在「有這個分類」的交易日，盤中一樣一根一根看。</div>';
+  if(!storyFolders.length){
+    html+='<div class="clsrp-popup-empty">還沒有任何分類<br>先到「🗂 分類」建立分類，<br>並把時間點分進去，再回來這裡回測。</div>';
+  }else{
+    storyFolders.forEach((f,i)=>{
+      const cnt=clsReplayFolderDayCount(f);
+      html+='<button class="clsrp-folder" '+(cnt?'':'disabled style="opacity:.45;cursor:default;" ')
+        +'onclick="'+(cnt?('pickClsReplayFolder('+i+')'):'')+'">'
+        +'<span>📁 '+escapeHtml(f)+'</span>'
+        +'<span class="clsrp-folder-cnt">'+(cnt?(cnt+' 天'):'無資料')+'</span></button>';
+    });
+  }
+  html+='<div class="clsrp-popup-close" onclick="document.getElementById(\'clsReplayPicker\').classList.remove(\'show\')">關閉</div>';
+  pop.innerHTML=html;
+  // 定位在按鈕下方
+  const r=(anchor||document.getElementById('btnClsReplay')).getBoundingClientRect();
+  pop.style.left=Math.max(6,Math.min(r.left, window.innerWidth-310))+'px';
+  pop.style.top=(r.bottom+6)+'px';
+  pop.classList.add('show');
+}
+function pickClsReplayFolder(i){
+  const name=storyFolders[i];
+  document.getElementById('clsReplayPicker').classList.remove('show');
+  if(name===undefined) return;
+  enterClsReplay(name);
+}
+function enterClsReplay(name){
+  clsReplayFolder=name;
+  clsReplayActive=true;
+  const days=clsReplayDayList();
+  if(!days.length){
+    clsReplayActive=false; clsReplayFolder=null;
+    alert('分類「'+name+'」底下還沒有任何有K棒資料的交易日。');
+    return;
+  }
+  // 從這個分類「最早的一天」開始回測；若目前日已在清單內就留在原地
+  if(days.indexOf(currentDay)<0) loadDay(days[0]);
+  else { updateDateDisplay(); if(typeof renderStoryTimeline==='function') renderStoryTimeline(); }
+  updateClsReplayBar();
+}
+function exitClsReplay(){
+  clsReplayActive=false; clsReplayFolder=null;
+  updateClsReplayBar();
+  updateDateDisplay();
+  if(typeof renderStoryTimeline==='function') renderStoryTimeline();
+}
+function updateClsReplayBar(){
+  const bar=document.getElementById('clsReplayBar');
+  const btn=document.getElementById('btnClsReplay');
+  if(!bar) return;
+  if(!clsReplayActive){
+    bar.classList.remove('show');
+    if(btn){ btn.classList.remove('on'); btn.textContent='🎯 分類回測'; }
+    return;
+  }
+  // 若選定的分類已被刪除，安全退出
+  if(!storyFolders.includes(clsReplayFolder)){ exitClsReplay(); return; }
+  const days=clsReplayDayList();
+  const pos=days.indexOf(currentDay);
+  const info=document.getElementById('clsReplayInfo');
+  if(info) info.textContent='🎯 '+clsReplayFolder+'　第 '+(pos>=0?(pos+1):'-')+' / '+days.length+' 天';
+  const pv=document.getElementById('clsReplayPrev'), nx=document.getElementById('clsReplayNext');
+  if(pv) pv.disabled=(pos<=0);
+  if(nx) nx.disabled=(pos<0 || pos>=days.length-1);
+  bar.classList.add('show');
+  if(btn){ btn.classList.add('on'); btn.textContent='🎯 分類回測中'; }
+}
+// 點畫面其他地方關掉挑選浮窗
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('clsReplayPicker');
+  const btn=document.getElementById('btnClsReplay');
+  if(pop && pop.classList.contains('show') && !pop.contains(e.target) && e.target!==btn && !(btn&&btn.contains(e.target)))
+    pop.classList.remove('show');
+});
+
 // ---- 分類（資料夾）管理 ----
 function addStoryFolder(){
   const name=prompt('新分類名稱（例如：開盤急殺V轉）：');
@@ -5168,6 +5312,7 @@ function deleteStoryFolderByIdx(i){
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{
     if(noteInFolder(n,name)) setNoteFoldersArr(n, noteFolders(n).filter(f=>f!==name));
   }));
+  if(clsReplayActive && clsReplayFolder===name){ exitClsReplay(); }
   storyFolders.splice(i,1);
   if(sclsFilter==='f:'+i) sclsFilter='__all__';
   else if(sclsFilter.startsWith('f:')){
@@ -5220,6 +5365,7 @@ function renameStoryFolderByIdx(i){
   if(nn===old) return;
   if(storyFolders.includes(nn)){ alert('已有同名分類'); return; }
   storyFolders[i]=nn;
+  if(clsReplayActive && clsReplayFolder===old){ clsReplayFolder=nn; updateClsReplayBar(); }
   // 同步更新所有筆記裡的舊分類名稱
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{
     const arr=noteFolders(n);
