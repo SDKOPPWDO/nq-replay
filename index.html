@@ -483,6 +483,18 @@ canvas.cross{pointer-events:none;}
 .sne-ov{position:fixed;inset:0;z-index:900;display:none;flex-direction:column;background:rgba(4,4,8,.78);backdrop-filter:blur(5px);padding:14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
 .sne-ov.show{display:flex;}
 .sne-shell{flex:1;min-height:0;width:100%;max-width:2200px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--b1);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.8);overflow:hidden;}
+/* 平板輸入模式：右側停靠面板 */
+.sne-dock{display:none;flex-shrink:0;width:46vw;min-width:320px;max-width:760px;flex-direction:column;background:var(--bg);border-left:2px solid #38bdf8;min-height:0;overflow:hidden;}
+.sne-dock.show{display:flex;}
+.sne-dock-hdr{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--b1);flex-shrink:0;background:var(--bg2);}
+.sne-dock-title{font-size:12px;font-weight:800;color:#38bdf8;}
+.sne-dock-w-btns{margin-left:auto;display:flex;gap:4px;}
+.sne-dock-w-btns button{padding:3px 10px;font-size:11px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;font-family:inherit;font-weight:700;}
+.sne-dock-w-btns button.on{background:#38bdf8;color:#04121f;border-color:#38bdf8;}
+.sne-dock-close{padding:4px 12px;font-size:11px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);cursor:pointer;font-family:inherit;font-weight:700;}
+.sne-dock-body{flex:1;min-height:0;display:flex;overflow:hidden;padding:8px;}
+.sne-dock-body .sne-shell{max-width:none;box-shadow:none;border-radius:10px;}
+.day-btn.on{background:#38bdf8;color:#04121f;border-color:#38bdf8;}
 .sne-hdr{display:flex;align-items:center;gap:9px;padding:10px 14px;background:linear-gradient(90deg,rgba(250,204,21,.10),transparent 55%);border-bottom:1px solid var(--b1);flex-shrink:0;flex-wrap:wrap;}
 .sne-hdr-title{font-size:14px;font-weight:800;color:#facc15;letter-spacing:.5px;}
 .sne-chip{font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--bg3);border:1px solid var(--b2);color:#fff;font-variant-numeric:tabular-nums;}
@@ -606,6 +618,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
+    <button class="day-btn" id="btnSneTablet" onclick="sneTabletToggle()" title="開啟後，輸入視窗會內嵌在畫面右側，可一邊看圖一邊打字（適合平板）" style="font-size:12px;padding:0 8px;width:auto;">📱 平板輸入：關</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -693,6 +706,18 @@ body.sne-popup .sne-shell{max-width:none;}
         <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()" title="還原故事線筆記＋模擬單交易紀錄＋學習日誌">⬆ 匯入</button>
         <input type="file" id="storyImportFile" accept=".json" style="display:none;" onchange="importStoryNotes(this)">
       </div>
+    </div>
+    <div class="sne-dock" id="sneDock">
+      <div class="sne-dock-hdr">
+        <span class="sne-dock-title">📝 輸入面板</span>
+        <span class="sne-dock-w-btns">
+          <button id="sneDockW_narrow" onclick="sneDockWidth('narrow')">窄</button>
+          <button id="sneDockW_mid" onclick="sneDockWidth('mid')">中</button>
+          <button id="sneDockW_wide" onclick="sneDockWidth('wide')">寬</button>
+        </span>
+        <button class="sne-dock-close" onclick="closeSneDock()">✕ 收合</button>
+      </div>
+      <div class="sne-dock-body" id="sneDockBody"></div>
     </div>
   </div>
 </div>
@@ -4241,6 +4266,9 @@ let sneMode = (function(){ try{ return localStorage.getItem(SNE_MODE_KEY)==='vie
 let sneViewNote = null;   // 預覽模式目前顯示的 {d,id}
 let sneState = null;
 let sneWin = null;
+let sneDockOpen = false;
+let sneTablet = (function(){ try{ return localStorage.getItem('nqSneTablet')==='1'; }catch(e){ return false; } })();
+let sneVVHandler = null, sneVVTimer = null;
 let sneDoc = null;
 let sneDraftTimer = null;
 let sneBoundDocs = [];
@@ -4311,6 +4339,16 @@ function sneNewState(){
 
 // ---- 開窗 / 聚焦 ----
 function sneFocusOrOpen(){
+  if(sneTablet){
+    if(sneDockOpen){
+      if(!sneState){ sneState=sneNewState(); sneMount(document, document.getElementById('sneDockBody')); }
+      const ta=document.getElementById('sne_ta_ma'); if(ta) try{ ta.focus(); }catch(e){}
+      return;
+    }
+    if(!sneState) sneState=sneNewState();
+    openSneDock();
+    return;
+  }
   if(sneWin && !sneWin.closed){
     if(!sneState){ sneState=sneNewState(); sneRemount(); }
     try{ sneWin.focus(); }catch(e){}
@@ -4319,6 +4357,82 @@ function sneFocusOrOpen(){
   if(!sneState) sneState=sneNewState();
   sneOpenWindow();
 }
+// ---------- 平板輸入模式：內嵌右側停靠面板 ----------
+function openSneDock(){
+  const dock=document.getElementById('sneDock');
+  if(!dock) return;
+  if(!sneState) sneState=sneNewState();
+  sneDockOpen=true;
+  dock.classList.add('show');
+  document.body.classList.add('sne-dock-on');
+  sneApplyDockWidth();
+  sneMount(document, document.getElementById('sneDockBody'));
+  sneBindViewport();
+  sneUpdateOpenBtn();
+  requestAnimationFrame(()=>{ if(typeof renderAll==='function') renderAll(); });
+  setTimeout(()=>{ const ta=document.getElementById('sne_ta_ma'); if(ta) try{ ta.focus(); }catch(e){} }, 60);
+}
+function closeSneDock(){
+  if(sneDirty()) sneSaveDraft();
+  sneDockOpen=false;
+  const dock=document.getElementById('sneDock'); if(dock) dock.classList.remove('show');
+  document.body.classList.remove('sne-dock-on');
+  const body=document.getElementById('sneDockBody'); if(body) body.innerHTML='';
+  sneUnbindDocs();
+  sneUnbindViewport();
+  sneDoc=null; sneState=null;
+  sneUpdateOpenBtn();
+  requestAnimationFrame(()=>{ if(typeof renderAll==='function') renderAll(); });
+}
+const SNE_DOCK_W={narrow:'360px', mid:'46vw', wide:'64vw'};
+function sneApplyDockWidth(){
+  let key='mid';
+  try{ key=localStorage.getItem('nqSneDockW')||'mid'; }catch(e){}
+  if(!SNE_DOCK_W[key]) key='mid';
+  const dock=document.getElementById('sneDock'); if(dock) dock.style.width=SNE_DOCK_W[key];
+  ['narrow','mid','wide'].forEach(k=>{ const b=document.getElementById('sneDockW_'+k); if(b) b.classList.toggle('on', k===key); });
+}
+function sneDockWidth(key){
+  if(!SNE_DOCK_W[key]) return;
+  try{ localStorage.setItem('nqSneDockW', key); }catch(e){}
+  sneApplyDockWidth();
+  requestAnimationFrame(()=>{ if(typeof renderAll==='function') renderAll(); });
+}
+// iPad 鍵盤彈出時，讓整個 App 縮到可視範圍內、避免面板被鍵盤蓋住
+function sneBindViewport(){
+  const vv=window.visualViewport; if(!vv) return;
+  sneVVHandler=()=>{
+    const ap=document.getElementById('appRoot');
+    if(ap && sneDockOpen) ap.style.height=vv.height+'px';
+    clearTimeout(sneVVTimer);
+    sneVVTimer=setTimeout(()=>{ if(typeof renderAll==='function') renderAll(); }, 180);
+  };
+  vv.addEventListener('resize', sneVVHandler);
+  vv.addEventListener('scroll', sneVVHandler);
+  sneVVHandler();
+}
+function sneUnbindViewport(){
+  const vv=window.visualViewport;
+  if(vv && sneVVHandler){ vv.removeEventListener('resize', sneVVHandler); vv.removeEventListener('scroll', sneVVHandler); }
+  sneVVHandler=null;
+  const ap=document.getElementById('appRoot'); if(ap) ap.style.height='';
+}
+function sneTabletToggle(){
+  sneTablet=!sneTablet;
+  try{ localStorage.setItem('nqSneTablet', sneTablet?'1':'0'); }catch(e){}
+  sneUpdateTabletBtn();
+  // 若切換模式時另一種正開著，先關掉以免混亂
+  if(!sneTablet && sneDockOpen) closeSneDock();
+  if(sneTablet && sneWin && !sneWin.closed){ try{ sneCloseWin(true); }catch(e){} }
+}
+function sneUpdateTabletBtn(){
+  const b=document.getElementById('btnSneTablet');
+  if(!b) return;
+  b.classList.toggle('on', sneTablet);
+  b.textContent = sneTablet ? '📱 平板輸入：開' : '📱 平板輸入：關';
+}
+document.addEventListener('DOMContentLoaded', sneUpdateTabletBtn);
+setTimeout(()=>{ try{ sneUpdateTabletBtn(); }catch(e){} }, 0);
 function sneAutoOpen(){
   if(sneWin && !sneWin.closed) return;
   sneState=sneNewState();
@@ -4379,16 +4493,17 @@ function sneStartWatch(w){
 function sneUpdateOpenBtn(blocked){
   const b=document.getElementById('storyOpenBtn');
   if(!b) return;
-  const open = !!(sneWin && !sneWin.closed);
+  const open = (!!(sneWin && !sneWin.closed)) || sneDockOpen;
   b.textContent = blocked ? '⚠ 被擋住了，點我開啟輸入視窗'
-                : (open ? '🗗 輸入視窗（點我切過去）' : '🗗 開啟輸入視窗');
+                : (open ? (sneDockOpen ? '📝 輸入面板（點我聚焦）' : '🗗 輸入視窗（點我切過去）') : '🗗 開啟輸入視窗');
   b.classList.toggle('on', open);
 }
 
 // ---- 主畫面換K棒 / 換格局時同步 ----
 function sneSyncBar(){
   sneUpdateOpenBtn();
-  if(!sneWin || sneWin.closed || !sneDoc || !sneState) return;
+  const open=(sneWin && !sneWin.closed) || sneDockOpen;
+  if(!open || !sneDoc || !sneState) return;
   if(sneState.mode==='new' && !sneState.locked){
     const m=sneCurrentMeta();
     if(m){ sneState.d=currentDay; sneState.meta=m; }
@@ -4910,6 +5025,13 @@ function sneUnbindDocs(){
   sneBoundDocs=[];
 }
 function sneCloseWin(force){
+  if(sneDockOpen){
+    if(!force && sneDirty()){
+      if(!window.confirm('有還沒儲存的修改，確定要收合嗎？\n（內容已存成草稿，下次開啟可以還原）')) return;
+    }
+    closeSneDock();
+    return;
+  }
   const w=(sneDoc&&sneDoc.defaultView)||window;
   if(!force && sneDirty()){
     if(!w.confirm('有還沒儲存的修改，確定要關閉嗎？\n（內容已存成草稿，下次開啟可以還原）')) return;
