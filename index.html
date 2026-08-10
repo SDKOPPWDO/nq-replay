@@ -4466,6 +4466,12 @@ function sneOpenWindow(silent){
   sneUpdateOpenBtn();
 }
 function sneRemount(){
+  // 平板停靠面板：重繪 sneDockBody（否則 textarea 不會刷新）
+  if(sneDockOpen){
+    const body=document.getElementById('sneDockBody');
+    if(body) sneMount(document, body);
+    return;
+  }
   if(!sneWin || sneWin.closed) return;
   const ov=sneWin.document.getElementById('sneOv');
   if(ov) sneMount(sneWin.document, ov);
@@ -4504,6 +4510,14 @@ function sneSyncBar(){
   sneUpdateOpenBtn();
   const open=(sneWin && !sneWin.closed) || sneDockOpen;
   if(!open || !sneDoc || !sneState) return;
+  // 換日：把還沒儲存的新筆記重設成空白（跟著新的一天），避免沿用前一天的內容。
+  // 前一天沒存完的內容會先存成草稿，回到那天可用「還原草稿」找回，不會掉字。
+  if(sneState.mode==='new' && sneState.d && sneState.d!==currentDay){
+    if(sneDirty()) sneSaveDraft();
+    sneState=sneNewState();
+    sneRemount();
+    return;
+  }
   if(sneState.mode==='new' && !sneState.locked){
     const m=sneCurrentMeta();
     if(m){ sneState.d=currentDay; sneState.meta=m; }
@@ -5016,7 +5030,8 @@ function editStoryNote(d,id){
     meta:{idx:n.idx, ts:n.ts, price:n.price, tf:n.tf||'1k'},
     fields:ld.fields, folders:noteFolders(n),
     orig:String(n.text||''), locked:true, hadLegacy:ld.hadLegacy};
-  if(sneWin && !sneWin.closed){ sneRemount(); try{ sneWin.focus(); }catch(e){} }
+  if(sneDockOpen){ sneRemount(); }
+  else if(sneWin && !sneWin.closed){ sneRemount(); try{ sneWin.focus(); }catch(e){} }
   else sneOpenWindow();
 }
 
@@ -5050,7 +5065,9 @@ function sneCommit(){
   if(!sneState) return;
   const txt=sneSerialize(sneState.fields);
   const w=(sneDoc&&sneDoc.defaultView)||window;
-  if(!txt.trim()){ w.alert('至少要寫一段內容再儲存。'); return; }
+  const hasFolder = !!(sneState.folders && sneState.folders.length);
+  // 允許「只分類、不寫計畫與盤勢規劃」也能儲存：有內容或有選分類都可以存
+  if(!txt.trim() && !hasFolder){ w.alert('至少要寫一段內容，或選一個分類再儲存。'); return; }
   if(sneState.mode==='edit'){
     const n=findStoryNote(sneState.d, sneState.id);
     if(!n){ w.alert('找不到這則筆記（可能已被刪除）'); }
