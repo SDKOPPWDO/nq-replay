@@ -471,13 +471,18 @@ canvas.cross{pointer-events:none;}
 .scls-side-item:hover{border-color:var(--b2);}
 .scls-side-item.on{background:#7c3aed;color:#fff;}
 .scls-side-label{flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.4;padding-top:1px;}
-.scls-side-acts{display:flex;gap:3px;flex-shrink:0;opacity:0;transition:opacity .1s;}
+.scls-side-acts{display:flex;gap:3px;flex-shrink:0;opacity:.85;transition:opacity .1s;}
 .scls-side-item:hover .scls-side-acts{opacity:1;}
-.scls-side-item.on .scls-side-acts{opacity:.9;}
+.scls-side-item.on .scls-side-acts{opacity:1;}
 .scls-side-act{width:20px;height:20px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
 .scls-side-item.on .scls-side-act{background:rgba(255,255,255,.18);border-color:transparent;color:#fff;}
 .scls-side-act:hover{color:#fff;border-color:#7c3aed;}
 .scls-side-act.del:hover{background:#ef4444;border-color:#ef4444;color:#fff;}
+.scls-side-act:disabled{opacity:.25;cursor:default;}
+.scls-side-act:disabled:hover{color:var(--t2);border-color:var(--b2);}
+.scls-side-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid rgba(255,255,255,.35);margin-top:1px;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
+.scls-side-dot:hover{border-color:#fff;}
+.scls-side-item.on .scls-side-dot{border-color:rgba(255,255,255,.8);}
 .scls-side-empty{font-size:10px;color:var(--t3);text-align:center;padding:12px 4px;line-height:1.6;}
 .scls-side-newbtn{flex-shrink:0;padding:8px;border-radius:8px;border:1px dashed var(--b2);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
 .scls-side-newbtn:hover{color:var(--t1);border-color:#7c3aed;}
@@ -757,6 +762,12 @@ body.sne-popup .sne-shell{max-width:none;}
   <div class="cpopup-title" id="cpopup-title">顏色</div>
   <div class="cpalette" id="cpalette"></div>
   <div class="cpopup-close" onclick="closeCP()">✕ 關閉</div>
+</div>
+<div class="cpopup" id="fclrPop">
+  <div class="cpopup-title" id="fclrPop-title">分類顏色</div>
+  <div class="cpalette" id="fclrPop-pal"></div>
+  <div class="cpopup-close" style="border-top:1px solid var(--b1);padding-top:6px;" onclick="fclrReset()">↺ 恢復預設色</div>
+  <div class="cpopup-close" onclick="closeFclrPop()">✕ 關閉</div>
 </div>
 <div class="tresult-overlay" id="tresultOverlay">
   <div class="tresult-card" style="max-width:1200px;">
@@ -3823,18 +3834,40 @@ window.addEventListener('resize',()=>{
 function escapeHtml(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 let storyNotes = {};   // {date:[{id,idx,ts,price,tf,text,folder}]}  分類單位＝單一時間點
 let storyFolders = [];
+let folderColors = {}; // {分類名稱: '#hex'}  每個分類的自訂顏色
 let storyScope = 'day';
 (function loadStoryStorage(){
   try{ storyNotes = JSON.parse(localStorage.getItem('nqStoryNotes')||'{}'); }catch(e){ storyNotes={}; }
   try{ storyFolders = JSON.parse(localStorage.getItem('nqStoryFolders')||'[]'); }catch(e){ storyFolders=[]; }
+  try{ folderColors = JSON.parse(localStorage.getItem('nqStoryFolderColors')||'{}'); }catch(e){ folderColors={}; }
   if(typeof storyNotes!=='object'||Array.isArray(storyNotes)||!storyNotes) storyNotes={};
   if(!Array.isArray(storyFolders)) storyFolders=[];
+  if(typeof folderColors!=='object'||Array.isArray(folderColors)||!folderColors) folderColors={};
 })();
 function saveStoryStorage(){
   try{
     localStorage.setItem('nqStoryNotes', JSON.stringify(storyNotes));
     localStorage.setItem('nqStoryFolders', JSON.stringify(storyFolders));
+    localStorage.setItem('nqStoryFolderColors', JSON.stringify(folderColors));
   }catch(e){ console.error('儲存失敗', e); }
+}
+// ---- 分類顏色小工具 ----
+// 取得某分類的顏色（沒設定就回傳預設紫色）
+const FOLDER_DEFAULT_COLOR='#7c3aed';
+function folderColor(name){ return folderColors[name] || FOLDER_DEFAULT_COLOR; }
+function hasFolderColor(name){ return !!folderColors[name]; }
+// hex 轉 rgba（給半透明底色用）
+function hexToRgba(hex,a){
+  let h=String(hex||'').replace('#','');
+  if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  const n=parseInt(h,16);
+  if(isNaN(n)) return 'rgba(124,58,237,'+a+')';
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+}
+// 產生分類標籤的行內樣式（底色 + 邊框 + 文字都吃這個分類的顏色）
+function folderTagStyle(name){
+  const c=folderColor(name);
+  return 'background:'+hexToRgba(c,0.18)+';border:1px solid '+c+';color:'+c+';';
 }
 
 // ---- 多分類支援：一則筆記可同時屬於多個分類 ----
@@ -4059,7 +4092,7 @@ function setStoryScope(s){
   renderStoryTimeline();
 }
 function tfBadgeHtml(tf){return '<span class="story-tf-badge">'+String(tf||'1k').toUpperCase()+'</span>';}
-function folderTagHtml(n){return noteFolders(n).map(f=>'<span class="story-note-folder-tag">📁 '+escapeHtml(f)+'</span>').join('');}
+function folderTagHtml(n){return noteFolders(n).map(f=>'<span class="story-note-folder-tag" style="'+folderTagStyle(f)+'">📁 '+escapeHtml(f)+'</span>').join('');}
 
 function renderStoryTimeline(){
   const tl=document.getElementById('storyTimeline');
@@ -4882,6 +4915,7 @@ function sneRenderFolderChips(doc){
     tag.className='sne-fchip-sel';
     tag.textContent='📁 '+f+'  ✕';
     tag.title='移除「'+f+'」';
+    if(hasFolderColor(f)){ const c=folderColor(f); tag.style.background=hexToRgba(c,0.20); tag.style.borderColor=c; tag.style.color=c; }
     tag.addEventListener('click', ()=>{
       sneState.folders=sneState.folders.filter(x=>x!==f);
       sneRenderFolderChips(doc);
@@ -4945,7 +4979,11 @@ function sneRenderFdropList(doc, q){
     const on=sel.indexOf(f)>=0;
     const item=doc.createElement('div');
     item.className='sne-fdrop-item'+(on?' on':'');
-    item.textContent=(on?'✓ ':'　')+'📁 '+f;
+    const dot=doc.createElement('span');
+    dot.style.cssText='display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)';
+    item.textContent=(on?'✓ ':'　');
+    item.appendChild(dot);
+    item.appendChild(doc.createTextNode('📁 '+f));
     item.addEventListener('click', ()=>{
       const arr=(sneState.folders||[]).slice();
       const i=arr.indexOf(f);
@@ -5223,9 +5261,10 @@ function openClsReplayPicker(anchor){
   }else{
     storyFolders.forEach((f,i)=>{
       const cnt=clsReplayFolderDayCount(f);
+      const cdot='<span style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)"></span>';
       html+='<button class="clsrp-folder" '+(cnt?'':'disabled style="opacity:.45;cursor:default;" ')
         +'onclick="'+(cnt?('pickClsReplayFolder('+i+')'):'')+'">'
-        +'<span>📁 '+escapeHtml(f)+'</span>'
+        +'<span>'+cdot+'📁 '+escapeHtml(f)+'</span>'
         +'<span class="clsrp-folder-cnt">'+(cnt?(cnt+' 天'):'無資料')+'</span></button>';
     });
   }
@@ -5314,6 +5353,7 @@ function deleteStoryFolderByIdx(i){
   }));
   if(clsReplayActive && clsReplayFolder===name){ exitClsReplay(); }
   storyFolders.splice(i,1);
+  delete folderColors[name];
   if(sclsFilter==='f:'+i) sclsFilter='__all__';
   else if(sclsFilter.startsWith('f:')){
     const fi=parseInt(sclsFilter.slice(2));
@@ -5343,12 +5383,21 @@ function renderStoryClsChips(){
   top+=item(sclsFilter==='__all__','全部',"setSclsFilter('__all__')");
   top+=item(sclsFilter==='__none__','未分類',"setSclsFilter('__none__')");
   let mid='';
+  const lastI=storyFolders.length-1;
   storyFolders.forEach((f,i)=>{
+    const col=folderColor(f);
+    const dot='<span class="scls-side-dot" style="background:'+col+'" title="設定顏色" '
+      +'onclick="event.stopPropagation();openFolderColorPicker('+i+',this)"></span>';
     const acts='<span class="scls-side-acts">'
+      +'<button class="scls-side-act" title="上移" '+(i===0?'disabled ':'')+'onclick="event.stopPropagation();moveStoryFolder('+i+',-1)">▲</button>'
+      +'<button class="scls-side-act" title="下移" '+(i===lastI?'disabled ':'')+'onclick="event.stopPropagation();moveStoryFolder('+i+',1)">▼</button>'
       +'<button class="scls-side-act" title="修改名稱" onclick="event.stopPropagation();renameStoryFolderByIdx('+i+')">✎</button>'
       +'<button class="scls-side-act del" title="刪除分類" onclick="event.stopPropagation();deleteStoryFolderByIdx('+i+')">✕</button>'
       +'</span>';
-    mid+=item(sclsFilter==='f:'+i,'📁 '+escapeHtml(f),"setSclsFilter('f:"+i+"')",acts);
+    const label=dot+'<span class="scls-side-label">📁 '+escapeHtml(f)+'</span>';
+    const on=sclsFilter==='f:'+i;
+    mid+='<div class="scls-side-item'+(on?' on':'')+'" onclick="setSclsFilter(\'f:'+i+'\')" '
+      +(on?'':'style="border-left:3px solid '+col+'"')+'>'+label+acts+'</div>';
   });
   if(!storyFolders.length) mid='<div class="scls-side-empty">還沒有分類<br>按下方＋新增</div>';
   el.innerHTML='<div class="scls-side-fixed">'+top+'</div>'
@@ -5365,6 +5414,7 @@ function renameStoryFolderByIdx(i){
   if(nn===old) return;
   if(storyFolders.includes(nn)){ alert('已有同名分類'); return; }
   storyFolders[i]=nn;
+  if(folderColors[old]!==undefined){ folderColors[nn]=folderColors[old]; delete folderColors[old]; }
   if(clsReplayActive && clsReplayFolder===old){ clsReplayFolder=nn; updateClsReplayBar(); }
   // 同步更新所有筆記裡的舊分類名稱
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{
@@ -5374,6 +5424,84 @@ function renameStoryFolderByIdx(i){
   saveStoryStorage();
   renderStoryClsChips(); renderStoryClsList(); renderSmktList(); renderStoryTimeline();
 }
+
+// ---- 分類排序：上移 / 下移 ----
+function moveStoryFolder(i, dir){
+  const j=i+dir;
+  if(j<0 || j>=storyFolders.length) return;
+  // 交換位置
+  const tmp=storyFolders[i]; storyFolders[i]=storyFolders[j]; storyFolders[j]=tmp;
+  // 若目前篩選的是被移動的其中一個，讓篩選跟著走
+  if(sclsFilter==='f:'+i) sclsFilter='f:'+j;
+  else if(sclsFilter==='f:'+j) sclsFilter='f:'+i;
+  saveStoryStorage();
+  renderStoryClsChips();
+  if(document.getElementById('sclsPageMkt').classList.contains('show')) renderSmktList();
+  else renderStoryClsList();
+}
+
+// ---- 分類顏色選擇器 ----
+let _fclrIdx=null;
+function openFolderColorPicker(i, el){
+  const name=storyFolders[i];
+  if(name===undefined) return;
+  _fclrIdx=i;
+  const pop=document.getElementById('fclrPop');
+  document.getElementById('fclrPop-title').textContent='📁 '+name+' 顏色';
+  const pal=document.getElementById('fclrPop-pal');
+  pal.innerHTML='';
+  const cur=folderColor(name);
+  PALETTE.forEach(col=>{
+    const d=document.createElement('div');
+    d.className='cpal-dot'+(col.toLowerCase()===cur.toLowerCase()?' sel':'');
+    d.style.background=col;
+    d.addEventListener('click',()=>applyFolderColor(col));
+    pal.appendChild(d);
+  });
+  const r=el.getBoundingClientRect(), pw=170;
+  let left=r.right+6, top=r.top-4;
+  if(left+pw>window.innerWidth-8) left=Math.max(8, r.left-pw-6);
+  if(top+240>window.innerHeight) top=Math.max(8, window.innerHeight-250);
+  pop.style.cssText='left:'+left+'px;top:'+top+'px;width:'+pw+'px;';
+  pop.classList.add('show');
+}
+function applyFolderColor(col){
+  if(_fclrIdx===null) return;
+  const name=storyFolders[_fclrIdx];
+  if(name===undefined) return;
+  folderColors[name]=col;
+  saveStoryStorage();
+  closeFclrPop();
+  refreshFolderColorViews();
+}
+function fclrReset(){
+  if(_fclrIdx===null) return;
+  const name=storyFolders[_fclrIdx];
+  if(name!==undefined) delete folderColors[name];
+  saveStoryStorage();
+  closeFclrPop();
+  refreshFolderColorViews();
+}
+function closeFclrPop(){
+  const pop=document.getElementById('fclrPop');
+  if(pop) pop.classList.remove('show');
+  _fclrIdx=null;
+}
+// 設定顏色後，把有顯示分類顏色的畫面都刷新一次
+function refreshFolderColorViews(){
+  renderStoryClsChips();
+  if(document.getElementById('sclsPageMkt').classList.contains('show')) renderSmktList();
+  else renderStoryClsList();
+  if(typeof renderStoryTimeline==='function') renderStoryTimeline();
+}
+// 點外面關閉分類顏色浮窗
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('fclrPop');
+  if(!pop || !pop.classList.contains('show')) return;
+  if(pop.contains(e.target)) return;
+  if(e.target.classList && e.target.classList.contains('scls-side-dot')) return;
+  closeFclrPop();
+});
 
 // ---- 篩選後的時間點清單 ----
 function getFilteredStoryNotes(){
@@ -5404,7 +5532,7 @@ function storyClsShowList(){
 function folderSelHtml(d,n){
   const fs=noteFolders(n);
   const inner = fs.length
-    ? fs.map(f=>'<span class="scls-fdrop-tag">📁 '+escapeHtml(f)+'</span>').join('')
+    ? fs.map(f=>'<span class="scls-fdrop-tag" style="'+folderTagStyle(f)+'">📁 '+escapeHtml(f)+'</span>').join('')
     : '<span class="scls-fdrop-ph">＋ 加入分類</span>';
   return '<div class="scls-fdrop-btn'+(fs.length?' has':'')+'" title="點一下編輯分類" '
     +'onclick="event.stopPropagation();openFdrop(\''+d+'\',\''+n.id+'\',this)">'+inner+'<span class="scls-fdrop-caret">▾</span></div>';
@@ -5450,8 +5578,9 @@ function renderFdropList(q){
   storyFolders.forEach((f,i)=>{
     if(query && f.toLowerCase().indexOf(query)<0) return;
     const on=sel.includes(f);
+    const dot='<span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)"></span>';
     h+='<div class="scls-fdrop-item'+(on?' on':'')+'" onclick="fdropToggle('+i+')">'
-      +'<span class="scls-fdrop-check">'+(on?'✓':'')+'</span>'
+      +'<span class="scls-fdrop-check">'+(on?'✓':'')+'</span>'+dot
       +'<span class="scls-fdrop-name">📁 '+escapeHtml(f)+'</span></div>';
   });
   if(!h) h='<div class="scls-fdrop-empty">'+(storyFolders.length?'找不到符合的分類':'還沒有分類，按下方＋新增')+'</div>';
