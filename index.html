@@ -121,6 +121,11 @@ canvas.cross{pointer-events:none;}
 .cpalette{display:grid;grid-template-columns:repeat(5,26px);gap:5px;}
 .cpal-dot{width:26px;height:26px;border-radius:5px;cursor:pointer;border:2px solid transparent;}
 .cpal-dot.sel{border-color:#fff;}
+.fpar-opt{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;white-space:normal;overflow-wrap:anywhere;line-height:1.4;}
+.fpar-opt:hover{border-color:#7c3aed;background:rgba(124,58,237,.12);}
+.fpar-opt.cur{border-color:#7c3aed;background:rgba(124,58,237,.2);}
+.fpar-opt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
+.fpar-hint{font-size:10px;color:var(--t3);line-height:1.5;padding:2px 2px 4px;}
 .cpopup-close{font-size:10px;color:var(--t3);text-align:center;cursor:pointer;}
 /* TRADE SYSTEM */
 .trade-toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:4px 2px;}
@@ -467,22 +472,30 @@ canvas.cross{pointer-events:none;}
 .scls-sidebar{width:300px;max-width:36vw;flex-shrink:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:0;}
 .scls-side-fixed{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
 .scls-side-scroll{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding-right:2px;}
-.scls-side-item{display:flex;align-items:flex-start;gap:6px;padding:7px 9px;border-radius:8px;border:1px solid transparent;background:var(--bg3);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;user-select:none;}
+.scls-side-item{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:7px 9px;border-radius:8px;border:1px solid transparent;background:var(--bg3);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;user-select:none;}
 .scls-side-item:hover{border-color:var(--b2);}
 .scls-side-item.on{background:#7c3aed;color:#fff;}
+.scls-side-row1{display:flex;align-items:flex-start;gap:6px;min-width:0;}
 .scls-side-label{flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.4;padding-top:1px;}
-.scls-side-acts{display:flex;gap:3px;flex-shrink:0;opacity:.85;transition:opacity .1s;}
+.scls-side-acts{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;opacity:.9;transition:opacity .1s;}
 .scls-side-item:hover .scls-side-acts{opacity:1;}
 .scls-side-item.on .scls-side-acts{opacity:1;}
-.scls-side-act{width:20px;height:20px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.scls-side-act{width:22px;height:22px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
 .scls-side-item.on .scls-side-act{background:rgba(255,255,255,.18);border-color:transparent;color:#fff;}
 .scls-side-act:hover{color:#fff;border-color:#7c3aed;}
 .scls-side-act.del:hover{background:#ef4444;border-color:#ef4444;color:#fff;}
 .scls-side-act:disabled{opacity:.25;cursor:default;}
 .scls-side-act:disabled:hover{color:var(--t2);border-color:var(--b2);}
+.scls-side-caret{width:14px;flex-shrink:0;text-align:center;font-size:9px;color:var(--t3);cursor:pointer;line-height:1.6;user-select:none;}
+.scls-side-caret.blank{cursor:default;}
+.scls-side-item.on .scls-side-caret{color:rgba(255,255,255,.85);}
 .scls-side-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid rgba(255,255,255,.35);margin-top:1px;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
 .scls-side-dot:hover{border-color:#fff;}
 .scls-side-item.on .scls-side-dot{border-color:rgba(255,255,255,.8);}
+.scls-side-item.child{margin-left:16px;border-left:2px solid var(--b2);border-top-left-radius:3px;border-bottom-left-radius:3px;}
+.scls-side-item.child.on{border-left-color:rgba(255,255,255,.5);}
+.scls-side-cnt{font-size:9px;font-weight:700;color:var(--t3);flex-shrink:0;padding-top:2px;}
+.scls-side-item.on .scls-side-cnt{color:rgba(255,255,255,.75);}
 .scls-side-empty{font-size:10px;color:var(--t3);text-align:center;padding:12px 4px;line-height:1.6;}
 .scls-side-newbtn{flex-shrink:0;padding:8px;border-radius:8px;border:1px dashed var(--b2);background:transparent;color:var(--t3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
 .scls-side-newbtn:hover{color:var(--t1);border-color:#7c3aed;}
@@ -768,6 +781,11 @@ body.sne-popup .sne-shell{max-width:none;}
   <div class="cpalette" id="fclrPop-pal"></div>
   <div class="cpopup-close" style="border-top:1px solid var(--b1);padding-top:6px;" onclick="fclrReset()">↺ 恢復預設色</div>
   <div class="cpopup-close" onclick="closeFclrPop()">✕ 關閉</div>
+</div>
+<div class="cpopup" id="fparPop" style="gap:6px;">
+  <div class="cpopup-title" id="fparPop-title">移動分類</div>
+  <div id="fparPop-list" style="display:flex;flex-direction:column;gap:4px;max-height:50vh;overflow-y:auto;"></div>
+  <div class="cpopup-close" onclick="closeFparPop()">✕ 關閉</div>
 </div>
 <div class="tresult-overlay" id="tresultOverlay">
   <div class="tresult-card" style="max-width:1200px;">
@@ -3835,20 +3853,28 @@ function escapeHtml(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'
 let storyNotes = {};   // {date:[{id,idx,ts,price,tf,text,folder}]}  分類單位＝單一時間點
 let storyFolders = [];
 let folderColors = {}; // {分類名稱: '#hex'}  每個分類的自訂顏色
+let folderParents = {}; // {子分類名稱: 母分類名稱}  子母資料夾（最多兩層）
+let folderCollapsed = {}; // {母分類名稱: true}  被摺疊起來的母分類
 let storyScope = 'day';
 (function loadStoryStorage(){
   try{ storyNotes = JSON.parse(localStorage.getItem('nqStoryNotes')||'{}'); }catch(e){ storyNotes={}; }
   try{ storyFolders = JSON.parse(localStorage.getItem('nqStoryFolders')||'[]'); }catch(e){ storyFolders=[]; }
   try{ folderColors = JSON.parse(localStorage.getItem('nqStoryFolderColors')||'{}'); }catch(e){ folderColors={}; }
+  try{ folderParents = JSON.parse(localStorage.getItem('nqStoryFolderParents')||'{}'); }catch(e){ folderParents={}; }
+  try{ folderCollapsed = JSON.parse(localStorage.getItem('nqStoryFolderCollapsed')||'{}'); }catch(e){ folderCollapsed={}; }
   if(typeof storyNotes!=='object'||Array.isArray(storyNotes)||!storyNotes) storyNotes={};
   if(!Array.isArray(storyFolders)) storyFolders=[];
   if(typeof folderColors!=='object'||Array.isArray(folderColors)||!folderColors) folderColors={};
+  if(typeof folderParents!=='object'||Array.isArray(folderParents)||!folderParents) folderParents={};
+  if(typeof folderCollapsed!=='object'||Array.isArray(folderCollapsed)||!folderCollapsed) folderCollapsed={};
 })();
 function saveStoryStorage(){
   try{
     localStorage.setItem('nqStoryNotes', JSON.stringify(storyNotes));
     localStorage.setItem('nqStoryFolders', JSON.stringify(storyFolders));
     localStorage.setItem('nqStoryFolderColors', JSON.stringify(folderColors));
+    localStorage.setItem('nqStoryFolderParents', JSON.stringify(folderParents));
+    localStorage.setItem('nqStoryFolderCollapsed', JSON.stringify(folderCollapsed));
   }catch(e){ console.error('儲存失敗', e); }
 }
 // ---- 分類顏色小工具 ----
@@ -3868,6 +3894,38 @@ function hexToRgba(hex,a){
 function folderTagStyle(name){
   const c=folderColor(name);
   return 'background:'+hexToRgba(c,0.18)+';border:1px solid '+c+';color:'+c+';';
+}
+// ---- 子母資料夾小工具（最多兩層：母 → 子）----
+function folderParent(name){                         // 回傳母分類名稱，最上層則回 null
+  const p=folderParents[name];
+  return (p && storyFolders.includes(p)) ? p : null;
+}
+function childrenOf(name){                            // 某母分類底下的子分類（依 storyFolders 原順序）
+  return storyFolders.filter(f=>folderParent(f)===name);
+}
+function hasChildren(name){ return childrenOf(name).length>0; }
+function topFolders(){                                // 最上層分類（沒有母分類）
+  return storyFolders.filter(f=>folderParent(f)===null);
+}
+function siblingsOf(name){                            // 同一層（同一個母分類底下）的分類
+  const p=folderParent(name);
+  return storyFolders.filter(f=>folderParent(f)===p);
+}
+function isCollapsed(name){ return !!folderCollapsed[name]; }
+// 篩選某分類時要一起顯示的名稱：若是母分類 → 自己＋所有子分類；否則只有自己
+function filterFolderNames(idx){
+  const name=storyFolders[idx];
+  if(name===undefined) return [];
+  return hasChildren(name) ? [name, ...childrenOf(name)] : [name];
+}
+// 依「母→子」樹狀順序列出所有分類，附上層級（0=母, 1=子）
+function foldersInTreeOrder(){
+  const out=[];
+  topFolders().forEach(p=>{
+    out.push({name:p, depth:0});
+    childrenOf(p).forEach(c=>out.push({name:c, depth:1}));
+  });
+  return out;
 }
 
 // ---- 多分類支援：一則筆記可同時屬於多個分類 ----
@@ -4152,6 +4210,9 @@ function exportStoryNotes(){
     exportedAt:new Date().toISOString(),
     notes:storyNotes,
     folders:storyFolders,
+    folderColors:folderColors,
+    folderParents:folderParents,
+    folderCollapsed:folderCollapsed,
     trades:{
       positions:dayPositions,
       closed:dayClosedTrades,
@@ -4191,6 +4252,16 @@ function importStoryNotes(input){
         storyNotes[d].sort((a,b)=>a.idx-b.idx);
       });
       (folders||[]).forEach(f2=>{ if(f2&&!storyFolders.includes(f2)) storyFolders.push(f2); });
+      // 合併顏色 / 子母關係 / 摺疊狀態（只補上目前沒有的，不覆蓋既有設定）
+      if(p.folderColors && typeof p.folderColors==='object'){
+        Object.keys(p.folderColors).forEach(k=>{ if(folderColors[k]===undefined) folderColors[k]=p.folderColors[k]; });
+      }
+      if(p.folderParents && typeof p.folderParents==='object'){
+        Object.keys(p.folderParents).forEach(k=>{ if(folderParents[k]===undefined) folderParents[k]=p.folderParents[k]; });
+      }
+      if(p.folderCollapsed && typeof p.folderCollapsed==='object'){
+        Object.keys(p.folderCollapsed).forEach(k=>{ if(folderCollapsed[k]===undefined) folderCollapsed[k]=p.folderCollapsed[k]; });
+      }
 
       // ── 還原模擬單交易紀錄（非破壞性：只補回目前沒有紀錄的日期）──
       let tradeDaysRestored=0, tradeDaysSkipped=0;
@@ -4973,17 +5044,18 @@ function sneRenderFdropList(doc, q){
   const query=(q||'').trim().toLowerCase();
   list.innerHTML='';
   let any=false;
-  storyFolders.forEach(f=>{
+  foldersInTreeOrder().forEach(({name:f,depth})=>{
     if(query && f.toLowerCase().indexOf(query)<0) return;
     any=true;
     const on=sel.indexOf(f)>=0;
     const item=doc.createElement('div');
     item.className='sne-fdrop-item'+(on?' on':'');
+    if(depth) item.style.marginLeft='16px';
     const dot=doc.createElement('span');
     dot.style.cssText='display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)';
     item.textContent=(on?'✓ ':'　');
     item.appendChild(dot);
-    item.appendChild(doc.createTextNode('📁 '+f));
+    item.appendChild(doc.createTextNode((depth?'└ ':'')+'📁 '+f));
     item.addEventListener('click', ()=>{
       const arr=(sneState.folders||[]).slice();
       const i=arr.indexOf(f);
@@ -5259,12 +5331,15 @@ function openClsReplayPicker(anchor){
   if(!storyFolders.length){
     html+='<div class="clsrp-popup-empty">還沒有任何分類<br>先到「🗂 分類」建立分類，<br>並把時間點分進去，再回來這裡回測。</div>';
   }else{
-    storyFolders.forEach((f,i)=>{
+    foldersInTreeOrder().forEach(({name:f,depth})=>{
+      const i=storyFolders.indexOf(f);
       const cnt=clsReplayFolderDayCount(f);
       const cdot='<span style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)"></span>';
-      html+='<button class="clsrp-folder" '+(cnt?'':'disabled style="opacity:.45;cursor:default;" ')
+      const pre=depth?'<span style="color:var(--t3);margin-right:2px">└</span>':'';
+      html+='<button class="clsrp-folder" '+(cnt?'':'disabled style="opacity:.45;cursor:default;'+(depth?'margin-left:16px;':'')+'" ')
+        +(cnt&&depth?'style="margin-left:16px" ':'')
         +'onclick="'+(cnt?('pickClsReplayFolder('+i+')'):'')+'">'
-        +'<span>'+cdot+'📁 '+escapeHtml(f)+'</span>'
+        +'<span>'+cdot+pre+'📁 '+escapeHtml(f)+'</span>'
         +'<span class="clsrp-folder-cnt">'+(cnt?(cnt+' 天'):'無資料')+'</span></button>';
     });
   }
@@ -5347,13 +5422,21 @@ function deleteStoryFolderByIdx(i){
   if(name===undefined) return;
   let cnt=0;
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{if(noteInFolder(n,name))cnt++;}));
-  if(!confirm('確定刪除分類「'+name+'」？\n裡面的 '+cnt+' 個時間點會移出這個分類（筆記本身與其他分類不受影響）')) return;
+  const kids=childrenOf(name);
+  let msg='確定刪除分類「'+name+'」？\n裡面的 '+cnt+' 個時間點會移出這個分類（筆記本身與其他分類不受影響）';
+  if(kids.length) msg+='\n\n它底下的 '+kids.length+' 個子分類不會被刪除，會自動變成最上層分類。';
+  if(!confirm(msg)) return;
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{
     if(noteInFolder(n,name)) setNoteFoldersArr(n, noteFolders(n).filter(f=>f!==name));
   }));
   if(clsReplayActive && clsReplayFolder===name){ exitClsReplay(); }
+  // 子分類提升為最上層
+  kids.forEach(k=>{ delete folderParents[k]; });
   storyFolders.splice(i,1);
   delete folderColors[name];
+  delete folderParents[name];   // 自己若是某人的子分類，一併清掉
+  delete folderCollapsed[name];
+  // 篩選索引修正
   if(sclsFilter==='f:'+i) sclsFilter='__all__';
   else if(sclsFilter.startsWith('f:')){
     const fi=parseInt(sclsFilter.slice(2));
@@ -5378,31 +5461,61 @@ function renderStoryClsChips(){
     cur.textContent=label;
   }
   if(!el) return;
-  const item=(active,label,onclick,acts)=>'<div class="scls-side-item'+(active?' on':'')+'" onclick="'+onclick+'"><span class="scls-side-label">'+label+'</span>'+(acts||'')+'</div>';
+  // 全部 / 未分類（單行、無操作）
+  const topItem=(active,label,onclick)=>
+    '<div class="scls-side-item'+(active?' on':'')+'" onclick="'+onclick+'">'
+    +'<div class="scls-side-row1"><span class="scls-side-caret blank"></span>'
+    +'<span class="scls-side-label">'+label+'</span></div></div>';
   let top='';
-  top+=item(sclsFilter==='__all__','全部',"setSclsFilter('__all__')");
-  top+=item(sclsFilter==='__none__','未分類',"setSclsFilter('__none__')");
-  let mid='';
-  const lastI=storyFolders.length-1;
-  storyFolders.forEach((f,i)=>{
-    const col=folderColor(f);
-    const dot='<span class="scls-side-dot" style="background:'+col+'" title="設定顏色" '
-      +'onclick="event.stopPropagation();openFolderColorPicker('+i+',this)"></span>';
-    const acts='<span class="scls-side-acts">'
-      +'<button class="scls-side-act" title="上移" '+(i===0?'disabled ':'')+'onclick="event.stopPropagation();moveStoryFolder('+i+',-1)">▲</button>'
-      +'<button class="scls-side-act" title="下移" '+(i===lastI?'disabled ':'')+'onclick="event.stopPropagation();moveStoryFolder('+i+',1)">▼</button>'
+  top+=topItem(sclsFilter==='__all__','全部',"setSclsFilter('__all__')");
+  top+=topItem(sclsFilter==='__none__','未分類',"setSclsFilter('__none__')");
+  // 資料夾樹（母 → 子，最多兩層）
+  const renderFolderRow=(name,isChild)=>{
+    const i=storyFolders.indexOf(name);
+    const col=folderColor(name);
+    const kids=childrenOf(name);
+    const isParent=kids.length>0;
+    // 摺疊箭頭（只有母分類有）
+    const caret = isParent
+      ? '<span class="scls-side-caret" title="'+(isCollapsed(name)?'展開':'收合')+'" onclick="event.stopPropagation();toggleFolderCollapse('+i+')">'+(isCollapsed(name)?'▶':'▼')+'</span>'
+      : '<span class="scls-side-caret blank"></span>';
+    const dot='<span class="scls-side-dot" style="background:'+col+'" title="設定顏色" onclick="event.stopPropagation();openFolderColorPicker('+i+',this)"></span>';
+    const cntBadge = isParent ? '<span class="scls-side-cnt" title="'+kids.length+' 個子分類">'+kids.length+'</span>' : '';
+    const label='<span class="scls-side-label">📁 '+escapeHtml(name)+'</span>';
+    const row1='<div class="scls-side-row1">'+caret+dot+label+cntBadge+'</div>';
+    // 上下移動：只在同一層（兄弟）之間
+    const sibs=siblingsOf(name), si=sibs.indexOf(name);
+    const canUp=si>0, canDown=si<sibs.length-1;
+    let acts='<div class="scls-side-acts">';
+    if(!isChild) acts+='<button class="scls-side-act" title="新增子分類" onclick="event.stopPropagation();addChildFolder('+i+')">＋子</button>';
+    acts+='<button class="scls-side-act" title="移動到…（設為某分類的子分類，或移回最上層）" onclick="event.stopPropagation();openFolderParentPicker('+i+',this)">⤴</button>'
+      +'<button class="scls-side-act" title="上移" '+(canUp?'':'disabled ')+'onclick="event.stopPropagation();moveStoryFolder('+i+',-1)">▲</button>'
+      +'<button class="scls-side-act" title="下移" '+(canDown?'':'disabled ')+'onclick="event.stopPropagation();moveStoryFolder('+i+',1)">▼</button>'
       +'<button class="scls-side-act" title="修改名稱" onclick="event.stopPropagation();renameStoryFolderByIdx('+i+')">✎</button>'
       +'<button class="scls-side-act del" title="刪除分類" onclick="event.stopPropagation();deleteStoryFolderByIdx('+i+')">✕</button>'
-      +'</span>';
-    const label=dot+'<span class="scls-side-label">📁 '+escapeHtml(f)+'</span>';
+      +'</div>';
     const on=sclsFilter==='f:'+i;
-    mid+='<div class="scls-side-item'+(on?' on':'')+'" onclick="setSclsFilter(\'f:'+i+'\')" '
-      +(on?'':'style="border-left:3px solid '+col+'"')+'>'+label+acts+'</div>';
+    return '<div class="scls-side-item'+(on?' on':'')+(isChild?' child':'')+'" onclick="setSclsFilter(\'f:'+i+'\')" '
+      +(on?'':'style="border-left:3px solid '+col+'"')+'>'+row1+acts+'</div>';
+  };
+  let mid='';
+  topFolders().forEach(pName=>{
+    mid+=renderFolderRow(pName,false);
+    if(!isCollapsed(pName)) childrenOf(pName).forEach(cName=>{ mid+=renderFolderRow(cName,true); });
   });
   if(!storyFolders.length) mid='<div class="scls-side-empty">還沒有分類<br>按下方＋新增</div>';
   el.innerHTML='<div class="scls-side-fixed">'+top+'</div>'
     +'<div class="scls-side-scroll" id="sclsSideScroll">'+mid+'</div>'
     +'<button class="scls-side-newbtn" onclick="addStoryFolder()">＋ 新增分類</button>';
+}
+// 收合／展開母分類
+function toggleFolderCollapse(i){
+  const name=storyFolders[i];
+  if(name===undefined) return;
+  if(folderCollapsed[name]) delete folderCollapsed[name];
+  else folderCollapsed[name]=true;
+  saveStoryStorage();
+  renderStoryClsChips();
 }
 function renameStoryFolderByIdx(i){
   const old=storyFolders[i];
@@ -5415,6 +5528,12 @@ function renameStoryFolderByIdx(i){
   if(storyFolders.includes(nn)){ alert('已有同名分類'); return; }
   storyFolders[i]=nn;
   if(folderColors[old]!==undefined){ folderColors[nn]=folderColors[old]; delete folderColors[old]; }
+  // 子母關係搬到新名稱：自己是別人的子分類
+  if(folderParents[old]!==undefined){ folderParents[nn]=folderParents[old]; delete folderParents[old]; }
+  // 自己是母分類 → 底下子分類指向的母名稱也要改
+  Object.keys(folderParents).forEach(k=>{ if(folderParents[k]===old) folderParents[k]=nn; });
+  // 摺疊狀態
+  if(folderCollapsed[old]!==undefined){ folderCollapsed[nn]=folderCollapsed[old]; delete folderCollapsed[old]; }
   if(clsReplayActive && clsReplayFolder===old){ clsReplayFolder=nn; updateClsReplayBar(); }
   // 同步更新所有筆記裡的舊分類名稱
   Object.keys(storyNotes).forEach(d=>storyNotes[d].forEach(n=>{
@@ -5425,26 +5544,125 @@ function renameStoryFolderByIdx(i){
   renderStoryClsChips(); renderStoryClsList(); renderSmktList(); renderStoryTimeline();
 }
 
-// ---- 分類排序：上移 / 下移 ----
+// ---- 分類排序：在「同一層」之間上移 / 下移 ----
 function moveStoryFolder(i, dir){
-  const j=i+dir;
-  if(j<0 || j>=storyFolders.length) return;
-  // 交換位置
-  const tmp=storyFolders[i]; storyFolders[i]=storyFolders[j]; storyFolders[j]=tmp;
-  // 若目前篩選的是被移動的其中一個，讓篩選跟著走
-  if(sclsFilter==='f:'+i) sclsFilter='f:'+j;
-  else if(sclsFilter==='f:'+j) sclsFilter='f:'+i;
+  const name=storyFolders[i];
+  if(name===undefined) return;
+  const sibs=siblingsOf(name);
+  const si=sibs.indexOf(name), tj=si+dir;
+  if(tj<0 || tj>=sibs.length) return;
+  const other=sibs[tj];
+  const ai=storyFolders.indexOf(name), aj=storyFolders.indexOf(other);
+  const tmp=storyFolders[ai]; storyFolders[ai]=storyFolders[aj]; storyFolders[aj]=tmp;
+  // 篩選索引跟著換
+  if(sclsFilter==='f:'+ai) sclsFilter='f:'+aj;
+  else if(sclsFilter==='f:'+aj) sclsFilter='f:'+ai;
   saveStoryStorage();
   renderStoryClsChips();
   if(document.getElementById('sclsPageMkt').classList.contains('show')) renderSmktList();
   else renderStoryClsList();
 }
 
+// ---- 新增子分類（建立在某母分類底下）----
+function addChildFolder(parentIdx){
+  const parent=storyFolders[parentIdx];
+  if(parent===undefined) return;
+  if(folderParent(parent)!==null){ alert('只能有兩層。請先把「'+parent+'」移回最上層，才能在它底下建子分類。'); return; }
+  const name=prompt('在「'+parent+'」底下新增子分類，名稱：');
+  if(name===null) return;
+  const nn=name.trim();
+  if(!nn) return;
+  if(storyFolders.includes(nn)){ alert('已有同名分類'); return; }
+  storyFolders.push(nn);
+  folderParents[nn]=parent;
+  delete folderCollapsed[parent]; // 展開母分類讓新子分類看得到
+  saveStoryStorage();
+  renderStoryClsChips(); renderStoryClsList(); renderSmktList(); renderStoryTimeline();
+}
+
+// ---- 移動到…（設為某分類的子分類，或移回最上層）----
+let _fparIdx=null;
+function openFolderParentPicker(i, el){
+  const name=storyFolders[i];
+  if(name===undefined) return;
+  if(typeof closeFclrPop==='function') closeFclrPop();
+  _fparIdx=i;
+  const pop=document.getElementById('fparPop');
+  document.getElementById('fparPop-title').textContent='移動「'+name+'」到…';
+  const list=document.getElementById('fparPop-list');
+  const curParent=folderParent(name);
+  let h='';
+  // 若自己底下有子分類，就不能再變成別人的子分類（避免三層）
+  if(hasChildren(name)){
+    h+='<div class="fpar-hint">「'+escapeHtml(name)+'」底下有子分類，只能留在最上層。<br>若要移到別的分類底下，請先把它的子分類移走。</div>';
+    h+='<div class="fpar-opt'+(curParent===null?' cur':'')+'" onclick="setFolderParent('+i+',null)">'
+      +'<span style="width:10px"></span>⌂ 最上層'+(curParent===null?'（目前）':'')+'</div>';
+  }else{
+    h+='<div class="fpar-opt'+(curParent===null?' cur':'')+'" onclick="setFolderParent('+i+',null)">'
+      +'<span style="width:10px"></span>⌂ 最上層（獨立分類）'+(curParent===null?'　目前':'')+'</div>';
+    // 可選的母分類＝所有最上層分類（排除自己）
+    const targets=topFolders().filter(f=>f!==name);
+    if(targets.length){
+      h+='<div class="fpar-hint">移到底下成為子分類：</div>';
+      targets.forEach(t=>{
+        const ti=storyFolders.indexOf(t);
+        const isCur=(curParent===t);
+        h+='<div class="fpar-opt'+(isCur?' cur':'')+'" onclick="setFolderParent('+i+','+ti+')">'
+          +'<span class="fpar-opt-dot" style="background:'+folderColor(t)+'"></span>'
+          +'📁 '+escapeHtml(t)+(isCur?'　目前':'')+'</div>';
+      });
+    }else{
+      h+='<div class="fpar-hint">目前沒有其他最上層分類可當母分類。</div>';
+    }
+  }
+  list.innerHTML=h;
+  const r=el.getBoundingClientRect(), pw=230;
+  let left=r.right+6, top=r.top-4;
+  if(left+pw>window.innerWidth-8) left=Math.max(8, r.left-pw-6);
+  if(top+300>window.innerHeight) top=Math.max(8, window.innerHeight-310);
+  pop.style.cssText='left:'+left+'px;top:'+top+'px;width:'+pw+'px;';
+  pop.classList.add('show');
+}
+function setFolderParent(i, parentIdxOrNull){
+  const name=storyFolders[i];
+  if(name===undefined){ closeFparPop(); return; }
+  if(parentIdxOrNull===null){
+    delete folderParents[name];
+  }else{
+    const parent=storyFolders[parentIdxOrNull];
+    if(parent===undefined || parent===name){ closeFparPop(); return; }
+    if(folderParent(parent)!==null){ alert('只能有兩層，不能移到「子分類」底下。'); return; }
+    if(hasChildren(name)){ alert('「'+name+'」底下還有子分類，不能再變成別人的子分類。'); return; }
+    folderParents[name]=parent;
+    delete folderCollapsed[parent];
+  }
+  // 移到陣列尾端 → 在新的同層裡排到最後（順序可預期）
+  const ai=storyFolders.indexOf(name);
+  if(ai>=0){ storyFolders.splice(ai,1); storyFolders.push(name); }
+  // 篩選失效就重設，避免指到錯的分類
+  sclsFilter='__all__';
+  saveStoryStorage();
+  closeFparPop();
+  renderStoryClsChips(); renderStoryClsList(); renderSmktList(); renderStoryTimeline();
+}
+function closeFparPop(){
+  const pop=document.getElementById('fparPop');
+  if(pop) pop.classList.remove('show');
+  _fparIdx=null;
+}
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('fparPop');
+  if(!pop || !pop.classList.contains('show')) return;
+  if(pop.contains(e.target)) return;
+  closeFparPop();
+});
+
 // ---- 分類顏色選擇器 ----
 let _fclrIdx=null;
 function openFolderColorPicker(i, el){
   const name=storyFolders[i];
   if(name===undefined) return;
+  closeFparPop();
   _fclrIdx=i;
   const pop=document.getElementById('fclrPop');
   document.getElementById('fclrPop-title').textContent='📁 '+name+' 顏色';
@@ -5510,8 +5728,8 @@ function getFilteredStoryNotes(){
     storyNotes[d].slice().sort((a,b)=>a.idx-b.idx).forEach(n=>{
       if(sclsFilter==='__none__' && noteFolders(n).length) return;
       if(sclsFilter.startsWith('f:')){
-        const f=storyFolders[parseInt(sclsFilter.slice(2))];
-        if(!noteFolders(n).includes(f)) return;
+        const names=filterFolderNames(parseInt(sclsFilter.slice(2)));  // 母分類→含所有子分類
+        if(!noteFolders(n).some(f=>names.includes(f))) return;
       }
       out.push({d, n});
     });
@@ -5575,13 +5793,16 @@ function renderFdropList(q){
   const sel=n?noteFolders(n):[];
   const query=(q||'').trim().toLowerCase();
   let h='';
-  storyFolders.forEach((f,i)=>{
+  foldersInTreeOrder().forEach(({name:f,depth})=>{
     if(query && f.toLowerCase().indexOf(query)<0) return;
+    const i=storyFolders.indexOf(f);
     const on=sel.includes(f);
     const dot='<span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;background:'+folderColor(f)+';box-shadow:0 0 0 1px rgba(0,0,0,.3)"></span>';
-    h+='<div class="scls-fdrop-item'+(on?' on':'')+'" onclick="fdropToggle('+i+')">'
+    const indent = depth ? 'style="margin-left:16px"' : '';
+    const pre = depth ? '<span style="color:var(--t3);margin-right:2px">└</span>' : '';
+    h+='<div class="scls-fdrop-item'+(on?' on':'')+'" '+indent+' onclick="fdropToggle('+i+')">'
       +'<span class="scls-fdrop-check">'+(on?'✓':'')+'</span>'+dot
-      +'<span class="scls-fdrop-name">📁 '+escapeHtml(f)+'</span></div>';
+      +'<span class="scls-fdrop-name">'+pre+'📁 '+escapeHtml(f)+'</span></div>';
   });
   if(!h) h='<div class="scls-fdrop-empty">'+(storyFolders.length?'找不到符合的分類':'還沒有分類，按下方＋新增')+'</div>';
   list.innerHTML=h;
