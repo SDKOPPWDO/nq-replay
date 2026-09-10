@@ -3,8 +3,10 @@
 // 負責把 data.bin（K棒歷史資料）快取在裝置本機，避免每次打開App都要重新下載一次
 // ============================================================
 
-const DATA_CACHE_NAME = 'nq-data-cache-v1';
+const DATA_CACHE_NAME = 'nq-data-cache-v2';
 const DATA_URL = 'https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/data.bin';
+const NDX_URL  = 'https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/ndx.bin';
+const CACHED_URLS = [DATA_URL, NDX_URL];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // 安裝後立刻生效，不用等使用者關掉所有分頁
@@ -15,7 +17,7 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.url === DATA_URL && e.request.method === 'GET') {
+  if (CACHED_URLS.includes(e.request.url) && e.request.method === 'GET') {
     e.respondWith(handleDataFetch(e.request));
   }
   // 其他請求（version.json、頁面本身等）一律不攔截，走瀏覽器預設行為
@@ -49,11 +51,16 @@ self.addEventListener('message', (e) => {
 
 async function doRefresh() {
   try {
-    const resp = await fetch(DATA_URL, { cache: 'no-store' });
-    if (resp && resp.ok) {
-      const cache = await caches.open(DATA_CACHE_NAME);
-      await cache.put(DATA_URL, resp.clone());
-    }
+    const cache = await caches.open(DATA_CACHE_NAME);
+    // NQ(data.bin) 與 NDX(ndx.bin) 一起強制重新抓、更新快取
+    await Promise.all(CACHED_URLS.map(async (url) => {
+      try {
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (resp && resp.ok) await cache.put(url, resp.clone());
+      } catch (e) {
+        console.error('[SW] 重新抓取失敗', url, e);
+      }
+    }));
   } catch (err) {
     console.error('[SW] 重新抓取資料失敗', err);
   } finally {

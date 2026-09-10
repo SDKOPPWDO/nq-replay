@@ -72,6 +72,9 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-sy
 .charts-col{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden;}
 .ccol{display:flex;flex-direction:column;flex:1;border-bottom:1px solid var(--b1);overflow:hidden;min-height:0;}
 .ccol:last-child{border-bottom:none;}
+.top-split{flex-direction:row;}
+.top-split>.split-half{flex:1 1 0;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;}
+.top-split>.split-half+.split-half{border-left:1px solid var(--b1);}
 .chdr{padding:3px 8px;background:var(--bg2);border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
 .chdr-l{font-weight:700;color:var(--t1);font-size:11px;}
 .chdr-r{color:var(--t3);font-size:10px;}
@@ -641,6 +644,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類：選一個分類後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
     <button class="day-btn" id="btnSneTablet" onclick="sneTabletToggle()" title="開啟後，輸入視窗會內嵌在畫面右側，可一邊看圖一邊打字（適合平板）" style="font-size:12px;padding:0 8px;width:auto;">📱 平板輸入：關</button>
+    <button class="day-btn" id="btnToggleNdx" onclick="toggleNdx()" title="在最上面的視窗左半顯示 NDX(固定30分K)，與 NQ 同步連動比對" style="font-size:12px;padding:0 8px;width:auto;">NDX比對：開</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -852,8 +856,9 @@ body.sne-popup .sne-shell{max-width:none;}
 const DATA_REPO_BASE = "https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/";
 const DATA_BIN_URL = DATA_REPO_BASE + "data.bin";
 const DATA_VERSION_URL = DATA_REPO_BASE + "version.json";
+const NDX_BIN_URL = DATA_REPO_BASE + "ndx.bin";
 const UP='#ef4444',DN='#22c55e',CW=6,CG=2,PADDING_BARS=2;
-let zoomLevel={'1k':1,'5k':1,'15k':1,'60k':1}; // multiplier: >1 = more bars (smaller), <1 = fewer bars (bigger)
+let zoomLevel={'1k':1,'5k':1,'15k':1,'60k':1,'ndx':1}; // multiplier: >1 = more bars (smaller), <1 = fewer bars (bigger)
 let maConfig=[{p:5,c:'#f97316',on:true},{p:10,c:'#00bfff',on:true},{p:20,c:'#ff69b4',on:true},{p:60,c:'#ffff00',on:true}];
 const PALETTE=['#ef4444','#fb923c','#f5c842','#22c55e','#14b8a6','#38bdf8','#3b82f6','#a78bfa','#ec4899','#ffffff','#fca5a5','#fdba74','#fde68a','#86efac','#99f6e4','#7dd3fc','#93c5fd','#c4b5fd','#f9a8d4','#94a3b8'];
 const TF_ORDER=['1k','5k','15k','60k'];
@@ -862,6 +867,7 @@ const TF_STEP={'1k':10,'5k':6,'15k':4,'60k':5};
 const TF_UNIT={'5k':5,'15k':15,'60k':60};
 
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
+let NDXDATA={},ndxBarsToday=[],ndxEnabled=true; // NDX(30分K)比對資料，idx與NQ共用同一條全域分鐘時間軸
 let panOffset={};
 let calYear=0,calMonth=0;
 let selectedTFs=['1k'];
@@ -929,6 +935,15 @@ async function loadData(){
   DATA = JSON.parse(jsonStr);
   DAYS = Object.keys(DATA).sort();
   DAYS_SET = new Set(DAYS);
+  // 額外載入 NDX(30分K) 比對資料（很小，直接抓；抓不到就不顯示NDX，不影響主流程）
+  try {
+    setLoadingText('載入 NDX 比對資料中...');
+    const ndxResp = await fetch(NDX_BIN_URL);
+    if(ndxResp.ok){
+      const nbuf = await ndxResp.arrayBuffer();
+      NDXDATA = JSON.parse(pako.inflate(new Uint8Array(nbuf), {to:'string'}));
+    }
+  } catch(e){ console.warn('[NDX] 載入失敗，將不顯示NDX', e); NDXDATA={}; }
   if(remoteVersion) localStorage.setItem('nq_data_version', remoteVersion);
 }
 
@@ -1030,6 +1045,7 @@ function loadDay(day){
   const d=DATA[day]||{};
   allBars={'1k':d['1k']||[],'5k':d['5k']||[],'15k':d['15k']||[],'60k':d['60k']||[]};
   mode1kBars=allBars['1k'];
+  { const nd=NDXDATA[day]; ndxBarsToday=(nd&&nd['30k'])?nd['30k']:[]; }
   cur1=0; // will be set after mode check
   hoverBar=null;panOffset={};
   selectedTFs.forEach(tf=>{panOffset[tf]=0;});
@@ -1110,6 +1126,7 @@ function renderAll(){
     if(bars[cursor]) updateChdrPrice(tf, bars[cursor]);
   });
   updateInfoBar(hoverBar||mode1kBars[cur1]);
+  if(typeof drawNdx==='function') drawNdx();
 }
 
 function drawChart(id,bars,cursor,timeStep,pan){
@@ -1239,18 +1256,19 @@ function drawChart(id,bars,cursor,timeStep,pan){
     view.forEach((b,i)=>{if((startIdx+i)%timeStep===0)ctx.fillText(b.ts,X(i),H-3);});
   };
   if(tfKey==='60k'){
-    // 60K 橫跨多天，每小時都標會太密 → 只標每天的美股盤前
-    const preTW=getPreOpenTW(currentDay);
+    // 60K 橫跨多天 → 只標每天的「開盤」那根（開盤落在的整點K棒）
+    const openTW=getOpenTW(currentDay);          // 例：21:30 / 22:30（台北時間）
+    const openBucketTs=openTW.slice(0,2)+':00';   // 開盤所在的整點bucket，例：21:00 / 22:00
     const hits=[];
-    view.forEach((b,i)=>{ if(b.ts===preTW) hits.push(i); });
+    view.forEach((b,i)=>{ if(b.ts===openBucketTs) hits.push(i); });
     if(hits.length){
-      ctx.fillStyle='#f5a623';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      ctx.font='bold 10px sans-serif';ctx.textAlign='center';
       hits.forEach(i=>{
         const x=X(i);
-        ctx.strokeStyle='rgba(245,166,35,0.25)';ctx.lineWidth=1;ctx.setLineDash([2,4]);
+        ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
         ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();ctx.setLineDash([]);
-        ctx.fillStyle='#f5a623';
-        ctx.fillText('盤前 '+preTW,x,H-3);
+        ctx.fillStyle='#ffffff';
+        ctx.fillText('開盤 '+openTW,x,H-3);
       });
     } else {
       drawStepLabels();
@@ -1583,11 +1601,9 @@ function rebuildMaBars(){
   });
 }
 
-function buildUI(){
-  const area=document.getElementById('chartsCol');area.innerHTML='';
-  selectedTFs.forEach(tf=>{
-    const col=document.createElement('div');col.className='ccol';
-    col.innerHTML=`
+// 產生單一 NQ 格局面板的內部 HTML（沿用原本的 header + canvas 結構）
+function nqPanelInner(tf){
+  return `
       <div class="chdr"><span class="chdr-l">${TF_LABELS[tf]}</span>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="chdr-price" id="price_${tf}">
@@ -1608,14 +1624,188 @@ function buildUI(){
         <canvas id="cv_${tf}"></canvas>
         <canvas id="cv_${tf}_cross" class="cross"></canvas>
       </div>`;
-    area.appendChild(col);
-    attachEvents(document.getElementById('wrap_'+tf),tf);
-    panOffset[tf]=panOffset[tf]||0;
+}
+
+// 產生 NDX(固定30分K) 面板的內部 HTML
+function ndxPanelInner(){
+  const tf='ndx';
+  return `
+      <div class="chdr"><span class="chdr-l" style="color:#a78bfa;">NDX · 30分K</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="chdr-price" id="price_${tf}">
+            <span class="chdr-price-lbl">漲跌</span>
+            <span class="chdr-price-val" id="priceVal_${tf}">—</span>
+          </span>
+          <span class="chdr-wick" id="wick_${tf}">
+            <span class="chdr-wick-item up"><span class="chdr-wick-lbl">上影</span><span class="chdr-wick-val" id="wickUp_${tf}">—</span></span>
+            <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
+          </span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
+          <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
+          <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
+          <span class="chdr-r" id="hdr_${tf}"></span>
+        </div>
+      </div>
+      <div class="cwrap" id="wrap_${tf}">
+        <canvas id="cv_${tf}"></canvas>
+      </div>`;
+}
+
+function buildUI(){
+  const area=document.getElementById('chartsCol');area.innerHTML='';
+  const tfs=[...selectedTFs];
+  const ndxOn = ndxEnabled && ndxBarsToday && ndxBarsToday.length>0;
+  tfs.forEach((tf,i)=>{
+    if(i===0 && ndxOn){
+      // 最上面的視窗切一半：左半 NDX(30分K)、右半 NQ 的第一個格局
+      const top=document.createElement('div');top.className='ccol top-split';
+      const h1=document.createElement('div');h1.className='split-half';h1.innerHTML=ndxPanelInner();
+      const h2=document.createElement('div');h2.className='split-half';h2.innerHTML=nqPanelInner(tf);
+      top.appendChild(h1);top.appendChild(h2);area.appendChild(top);
+      attachPanOnly(document.getElementById('wrap_ndx'),'ndx');
+      attachEvents(document.getElementById('wrap_'+tf),tf);
+      panOffset['ndx']=panOffset['ndx']||0;panOffset[tf]=panOffset[tf]||0;
+    } else {
+      const col=document.createElement('div');col.className='ccol';
+      col.innerHTML=nqPanelInner(tf);area.appendChild(col);
+      attachEvents(document.getElementById('wrap_'+tf),tf);
+      panOffset[tf]=panOffset[tf]||0;
+    }
   });
 }
 
+// NDX 只有平移/縮放，不參與 NQ 的十字線同步（避免互相干擾）
+function attachPanOnly(wrap,tf){
+  if(!wrap) return;
+  let rDrag=false,startX=0,startPan=0;
+  wrap.addEventListener('contextmenu',e=>e.preventDefault());
+  wrap.addEventListener('mousedown',e=>{if(e.button===2){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
+  window.addEventListener('mousemove',e=>{if(!rDrag)return;panOffset[tf]=Math.max(0,startPan+Math.round((e.clientX-startX)/((6+2)*(zoomLevel[tf]||1))));renderAll();});
+  window.addEventListener('mouseup',e=>{if(e.button===2&&rDrag){rDrag=false;wrap.style.cursor='default';}});
+  let tStartX=0,tStartPan=0,tTwo=false;
+  wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){tTwo=true;tStartX=(e.touches[0].clientX+e.touches[1].clientX)/2;tStartPan=panOffset[tf]||0;}},{passive:true});
+  wrap.addEventListener('touchmove',e=>{if(tTwo&&e.touches.length===2){e.preventDefault();const cx=(e.touches[0].clientX+e.touches[1].clientX)/2;panOffset[tf]=Math.max(0,tStartPan+Math.round((cx-tStartX)/((6+2)*(zoomLevel[tf]||1))));renderAll();}},{passive:false});
+  wrap.addEventListener('touchend',()=>{tTwo=false;});
+}
 
+function toggleNdx(){
+  ndxEnabled=!ndxEnabled;
+  const btn=document.getElementById('btnToggleNdx');
+  if(btn) btn.textContent='NDX比對：'+(ndxEnabled?'開':'關');
+  buildUI();
+  if(mode1kBars.length) renderAll();
+}
 
+// 找出「NQ 目前播放到的位置(idx)」對應到 NDX 要顯示到第幾根（正在形成中的那根30分K）
+function ndxCursorForIdx(curIdx){
+  let last=-1;
+  for(let i=0;i<ndxBarsToday.length;i++){ if(ndxBarsToday[i].idx<=curIdx) last=i; else break; }
+  return last;
+}
+
+function drawNdx(){
+  const cv=document.getElementById('cv_ndx');
+  if(!cv) return;
+  const hdr=document.getElementById('hdr_ndx');
+  const wrap=cv.parentElement,dpr=window.devicePixelRatio||2;
+  const W=wrap.clientWidth||200,H=wrap.clientHeight||200;
+  if(!ndxBarsToday.length){
+    cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+    ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#707080';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('這天沒有 NDX 資料',W/2,H/2);
+    if(hdr) hdr.textContent='—';
+    return;
+  }
+  const curIdx = mode1kBars.length ? mode1kBars[cur1].idx : 0;
+  const cursor = ndxCursorForIdx(curIdx);
+  if(cursor<0){
+    cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+    ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#707080';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('NDX 尚未開盤',W/2,H/2);
+    if(hdr) hdr.textContent='#0/'+ndxBarsToday.length;
+    return;
+  }
+  drawNdxChart('cv_ndx', ndxBarsToday, cursor, panOffset['ndx']||0);
+  if(hdr) hdr.textContent='#'+(cursor+1)+'/'+ndxBarsToday.length;
+  updateChdrPrice('ndx', ndxBarsToday[cursor]);
+}
+
+// NDX 專用繪圖（精簡版：格線 / K棒 / 均線 / 現價 / 時間軸；不畫交易箭頭與故事線）
+function drawNdxChart(id,bars,cursor,pan){
+  const cv=document.getElementById(id);
+  if(!cv||!bars.length) return;
+  const zoom=zoomLevel['ndx']||1;
+  const CW2=Math.max(2,Math.round(6*zoom)), CG2=Math.max(1,Math.round(2*zoom)), CS=CW2+CG2;
+  const wrap=cv.parentElement,dpr=window.devicePixelRatio||2;
+  const W=wrap.clientWidth||200,H=wrap.clientHeight||200;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
+  const vis=bars.slice(0,cursor+1);
+  if(!vis.length) return;
+  const P={t:10,r:62,b:22,l:2};
+  const cW2=W-P.l-P.r,cH=H-P.t-P.b;
+  const mxC=Math.floor(cW2/CS)-PADDING_BARS;
+  const panC=Math.max(0,Math.min(pan,vis.length-1));
+  const endIdx=Math.max(0,vis.length-1-panC);
+  const startIdx=Math.max(0,endIdx-mxC+1);
+  const view=vis.slice(startIdx,endIdx+1);
+  if(!view.length) return;
+  const allP=view.flatMap(b=>[b.h,b.l]);
+  let lo=Math.min(...allP),hi=Math.max(...allP);
+  const pd=(hi-lo)*0.08||1;lo-=pd;hi+=pd;
+  const rng=hi-lo||1;
+  const Y=p=>P.t+cH*(1-(p-lo)/rng);
+  const rightAnchorX=W-P.r-PADDING_BARS*CS-CW2/2;
+  const X=i=>rightAnchorX-(view.length-1-i)*CS;
+  cv._layout={P,W,H,lo,hi,rng,startIdx,endIdx,view,vis,Y,X,cH,pan:panC};
+  // grid
+  for(let i=0;i<=4;i++){
+    const y=P.t+cH*i/4,price=hi-rng*i/4;
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.setLineDash([4,5]);
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#d0d0e0';ctx.font='10px monospace';ctx.textAlign='left';
+    ctx.fillText(price.toFixed(1),W-P.r+4,y+4);
+  }
+  // 開盤那根做記號（NDX第一根＝美股開盤）
+  if(startIdx===0 && view.length){
+    const x=X(0);
+    ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();ctx.setLineDash([]);
+  }
+  // K棒
+  view.forEach((b,i)=>{
+    const x=X(i),up=b.c>=b.o,col=up?UP:DN;
+    ctx.strokeStyle=col;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,Y(b.h));ctx.lineTo(x,Y(b.l));ctx.stroke();
+    const tp=Math.min(Y(b.o),Y(b.c)),bh=Math.max(Math.abs(Y(b.c)-Y(b.o)),1.5);
+    ctx.fillStyle=col;ctx.fillRect(x-CW2/2,tp,CW2,bh);
+  });
+  // 均線（沿用 maConfig 的開關與顏色）
+  const mk=['m5','m10','m20','m60'];
+  maConfig.forEach((ma,mi)=>{
+    if(!ma.on) return;
+    ctx.strokeStyle=ma.c;ctx.lineWidth=mi===3?2:1.5;ctx.beginPath();
+    let st=false;
+    view.forEach((b,i)=>{const v=b[mk[mi]]??null;if(v==null)return;st?(ctx.lineTo(X(i),Y(v))):(ctx.moveTo(X(i),Y(v)),st=true);});
+    ctx.stroke();
+  });
+  // 現價標籤
+  const last=view[view.length-1],ly=Y(last.c);
+  ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(P.l,ly);ctx.lineTo(W-P.r,ly);ctx.stroke();ctx.setLineDash([]);
+  const pc=last.c>=last.o?UP:DN;
+  ctx.fillStyle=pc;ctx.fillRect(W-P.r+1,ly-9,P.r-3,18);
+  ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='left';
+  ctx.fillText(last.c.toFixed(1),W-P.r+4,ly+4);
+  // 時間軸（每2根標一次）
+  ctx.fillStyle='#d0d0e0';ctx.font='10px sans-serif';ctx.textAlign='center';
+  view.forEach((b,i)=>{ if((startIdx+i)%2===0) ctx.fillText(b.ts,X(i),H-3); });
+}
 
 
 
