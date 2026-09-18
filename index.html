@@ -645,6 +645,9 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnToggleBtnSide" onclick="toggleBtnColSide()" title="把操作按鈕列切換到左邊或右邊" style="font-size:12px;padding:0 8px;width:auto;">⇄ 工具列：右</button>
     <button class="day-btn" id="btnSneTablet" onclick="sneTabletToggle()" title="開啟後，輸入視窗會內嵌在畫面右側，可一邊看圖一邊打字（適合平板）" style="font-size:12px;padding:0 8px;width:auto;">📱 平板輸入：關</button>
     <button class="day-btn" id="btnToggleNdx" onclick="toggleNdx()" title="在最上面的視窗左半顯示 NDX(固定30分K)，與 NQ 同步連動比對" style="font-size:12px;padding:0 8px;width:auto;">NDX比對：開</button>
+    <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：開盤=開盤前一根(5K約21:25)；盤前=盤前時段(5K約15:55，冬夏不同)；早上10點=台北10點(5K約09:55)" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
+    <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在NQ圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
+    <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -868,6 +871,8 @@ const TF_UNIT={'5k':5,'15k':15,'60k':60};
 
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
+let startMode = (['open','preopen','am10'].includes(localStorage.getItem('nq_start_mode'))) ? localStorage.getItem('nq_start_mode') : 'open'; // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am10'=早上10點(09:55)
+let zoneList=[], zoneMode=false, zoneDraft=null, zoneDragging=false; // 使用者手畫的灰色方框（時間+價格），純記憶體、關掉即消失
 let panOffset={};
 let calYear=0,calMonth=0;
 let selectedTFs=['1k'];
@@ -1139,6 +1144,46 @@ function renderAll(){
   if(typeof drawNdx==='function') drawNdx();
 }
 
+// 由滑鼠位置換算成 (全域idx, 價格)（用該面板存下的座標對照）
+function nqPointFromLayout(L, mx, my){
+  let bi=0, bd=Infinity;
+  for(let i=0;i<L.view.length;i++){ const d=Math.abs(L.X(i)-mx); if(d<bd){ bd=d; bi=i; } }
+  const idx = L.view.length? L.view[bi].idx : 0;
+  const price = L.lo + (1-(my-L.P.t)/L.cH)*L.rng;
+  return {idx, price, bi};
+}
+
+// 把使用者畫的灰色方框畫在K棒後面（用全域idx對映到本面板的X，價格對映到Y）
+function drawZones(ctx, L){
+  if(!L || !L.view || !L.view.length) return;
+  if(!zoneList.length && !zoneDraft) return;
+  const vFirst=L.view[0].idx, vLast=(L.view[L.view.length-1].idx_end||L.view[L.view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  const xForIdx=(idx)=>{
+    for(let i=0;i<L.view.length;i++){ const lo=L.view[i].idx, hi=(L.view[i].idx_end||L.view[i].idx); if(idx>=lo&&idx<=hi) return L.X(i); }
+    if(idx<vFirst) return plotL;
+    if(idx>vLast)  return plotR;
+    let bi=0,bd=Infinity; for(let i=0;i<L.view.length;i++){ const d=Math.abs(L.view[i].idx-idx); if(d<bd){bd=d;bi=i;} } return L.X(bi);
+  };
+  const paint=(z, draft)=>{
+    const a=Math.min(z.idxA,z.idxB), b=Math.max(z.idxA,z.idxB);
+    if(b<vFirst || a>vLast) return;                 // 完全在畫面外就不畫
+    let x1=xForIdx(a), x2=xForIdx(b); if(x2<x1){const tmp=x1;x1=x2;x2=tmp;}
+    const yTop=L.Y(Math.max(z.pLo,z.pHi)), yBot=L.Y(Math.min(z.pLo,z.pHi));
+    const w=Math.max(2,x2-x1), h=Math.max(2,yBot-yTop);
+    ctx.fillStyle = draft?'rgba(150,150,160,0.15)':'rgba(150,150,160,0.22)';
+    ctx.fillRect(x1,yTop,w,h);
+    ctx.strokeStyle = draft?'rgba(255,220,120,0.9)':'rgba(210,210,220,0.55)';
+    ctx.lineWidth=1; if(draft) ctx.setLineDash([4,3]);
+    ctx.strokeRect(x1,yTop,w,h); if(draft) ctx.setLineDash([]);
+  };
+  ctx.save();
+  ctx.beginPath();ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT);ctx.clip();
+  for(const z of zoneList) paint(z,false);
+  if(zoneDraft) paint(zoneDraft,true);
+  ctx.restore();
+}
+
 function drawChart(id,bars,cursor,timeStep,pan){
   const cv=document.getElementById(id);
   if(!cv||!bars.length) return;
@@ -1200,6 +1245,28 @@ function drawChart(id,bars,cursor,timeStep,pan){
       }
     }
   }
+
+  // 60K：美股盤時段用很淺的黃色反白（夏令 21:00~03:00 / 冬令 22:00~04:00 台北時間），畫在K棒後面
+  if(tfKey==='60k'){
+    const _dst=isDST(currentDay);
+    const startTs=_dst?'21:00':'22:00', endTs=_dst?'03:00':'04:00';
+    ctx.fillStyle='rgba(255,235,130,0.12)';
+    for(let i=0;i<view.length;i++){
+      if(view[i].ts===startTs){
+        let j=-1;
+        for(let k=i+1;k<view.length;k++){
+          if(view[k].ts===startTs) break;        // 碰到下一天的開盤就停
+          if(view[k].ts===endTs){ j=k; break; }
+        }
+        const xS=X(i)-CS/2;
+        const xE=(j>=0)?(X(j)-CS/2):(W-P.r);      // 到03:00那根的左緣；資料還沒到就畫到右邊界
+        ctx.fillRect(xS, P.t, Math.max(2,xE-xS), H-P.b-P.t);
+      }
+    }
+  }
+
+  // 使用者畫的灰色方框（時間+價格區間），畫在K棒後面
+  drawZones(ctx, cv._layout);
 
   const dst=isDST(currentDay);
   // 盤前箭頭
@@ -1265,27 +1332,8 @@ function drawChart(id,bars,cursor,timeStep,pan){
     ctx.fillStyle='#d0d0e0';ctx.font='10px sans-serif';ctx.textAlign='center';
     view.forEach((b,i)=>{if((startIdx+i)%timeStep===0)ctx.fillText(b.ts,X(i),H-3);});
   };
-  if(tfKey==='60k'){
-    // 60K 橫跨多天 → 只標每天的「開盤」那根（開盤落在的整點K棒）
-    const openTW=getOpenTW(currentDay);          // 例：21:30 / 22:30（台北時間）
-    const openBucketTs=openTW.slice(0,2)+':00';   // 開盤所在的整點bucket，例：21:00 / 22:00
-    const hits=[];
-    view.forEach((b,i)=>{ if(b.ts===openBucketTs) hits.push(i); });
-    if(hits.length){
-      ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-      hits.forEach(i=>{
-        const x=X(i);
-        ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-        ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,H-P.b);ctx.stroke();ctx.setLineDash([]);
-        ctx.fillStyle='#ffffff';
-        ctx.fillText('開盤 '+openTW,x,H-3);
-      });
-    } else {
-      drawStepLabels();
-    }
-  } else {
-    drawStepLabels();
-  }
+  // 60K 開盤時段改用淺黃反白顯示（見上方），這裡一律畫一般時間標籤，不再畫21:00虛線
+  drawStepLabels();
 
   // 交易進出場箭頭 (所有格局都顯示)
   if(tradeSystemOn && typeof getDayMarkers==='function'){
@@ -1505,8 +1553,49 @@ function attachEvents(wrap,tf){
     else if(!tTwo&&e.touches.length===1){e.preventDefault();const t=e.touches[0],r=wrap.getBoundingClientRect();handleCross(tf,(t.clientX-r.left)/r.width);}
   },{passive:false});
   wrap.addEventListener('touchend',()=>{tTwo=false;wrap._panStart=null;clearAllCross();});
-  wrap.addEventListener('mousemove',e=>{if(rDrag)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width);});
+  wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
+
+  // ===== 畫方框模式（左鍵拖曳畫、單擊刪除）=====
+  let zStart=null;
+  wrap.addEventListener('mousedown',e=>{
+    if(!zoneMode || e.button!==0) return;
+    const cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
+    e.preventDefault();
+    const r=wrap.getBoundingClientRect();
+    const p=nqPointFromLayout(cv._layout, e.clientX-r.left, e.clientY-r.top);
+    zStart={idx:p.idx, price:p.price}; zoneDragging=true; zoneDraft=null;
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!zoneDragging || !zStart) return;
+    const cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
+    const r=wrap.getBoundingClientRect();
+    const p=nqPointFromLayout(cv._layout, e.clientX-r.left, e.clientY-r.top);
+    zoneDraft={idxA:zStart.idx, idxB:p.idx, pLo:Math.min(zStart.price,p.price), pHi:Math.max(zStart.price,p.price)};
+    renderAll();
+  });
+  window.addEventListener('mouseup',e=>{
+    if(!zoneDragging) return;
+    zoneDragging=false;
+    const cv=document.getElementById('cv_'+tf);
+    const big = zoneDraft && cv && cv._layout
+             && Math.abs(zoneDraft.idxB-zoneDraft.idxA)>=1
+             && Math.abs(cv._layout.Y(zoneDraft.pHi)-cv._layout.Y(zoneDraft.pLo))>=4;
+    if(big){ zoneList.push({idxA:zoneDraft.idxA, idxB:zoneDraft.idxB, pLo:zoneDraft.pLo, pHi:zoneDraft.pHi}); zoneDraft=null; renderAll(); }
+    else {
+      zoneDraft=null;
+      if(zStart){   // 單擊：若點在某個方框內就刪掉它
+        for(let i=zoneList.length-1;i>=0;i--){
+          const z=zoneList[i];
+          const a=Math.min(z.idxA,z.idxB), b=Math.max(z.idxA,z.idxB);
+          const plo=Math.min(z.pLo,z.pHi), phi=Math.max(z.pLo,z.pHi);
+          if(zStart.idx>=a && zStart.idx<=b && zStart.price>=plo && zStart.price<=phi){ zoneList.splice(i,1); break; }
+        }
+      }
+      renderAll();
+    }
+    zStart=null;
+  });
 }
 
 function toggleTF(tf,btn){
@@ -1826,6 +1915,7 @@ function drawNdxChart(id,bars,cursor,pan){
 
 
 document.getElementById('btnPrevDay').addEventListener('click',goPrevDay);
+{ const _sb=document.getElementById('btnStartMode'); if(_sb) _sb.textContent='起始：'+startModeLabel(); }
 document.getElementById('btnNextDay').addEventListener('click',goNextDay);
 document.getElementById('btnPrevDay2')?.addEventListener('click',goPrevDay);
 document.getElementById('btnNextDay2')?.addEventListener('click',goNextDay);
@@ -1982,20 +2072,62 @@ function setMode(mode) {
   }
 }
 
+// 早上10點起始（固定台北10:00，無冬夏差異；取最接近當日開頭的那根再往前一根）
+function findAm10Idx(bars){
+  const todayStartIdx = mode1kBars.length>0 ? mode1kBars[0].idx : 0;
+  let best=-1, bestDiff=Infinity;
+  bars.forEach((b,i)=>{
+    if(b.ts==='10:00'){
+      const diff=Math.abs(b.idx-todayStartIdx);
+      if(diff<bestDiff){ bestDiff=diff; best=i; }
+    }
+  });
+  if(best>0) best=best-1;
+  return best>=0?best:0;
+}
+
 function getModeStartIdx() {
   if(!mode1kBars.length) return 0;
-  return findOpenIdx(mode1kBars, currentDay); // 固定為美盤模式
+  if(startMode==='preopen') return findPreOpenIdx(mode1kBars, currentDay); // 盤前時段（5K約15:55 / 冬令16:55）
+  if(startMode==='am10')    return findAm10Idx(mode1kBars);                // 早上10點（5K約09:55）
+  return findOpenIdx(mode1kBars, currentDay);                             // 開盤前一根（5K約21:25 / 冬令22:25）
+}
+
+function startModeLabel(){
+  return startMode==='preopen' ? '盤前' : (startMode==='am10' ? '早上10點' : '開盤');
+}
+
+// 開關「畫方框」模式
+function toggleZoneMode(){
+  zoneMode=!zoneMode;
+  const b=document.getElementById('btnZoneMode');
+  if(b){ b.textContent='方框：'+(zoneMode?'開':'關'); b.style.color=zoneMode?'#ffd479':''; b.style.fontWeight=zoneMode?'700':''; }
+  document.querySelectorAll('.cwrap').forEach(w=>{ w.style.cursor = zoneMode?'crosshair':''; });
+}
+function clearZones(){ zoneList=[]; zoneDraft=null; if(mode1kBars.length) renderAll(); }
+
+// 切換「復盤起始時段」：開盤 → 盤前 → 早上10點 → 開盤（循環）
+function toggleStartMode(){
+  startMode = (startMode==='open') ? 'preopen' : (startMode==='preopen' ? 'am10' : 'open');
+  localStorage.setItem('nq_start_mode', startMode);
+  const btn=document.getElementById('btnStartMode');
+  if(btn) btn.textContent = '起始：'+startModeLabel();
+  if(mode1kBars.length){ resetToModeStart(); renderAll(); }
 }
 
 function findPreOpenIdx(bars, dateStr) {
-  const tw = getPreOpenTW(dateStr);
-  // find today's pre-open bar using idx
-  const todayStart = bars.length > 0 ? bars[0].idx : 0;
-  let best = 0;
-  for(let i = 0; i < bars.length; i++) {
-    if(bars[i].ts === tw && bars[i].idx >= todayStart) { best = i; break; }
-  }
-  return best;
+  const tw = getPreOpenTW(dateStr);   // 盤前：16:00(夏) / 17:00(冬) 台北時間
+  const todayStartIdx = mode1kBars.length>0 ? mode1kBars[0].idx : 0;
+  let best=-1, bestDiff=Infinity;
+  bars.forEach((b,i)=>{
+    if(b.ts===tw){
+      const diff=Math.abs(b.idx-todayStartIdx);
+      if(diff<bestDiff){ bestDiff=diff; best=i; }
+    }
+  });
+  // 往前一根，跟開盤起始一致（例如5K會停在盤前的前一根15:55）
+  if(best>0) best=best-1;
+  return best>=0?best:0;
 }
 
 function resetToModeStart() {
