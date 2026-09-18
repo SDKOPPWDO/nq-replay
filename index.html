@@ -627,6 +627,8 @@ body.sne-popup .sne-shell{max-width:none;}
 .smkt-item-meta{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
 .smkt-fdrop-btn{margin-left:auto;padding:2px 7px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t3);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
 .smkt-fdrop-btn.has{border-color:#7c3aed;color:#c4b5fd;background:rgba(124,58,237,.14);}
+.smkt-del-btn{padding:2px 6px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t3);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.smkt-del-btn:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,.12);}
 .smkt-item-text{color:var(--t2);font-size:9.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .smkt-detail{min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;min-height:0;}
 .smkt-note-info{background:var(--bg3);border-left:3px solid #facc15;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--t1);line-height:1.5;flex-shrink:0;white-space:pre-wrap;max-height:38vh;overflow-y:auto;}
@@ -642,7 +644,6 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類：選一個分類後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
-    <button class="day-btn" id="btnToggleNdx" onclick="toggleNdx()" title="在最上面的視窗左半顯示 NDX(固定30分K)，與 NQ 同步連動比對" style="font-size:12px;padding:0 8px;width:auto;">NDX比對：開</button>
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：開盤=開盤前一根(5K約21:25)；盤前=盤前時段(5K約15:55，冬夏不同)；早上10點=台北10點(5K約09:55)" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在NQ圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
     <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
@@ -938,25 +939,6 @@ async function loadData(){
   DATA = JSON.parse(jsonStr);
   DAYS = Object.keys(DATA).sort();
   DAYS_SET = new Set(DAYS);
-  // 額外載入 NDX 比對資料（很小，直接抓；抓不到就不顯示NDX，不影響主流程）
-  try {
-    setLoadingText('載入 NDX 比對資料中...');
-    const ndxResp = await fetch(NDX_BIN_URL);
-    if(ndxResp.ok){
-      const nbuf = await ndxResp.arrayBuffer();
-      const nobj = JSON.parse(pako.inflate(new Uint8Array(nbuf), {to:'string'}));
-      NDXBUCKETS = (nobj && nobj.buckets) ? nobj.buckets : [];
-      // 每個30分bucket先算好「已收完」的OHLC與起訖idx（畫歷史時直接用），並標記每日第一根
-      for(let k=0;k<NDXBUCKETS.length;k++){
-        const B=NDXBUCKETS[k], m=B.m;
-        B.i=m[0][0]; B.e=m[m.length-1][0];
-        let h=m[0][2], l=m[0][3];
-        for(let j=0;j<m.length;j++){ if(m[j][2]>h)h=m[j][2]; if(m[j][3]<l)l=m[j][3]; }
-        B.O=m[0][1]; B.H=h; B.L=l; B.C=m[m.length-1][4];
-        B.nd = (k===0) || (B.d!==NDXBUCKETS[k-1].d);
-      }
-    }
-  } catch(e){ console.warn('[NDX] 載入失敗，將不顯示NDX', e); NDXBUCKETS=[]; }
   if(remoteVersion) localStorage.setItem('nq_data_version', remoteVersion);
 }
 
@@ -1141,7 +1123,6 @@ function renderAll(){
     if(bars[cursor]) updateChdrPrice(tf, bars[cursor]);
   });
   updateInfoBar(hoverBar||mode1kBars[cur1]);
-  if(typeof drawNdx==='function') drawNdx();
 }
 
 // 由滑鼠位置換算成 (全域idx, 價格)（用該面板存下的座標對照）
@@ -1171,6 +1152,14 @@ function zoneScreenRect(L, z){
 function zoneHitTest(L, mx, my){
   const E=6;
   for(let i=zoneList.length-1;i>=0;i--){
+    const z=zoneList[i];
+    if(z.kind==='line'){
+      const x1=xForIdxOnLayout(L,Math.min(z.idxA,z.idxB)), x2=xForIdxOnLayout(L,Math.max(z.idxA,z.idxB));
+      const y=L.Y(z.p);
+      if(my<y-E||my>y+E||mx<x1-E||mx>x2+E) continue;
+      let h='move'; if(Math.abs(mx-x1)<=E) h='l'; else if(Math.abs(mx-x2)<=E) h='r';
+      return {index:i, handle:h};
+    }
     const R=zoneScreenRect(L, zoneList[i]);
     if(mx<R.x1-E || mx>R.x2+E || my<R.yTop-E || my>R.yBot+E) continue;
     const nl=Math.abs(mx-R.x1)<=E, nr=Math.abs(mx-R.x2)<=E, nt=Math.abs(my-R.yTop)<=E, nb=Math.abs(my-R.yBot)<=E;
@@ -1203,18 +1192,39 @@ function drawZones(ctx, L){
     const w=Math.max(2,x2-x1), h=Math.max(2,yBot-yTop);
     ctx.fillStyle = draft?'rgba(150,150,160,0.15)':'rgba(150,150,160,0.22)';
     ctx.fillRect(x1,yTop,w,h);
-    ctx.strokeStyle = draft?'rgba(255,220,120,0.9)':'rgba(210,210,220,0.55)';
-    ctx.lineWidth=1; if(draft) ctx.setLineDash([4,3]);
-    ctx.strokeRect(x1,yTop,w,h); if(draft) ctx.setLineDash([]);
-    if(!draft){   // 四角控制點（提示可調整長寬）
-      ctx.fillStyle='rgba(220,220,230,0.65)'; const s=3;
-      [[x1,yTop],[x2,yTop],[x1,yBot],[x2,yBot]].forEach(pt=>ctx.fillRect(pt[0]-s,pt[1]-s,s*2,s*2));
+    if(draft){   // 只有「正在畫」時顯示虛線提示；畫完就是純色塊（無邊線、無角點）
+      ctx.strokeStyle='rgba(255,220,120,0.9)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+      ctx.strokeRect(x1,yTop,w,h); ctx.setLineDash([]);
     }
   };
   ctx.save();
   ctx.beginPath();ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT);ctx.clip();
-  for(const z of zoneList) paint(z,false);
-  if(zoneDraft) paint(zoneDraft,true);
+  for(const z of zoneList){ if(z.kind==='line') continue; paint(z,false); }
+  if(zoneDraft && zoneDraft.kind!=='line') paint(zoneDraft,true);
+  ctx.restore();
+}
+
+// 白色水平線段：畫在「最上層」（K棒到了會在線下方），可單獨移動/刪除/調整長度
+function drawZonesTop(ctx, L){
+  if(!L || !L.view || !L.view.length) return;
+  const lines=zoneList.filter(z=>z.kind==='line');
+  const draftLine=(zoneDraft && zoneDraft.kind==='line')?zoneDraft:null;
+  if(!lines.length && !draftLine) return;
+  const vFirst=L.view[0].idx, vLast=(L.view[L.view.length-1].idx_end||L.view[L.view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  ctx.save(); ctx.beginPath(); ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT); ctx.clip();
+  const paint=(z,draft)=>{
+    const a=Math.min(z.idxA,z.idxB), b=Math.max(z.idxA,z.idxB);
+    if(b<vFirst||a>vLast) return;
+    let x1=xForIdxOnLayout(L,a), x2=xForIdxOnLayout(L,b); if(x2<x1){const tmp=x1;x1=x2;x2=tmp;}
+    const y=L.Y(z.p);
+    ctx.strokeStyle=draft?'rgba(255,255,255,0.75)':'#ffffff'; ctx.lineWidth=2;
+    if(draft) ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+    if(draft) ctx.setLineDash([]);
+  };
+  for(const z of lines) paint(z,false);
+  if(draftLine) paint(draftLine,true);
   ctx.restore();
 }
 
@@ -1284,18 +1294,31 @@ function drawChart(id,bars,cursor,timeStep,pan){
   if(tfKey==='60k'){
     const _dst=isDST(currentDay);
     const startTs=_dst?'21:00':'22:00', endTs=_dst?'03:00':'04:00';
+    const full=allBars['60k']||[];
+    // 用「完整資料」判斷該場次是否正常收盤到 endTs（複盤看不到未來，所以查整段資料，早收盤就整段都不畫）
+    const closesNormally=(openIdx)=>{
+      let s=-1; for(let x=0;x<full.length;x++){ if(full[x].idx===openIdx){ s=x; break; } }
+      if(s<0) return true;
+      for(let x=s+1;x<full.length;x++){
+        if((full[x].idx-(full[x-1].idx_end||full[x-1].idx))>2) return false; // 收盤前就斷點 = 早收盤
+        if(full[x].ts===endTs) return true;                                  // 有走到正常收盤
+        if(full[x].ts===startTs) return false;                               // 到下一天開盤都沒收盤
+      }
+      return false;                                                          // 掃到底都沒正常收盤 = 早收盤
+    };
     ctx.fillStyle='rgba(255,235,130,0.12)';
     for(let i=0;i<view.length;i++){
-      if(view[i].ts===startTs){
-        let j=-1;
-        for(let k=i+1;k<view.length;k++){
-          if(view[k].ts===startTs) break;        // 碰到下一天的開盤就停
-          if(view[k].ts===endTs){ j=k; break; }
-        }
-        const xS=X(i)-CS/2;
-        const xE=(j>=0)?(X(j)+CS/2):(X(view.length-1)+CS/2); // 含03:00那根；03:00還沒出現就只畫到目前最後一根，不外溢
-        ctx.fillRect(xS, P.t, Math.max(2,xE-xS), H-P.b-P.t);
+      if(view[i].ts!==startTs) continue;
+      if(!closesNormally(view[i].idx)) continue;   // 早收盤 → 完全不畫黃底
+      let j=-1;
+      for(let k=i+1;k<view.length;k++){
+        if((view[k].idx-(view[k-1].idx_end||view[k-1].idx))>2) break;
+        if(view[k].ts===startTs) break;
+        if(view[k].ts===endTs){ j=k; break; }
       }
+      const xS=X(i)-CS/2;
+      const xE=(j>=0)?(X(j)+CS/2):(X(view.length-1)+CS/2); // 收盤已在畫面→到收盤；還沒到→畫到目前(複盤進行中)
+      ctx.fillRect(xS, P.t, Math.max(2,xE-xS), H-P.b-P.t);
     }
   }
 
@@ -1441,6 +1464,8 @@ function drawChart(id,bars,cursor,timeStep,pan){
       ctx.restore();
     });
   }
+  // 白色水平線畫在最上層（K棒會在線下方）
+  drawZonesTop(ctx, cv._layout);
 }
 
 function drawCrossOnChart(cvId,bi){
@@ -1577,7 +1602,7 @@ function xFracTo1kAbs(xFrac){
 function attachEvents(wrap,tf){
   let rDrag=false,startX=0,startPan=0;
   wrap.addEventListener('contextmenu',e=>e.preventDefault());
-  wrap.addEventListener('mousedown',e=>{if(e.button===2){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
+  wrap.addEventListener('mousedown',e=>{if(e.button===2 && !zoneMode){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
   window.addEventListener('mousemove',e=>{if(!rDrag)return;panOffset[tf]=Math.max(0,startPan+Math.round((e.clientX-startX)/((6+2)*(zoomLevel[tf]||1))));renderAll();});
   window.addEventListener('mouseup',e=>{if(e.button===2&&rDrag){rDrag=false;wrap.style.cursor='crosshair';}});
   let tStartX=0,tStartPan=0,tTwo=false;
@@ -1590,13 +1615,14 @@ function attachEvents(wrap,tf){
   wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
 
-  // ===== 方框：畫、移動、調整長寬、刪除（Pointer 事件 + setPointerCapture）=====
-  // 邊/角=拉伸；內部拖曳=整塊移動；內部點一下=刪除；空白處拖曳=畫新的
-  let zStart=null, zStartPx=null, zPid=null, zEditIdx=-1, zHandle=null, zOrig=null;
+  // ===== 方框/水平線：畫、移動、調整、刪除（Pointer 事件 + setPointerCapture）=====
+  // 左鍵空白拖曳=灰色方框(預設30根)；右鍵空白拖曳=白色水平線(預設30根,最上層)
+  // 命中既有物件：邊/角/端點=調整、內部/線身拖曳=移動、點一下=刪除
+  let zStart=null, zStartPx=null, zPid=null, zEditIdx=-1, zHandle=null, zOrig=null, zNewKind=null;
   wrap.addEventListener('dragstart', e=>e.preventDefault());
   wrap.addEventListener('pointerdown', e=>{
-    if(!zoneMode || e.button!==0) return;
-    if(e.pointerType && e.pointerType!=='mouse' && e.pointerType!=='pen') return; // 觸控維持原本平移/十字線
+    if(!zoneMode || (e.button!==0 && e.button!==2)) return;
+    if(e.pointerType && e.pointerType!=='mouse' && e.pointerType!=='pen') return; // 觸控維持原本操作
     const cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
     e.preventDefault();
     zPid=e.pointerId; try{ wrap.setPointerCapture(zPid); }catch(_){}
@@ -1606,10 +1632,14 @@ function attachEvents(wrap,tf){
     zoneActiveTf=tf; zStart={idx:p.idx, price:p.price}; zStartPx={x:e.clientX, y:e.clientY};
     const hit=zoneHitTest(cv._layout, mx, my);
     if(hit){
-      zEditIdx=hit.index; zHandle=hit.handle;
+      zEditIdx=hit.index; zHandle=hit.handle; zNewKind=null;
       const z=zoneList[hit.index];
-      zOrig={idxA:Math.min(z.idxA,z.idxB), idxB:Math.max(z.idxA,z.idxB), pLo:Math.min(z.pLo,z.pHi), pHi:Math.max(z.pLo,z.pHi)};
-    } else { zEditIdx=-1; zHandle=null; zOrig=null; }
+      if(z.kind==='line') zOrig={kind:'line', idxA:Math.min(z.idxA,z.idxB), idxB:Math.max(z.idxA,z.idxB), p:z.p};
+      else zOrig={kind:'box', idxA:Math.min(z.idxA,z.idxB), idxB:Math.max(z.idxA,z.idxB), pLo:Math.min(z.pLo,z.pHi), pHi:Math.max(z.pLo,z.pHi)};
+    } else {
+      zEditIdx=-1; zHandle=null; zOrig=null;
+      zNewKind = (e.button===2) ? 'line' : 'box';   // 右鍵=水平線，左鍵=方框
+    }
     zoneDraft=null; zoneDragging=true;
   });
   wrap.addEventListener('pointermove', e=>{
@@ -1617,7 +1647,6 @@ function attachEvents(wrap,tf){
     const r=wrap.getBoundingClientRect();
     const mx=e.clientX-r.left, my=e.clientY-r.top;
     if(!zoneDragging){
-      // 沒在拖曳時：換游標提示可移動/拉伸
       if(zoneMode && zoneActiveTf===null){
         const hit=zoneHitTest(cv._layout, mx, my);
         wrap.style.cursor = hit ? zoneCursor(hit.handle) : 'crosshair';
@@ -1627,22 +1656,31 @@ function attachEvents(wrap,tf){
     if(zoneActiveTf!==tf || e.pointerId!==zPid) return;
     const p=nqPointFromLayout(cv._layout, mx, my);
     if(zEditIdx>=0 && zOrig){
-      const z=zoneList[zEditIdx];
-      if(!z){ return; }
+      const z=zoneList[zEditIdx]; if(!z){ return; }
       const dIdx=p.idx-zStart.idx, dP=p.price-zStart.price;
-      if(zHandle==='move'){
-        z.idxA=zOrig.idxA+dIdx; z.idxB=zOrig.idxB+dIdx; z.pLo=zOrig.pLo+dP; z.pHi=zOrig.pHi+dP;
+      if(zOrig.kind==='line'){
+        if(zHandle==='move'){ z.idxA=zOrig.idxA+dIdx; z.idxB=zOrig.idxB+dIdx; z.p=zOrig.p+dP; }
+        else if(zHandle==='l'){ z.idxA=p.idx; }
+        else if(zHandle==='r'){ z.idxB=p.idx; }
       } else {
-        let A=zOrig.idxA, B=zOrig.idxB, lo=zOrig.pLo, hi=zOrig.pHi;
-        if(zHandle.includes('l')) A=p.idx;
-        if(zHandle.includes('r')) B=p.idx;
-        if(zHandle.includes('t')) hi=p.price;
-        if(zHandle.includes('b')) lo=p.price;
-        z.idxA=A; z.idxB=B; z.pLo=lo; z.pHi=hi;
+        if(zHandle==='move'){ z.idxA=zOrig.idxA+dIdx; z.idxB=zOrig.idxB+dIdx; z.pLo=zOrig.pLo+dP; z.pHi=zOrig.pHi+dP; }
+        else {
+          let A=zOrig.idxA,B=zOrig.idxB,lo=zOrig.pLo,hi=zOrig.pHi;
+          if(zHandle.includes('l')) A=p.idx;
+          if(zHandle.includes('r')) B=p.idx;
+          if(zHandle.includes('t')) hi=p.price;
+          if(zHandle.includes('b')) lo=p.price;
+          z.idxA=A; z.idxB=B; z.pLo=lo; z.pHi=hi;
+        }
       }
       renderAll();
     } else {
-      zoneDraft={idxA:zStart.idx, idxB:p.idx, pLo:Math.min(zStart.price,p.price), pHi:Math.max(zStart.price,p.price)};
+      const units=(TF_UNITS_MAP[tf]||1);
+      if(zNewKind==='line'){
+        zoneDraft={kind:'line', idxA:zStart.idx, idxB:zStart.idx+30*units, p:p.price};
+      } else {
+        zoneDraft={idxA:zStart.idx, idxB:zStart.idx+30*units, pLo:Math.min(zStart.price,p.price), pHi:Math.max(zStart.price,p.price)};
+      }
       renderAll();
     }
   });
@@ -1654,17 +1692,28 @@ function attachEvents(wrap,tf){
     const movedPx = zStartPx ? (Math.abs(e.clientX-zStartPx.x)+Math.abs(e.clientY-zStartPx.y)) : 0;
     if(zEditIdx>=0){
       if(movedPx<=4){
-        if(zHandle==='move' && zoneList[zEditIdx]) zoneList.splice(zEditIdx,1); // 點內部=刪除；點邊角沒拖動則不動作
+        if(zHandle==='move' && zoneList[zEditIdx]) zoneList.splice(zEditIdx,1);  // 點內部/線身=刪除
       } else {
-        const z=zoneList[zEditIdx];   // 正規化順序
-        if(z){ const A=Math.min(z.idxA,z.idxB),B=Math.max(z.idxA,z.idxB),lo=Math.min(z.pLo,z.pHi),hi=Math.max(z.pLo,z.pHi); z.idxA=A;z.idxB=B;z.pLo=lo;z.pHi=hi; }
+        const z=zoneList[zEditIdx];
+        if(z){
+          if(z.kind==='line'){ const A=Math.min(z.idxA,z.idxB),B=Math.max(z.idxA,z.idxB); z.idxA=A; z.idxB=B; }
+          else { const A=Math.min(z.idxA,z.idxB),B=Math.max(z.idxA,z.idxB),lo=Math.min(z.pLo,z.pHi),hi=Math.max(z.pLo,z.pHi); z.idxA=A;z.idxB=B;z.pLo=lo;z.pHi=hi; }
+        }
       }
-    } else {
-      if(zoneDraft && movedPx>4 && zoneDraft.pHi>zoneDraft.pLo){
-        zoneList.push({idxA:zoneDraft.idxA, idxB:zoneDraft.idxB, pLo:zoneDraft.pLo, pHi:zoneDraft.pHi});
+    } else if(zoneDraft && movedPx>4){
+      if(zoneDraft.kind==='line'){
+        zoneList.push({kind:'line', idxA:zoneDraft.idxA, idxB:zoneDraft.idxB, p:zoneDraft.p});
+      } else {
+        let A=zoneDraft.idxA, B=zoneDraft.idxB, lo=zoneDraft.pLo, hi=zoneDraft.pHi;
+        if(!(hi>lo)){
+          const L=(document.getElementById('cv_'+tf)||{})._layout;
+          const dh = L ? L.rng*0.06 : (Math.abs(lo)*0.002||1);
+          lo = zoneDraft.pLo - dh/2; hi = zoneDraft.pLo + dh/2;
+        }
+        zoneList.push({idxA:A, idxB:B, pLo:lo, pHi:hi});
       }
     }
-    zoneDraft=null; zEditIdx=-1; zHandle=null; zOrig=null; zStart=null; zStartPx=null;
+    zoneDraft=null; zEditIdx=-1; zHandle=null; zOrig=null; zNewKind=null; zStart=null; zStartPx=null;
     renderAll();
   };
   wrap.addEventListener('pointerup', finishZone);
@@ -1847,24 +1896,11 @@ function ndxPanelInner(){
 
 function buildUI(){
   const area=document.getElementById('chartsCol');area.innerHTML='';
-  const tfs=[...selectedTFs];
-  const ndxOn = ndxEnabled && NDXBUCKETS && NDXBUCKETS.length>0;
-  tfs.forEach((tf,i)=>{
-    if(i===0 && ndxOn){
-      // 最上面的視窗切一半：左半 NDX(30分K)、右半 NQ 的第一個格局
-      const top=document.createElement('div');top.className='ccol top-split';
-      const h1=document.createElement('div');h1.className='split-half';h1.innerHTML=ndxPanelInner();
-      const h2=document.createElement('div');h2.className='split-half';h2.innerHTML=nqPanelInner(tf);
-      top.appendChild(h1);top.appendChild(h2);area.appendChild(top);
-      attachPanOnly(document.getElementById('wrap_ndx'),'ndx');
-      attachEvents(document.getElementById('wrap_'+tf),tf);
-      panOffset['ndx']=panOffset['ndx']||0;panOffset[tf]=panOffset[tf]||0;
-    } else {
-      const col=document.createElement('div');col.className='ccol';
-      col.innerHTML=nqPanelInner(tf);area.appendChild(col);
-      attachEvents(document.getElementById('wrap_'+tf),tf);
-      panOffset[tf]=panOffset[tf]||0;
-    }
+  [...selectedTFs].forEach((tf)=>{
+    const col=document.createElement('div');col.className='ccol';
+    col.innerHTML=nqPanelInner(tf);area.appendChild(col);
+    attachEvents(document.getElementById('wrap_'+tf),tf);
+    panOffset[tf]=panOffset[tf]||0;
   });
 }
 
@@ -1873,7 +1909,7 @@ function attachPanOnly(wrap,tf){
   if(!wrap) return;
   let rDrag=false,startX=0,startPan=0;
   wrap.addEventListener('contextmenu',e=>e.preventDefault());
-  wrap.addEventListener('mousedown',e=>{if(e.button===2){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
+  wrap.addEventListener('mousedown',e=>{if(e.button===2 && !zoneMode){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
   window.addEventListener('mousemove',e=>{if(!rDrag)return;panOffset[tf]=Math.max(0,startPan+Math.round((e.clientX-startX)/((6+2)*(zoomLevel[tf]||1))));renderAll();});
   window.addEventListener('mouseup',e=>{if(e.button===2&&rDrag){rDrag=false;wrap.style.cursor='default';}});
   let tStartX=0,tStartPan=0,tTwo=false;
@@ -6010,11 +6046,19 @@ function renderSmktList(){
         ${tfBadgeHtml(n.tf)}
         <span class="story-note-price">${(+n.price).toFixed(1)}</span>
         ${smktFolderBtn(d,n)}
+        <button class="smkt-del-btn" title="刪除這則行情" onclick="event.stopPropagation();deleteStoryNote('${d}','${n.id}')">🗑</button>
       </div>
       <div class="smkt-item-text">${storyNotePreviewHtml(n)}</div>
     </div>`;
   });
   el.innerHTML=h;
+  // 若右側選取的行情已被刪除，清空詳細區
+  if(smktSelNote && !findStoryNote(smktSelNote.d, smktSelNote.id)){
+    smktSelNote=null;
+    const info=document.getElementById('smktNoteInfo'); if(info){ info.style.display='none'; info.innerHTML=''; }
+    const hdr=document.getElementById('smktHdr'); if(hdr) hdr.innerHTML='';
+    if(typeof renderSmktCharts==='function') try{ renderSmktCharts(); }catch(e){}
+  }
 }
 function selectSmktNote(d,id){
   const n=findStoryNote(d,id); if(!n) return;
