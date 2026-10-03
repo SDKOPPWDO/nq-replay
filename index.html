@@ -354,6 +354,21 @@ canvas.cross{pointer-events:none;}
 .lfill{height:100%;background:var(--blue);animation:ld 1.5s ease-in-out infinite;}
 @keyframes ld{0%{width:0}50%{width:70%}100%{width:100%}}
 
+/* ===== 📐 指標選單 ===== */
+.ind-popup{position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--b2);border-radius:12px;padding:10px;box-shadow:0 12px 40px rgba(0,0,0,.8);display:none;width:300px;max-height:70vh;overflow-y:auto;}
+.ind-popup.show{display:block;}
+.ind-popup-title{font-size:12px;font-weight:800;color:var(--t1);margin-bottom:8px;}
+.ind-item{border:1px solid var(--b2);background:var(--bg3);border-radius:9px;padding:9px 10px;margin-bottom:6px;}
+.ind-item.on{border-color:#3b82f6;background:rgba(59,130,246,.10);}
+.ind-item-top{display:flex;align-items:center;gap:8px;}
+.ind-item-name{flex:1;font-size:12px;font-weight:700;color:var(--t1);}
+.ind-item-desc{font-size:10px;color:var(--t3);line-height:1.5;margin-top:5px;}
+.ind-opt{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--t2);margin-top:6px;cursor:pointer;user-select:none;}
+.ind-opt input{accent-color:#3b82f6;cursor:pointer;}
+.ind-opt .ind-num{width:58px;height:22px;border-radius:5px;border:1px solid var(--b2);background:var(--bg2);color:var(--t1);font-family:inherit;font-size:11px;text-align:center;margin-left:auto;}
+.ind-note{font-size:10px;line-height:1.5;margin-top:6px;padding:5px 7px;border-radius:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#fbbf24;}
+.ind-popup-foot{font-size:9.5px;color:var(--t3);text-align:center;margin-top:4px;line-height:1.5;}
+.day-btn.ind-on{background:#2563eb;border-color:#2563eb;color:#fff;}
 /* ===== STORY LINE PANEL ===== */
 .story-col{width:236px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--b1);display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .story-col.hidden{display:none;}
@@ -644,9 +659,10 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
     <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類：選一個分類後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
-    <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：開盤=開盤前一根(5K約21:25)；盤前=盤前時段(5K約15:55，冬夏不同)；早上10點=台北10點(5K約09:55)" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
+    <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：開盤=開盤前一根(5K約21:25)；盤前=盤前時段(5K約15:55，冬夏不同)；早上8點=台北8點(5K約07:55)" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在NQ圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
     <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
+    <button class="day-btn" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -670,6 +686,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="clsrp-exit" onclick="exitClsReplay()">✕ 退出分類回測</button>
   </div>
   <div class="clsrp-popup" id="clsReplayPicker"></div>
+  <div class="ind-popup" id="indPopup"></div>
   <div class="cal-popup" id="calPopup">
     <div class="cal-header">
       <button class="cal-nav" id="calPrev">‹</button>
@@ -870,7 +887,7 @@ const TF_UNIT={'5k':5,'15k':15,'60k':60};
 
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
-let startMode = (['open','preopen','am10'].includes(localStorage.getItem('nq_start_mode'))) ? localStorage.getItem('nq_start_mode') : 'open'; // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am10'=早上10點(09:55)
+let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8') s='am8'; return ['open','preopen','am8'].includes(s)?s:'open'; })(); // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am8'=早上8點(09:55)
 let zoneList=[], zoneMode=false, zoneDraft=null, zoneDragging=false, zoneActiveTf=null; // 使用者手畫的灰色方框（時間+價格），純記憶體、關掉即消失
 let panOffset={};
 let calYear=0,calMonth=0;
@@ -1324,6 +1341,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
 
   // 使用者畫的灰色方框（時間+價格區間），畫在K棒後面
   drawZones(ctx, cv._layout);
+  drawIndicators(ctx, cv._layout, tfKey, 'back');
 
   const dst=isDST(currentDay);
   // 盤前箭頭
@@ -1465,6 +1483,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
     });
   }
   // 白色水平線畫在最上層（K棒會在線下方）
+  drawIndicators(ctx, cv._layout, tfKey, 'top');
   drawZonesTop(ctx, cv._layout);
 }
 
@@ -2213,12 +2232,12 @@ function setMode(mode) {
   }
 }
 
-// 早上10點起始（固定台北10:00，無冬夏差異；取最接近當日開頭的那根再往前一根）
-function findAm10Idx(bars){
+// 早上8點起始（固定台北08:00，無冬夏差異；取最接近當日開頭的那根再往前一根）
+function findAm8Idx(bars){
   const todayStartIdx = mode1kBars.length>0 ? mode1kBars[0].idx : 0;
   let best=-1, bestDiff=Infinity;
   bars.forEach((b,i)=>{
-    if(b.ts==='10:00'){
+    if(b.ts==='08:00'){
       const diff=Math.abs(b.idx-todayStartIdx);
       if(diff<bestDiff){ bestDiff=diff; best=i; }
     }
@@ -2230,12 +2249,12 @@ function findAm10Idx(bars){
 function getModeStartIdx() {
   if(!mode1kBars.length) return 0;
   if(startMode==='preopen') return findPreOpenIdx(mode1kBars, currentDay); // 盤前時段（5K約15:55 / 冬令16:55）
-  if(startMode==='am10')    return findAm10Idx(mode1kBars);                // 早上10點（5K約09:55）
+  if(startMode==='am8')    return findAm8Idx(mode1kBars);                // 早上8點（5K約07:55）
   return findOpenIdx(mode1kBars, currentDay);                             // 開盤前一根（5K約21:25 / 冬令22:25）
 }
 
 function startModeLabel(){
-  return startMode==='preopen' ? '盤前' : (startMode==='am10' ? '早上10點' : '開盤');
+  return startMode==='preopen' ? '盤前' : (startMode==='am8' ? '早上8點' : '開盤');
 }
 
 // 開關「畫方框」模式
@@ -2247,9 +2266,9 @@ function toggleZoneMode(){
 }
 function clearZones(){ zoneList=[]; zoneDraft=null; if(mode1kBars.length) renderAll(); }
 
-// 切換「復盤起始時段」：開盤 → 盤前 → 早上10點 → 開盤（循環）
+// 切換「復盤起始時段」：開盤 → 盤前 → 早上8點 → 開盤（循環）
 function toggleStartMode(){
-  startMode = (startMode==='open') ? 'preopen' : (startMode==='preopen' ? 'am10' : 'open');
+  startMode = (startMode==='open') ? 'preopen' : (startMode==='preopen' ? 'am8' : 'open');
   localStorage.setItem('nq_start_mode', startMode);
   const btn=document.getElementById('btnStartMode');
   if(btn) btn.textContent = '起始：'+startModeLabel();
@@ -6307,6 +6326,342 @@ function updateSmktChdrPrice(tf,bar){
   priceEl.className='chdr-price '+(up?'up':'dn');
   priceValEl.textContent=(up?'+':'')+chg.toFixed(2);
   priceValEl.style.color=up?'var(--up)':'var(--dn)';
+}
+
+// ============================================================
+// 📐 指標系統：在 INDICATORS 裡新增一筆，就會自動出現在指標選單
+//   back(ctx, L, tf)：畫在K棒後面；top(ctx, L, tf)：畫在K棒上面
+//   opts：該指標的小開關（存在 indicatorOpts[id][key]）
+// ============================================================
+const INDICATORS = [
+  {
+    id:'rthRange',
+    name:'美股開盤區間',
+    desc:'框出美股正規盤（夏令 21:30–04:00／冬令 22:30–05:00，台北時間）的走勢。方框上緣＝當日高點、下緣＝當日低點，高低點虛線一路延伸到隔天開盤前。只用目前播放到的K棒計算，不會看到未來。',
+    opts:[{key:'labels', label:'顯示高低點價格標籤', def:true}],
+    back:(ctx,L,tf)=>drawRthRange(ctx,L,tf,'back'),
+    top:(ctx,L,tf)=>drawRthRange(ctx,L,tf,'top')
+  },
+  {
+    id:'volBand',
+    name:'美股盤中最大量帶',
+    desc:'把美股盤中每根 1 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊最厚、達到最大量指定 % 以上的價格區間畫成帶子（橘色＝最大量那區，黃色＝其他獨立高量區）。收盤後才出現，延伸到隔天美股開盤前。',
+    opts:[
+      {key:'pct', label:'畫出重疊量 ≥ 最大量的 %', type:'number', def:90, min:50, max:100, step:1},
+      {key:'maxBands', label:'每天最多畫幾條帶子', type:'number', def:5, min:1, max:10, step:1},
+      {key:'labels', label:'顯示價位標籤（支撐／壓力）', def:true}
+    ],
+    note:()=> dataHasVolume() ? '' : '目前 data.bin 沒有成交量欄位，暫時以「停留時間」計算（每根 1 分K 算 1）。在資料的每根K棒加上 v（成交量）後，會自動改用成交量。',
+    back:(ctx,L,tf)=>drawVolBand(ctx,L,tf,'back'),
+    top:(ctx,L,tf)=>drawVolBand(ctx,L,tf,'top')
+  }
+  // 之後的新指標加在這裡
+];
+
+let indicatorOn = {}, indicatorOpts = {};
+try{ indicatorOn = JSON.parse(localStorage.getItem('nqIndicatorsOn')||'{}')||{}; }catch(e){ indicatorOn={}; }
+try{ indicatorOpts = JSON.parse(localStorage.getItem('nqIndicatorOpts')||'{}')||{}; }catch(e){ indicatorOpts={}; }
+function saveIndicatorState(){
+  try{
+    localStorage.setItem('nqIndicatorsOn', JSON.stringify(indicatorOn));
+    localStorage.setItem('nqIndicatorOpts', JSON.stringify(indicatorOpts));
+  }catch(e){}
+}
+function indOpt(id,key){
+  const ind=INDICATORS.find(x=>x.id===id);
+  const o=ind && ind.opts ? ind.opts.find(x=>x.key===key) : null;
+  const v=indicatorOpts[id] ? indicatorOpts[id][key] : undefined;
+  return v===undefined ? (o?o.def:undefined) : v;
+}
+
+function drawIndicators(ctx, L, tf, layer){
+  if(!L || !L.view || !L.view.length) return;
+  INDICATORS.forEach(ind=>{
+    if(!indicatorOn[ind.id]) return;
+    const fn = layer==='top' ? ind.top : ind.back;
+    if(!fn) return;
+    try{ fn(ctx, L, tf); }catch(e){ console.warn('[指標] '+ind.name+' 繪製失敗', e); }
+  });
+}
+
+function updateIndicatorBtn(){
+  const b=document.getElementById('btnIndicators');
+  if(!b) return;
+  const n=INDICATORS.filter(x=>indicatorOn[x.id]).length;
+  b.textContent = n ? ('📐 指標 ('+n+')') : '📐 指標';
+  b.classList.toggle('ind-on', n>0);
+}
+function renderIndicatorMenu(){
+  const pop=document.getElementById('indPopup');
+  if(!pop) return;
+  let h='<div class="ind-popup-title">📐 指標</div>';
+  INDICATORS.forEach(ind=>{
+    const on=!!indicatorOn[ind.id];
+    h+='<div class="ind-item'+(on?' on':'')+'">'
+      +'<div class="ind-item-top"><span class="ind-item-name">'+escapeHtml(ind.name)+'</span>'
+      +'<div class="trade-switch'+(on?' on':'')+'" onclick="toggleIndicator(\''+ind.id+'\')"><div class="trade-switch-knob"></div></div></div>'
+      +'<div class="ind-item-desc">'+escapeHtml(ind.desc)+'</div>';
+    (ind.opts||[]).forEach(o=>{
+      if(o.type==='number'){
+        const v=indOpt(ind.id,o.key);
+        h+='<label class="ind-opt">'+escapeHtml(o.label)+'<input type="number" class="ind-num" min="'+o.min+'" max="'+o.max+'" step="'+(o.step||1)+'" value="'+v+'"'
+          +' onchange="setIndicatorNumOpt(\''+ind.id+'\',\''+o.key+'\',this)"></label>';
+        return;
+      }
+      const v=!!indOpt(ind.id,o.key);
+      h+='<label class="ind-opt"><input type="checkbox" '+(v?'checked':'')
+        +' onchange="setIndicatorOpt(\''+ind.id+'\',\''+o.key+'\',this.checked)">'+escapeHtml(o.label)+'</label>';
+    });
+    const nt = ind.note ? ind.note() : '';
+    if(nt) h+='<div class="ind-note">⚠ '+escapeHtml(nt)+'</div>';
+    h+='</div>';
+  });
+  h+='<div class="ind-popup-foot">可以同時開多個指標疊加顯示，會出現在所有 NQ 格局（1K／5K／15K／60K）</div>';
+  pop.innerHTML=h;
+}
+function toggleIndicatorMenu(anchor){
+  const pop=document.getElementById('indPopup');
+  if(!pop) return;
+  if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  renderIndicatorMenu();
+  const r=(anchor||document.getElementById('btnIndicators')).getBoundingClientRect();
+  pop.style.left=Math.max(6, Math.min(r.left, window.innerWidth-310))+'px';
+  pop.style.top=(r.bottom+6)+'px';
+  pop.classList.add('show');
+}
+function toggleIndicator(id){
+  indicatorOn[id]=!indicatorOn[id];
+  saveIndicatorState(); renderIndicatorMenu(); updateIndicatorBtn();
+  if(mode1kBars.length) renderAll();
+}
+function setIndicatorNumOpt(id,key,el){
+  const ind=INDICATORS.find(x=>x.id===id);
+  const o=ind && ind.opts ? ind.opts.find(x=>x.key===key) : null;
+  if(!o) return;
+  let v=parseFloat(el.value);
+  if(!isFinite(v)) v=o.def;
+  v=Math.min(o.max, Math.max(o.min, v));
+  el.value=v;
+  setIndicatorOpt(id,key,v);
+}
+function setIndicatorOpt(id,key,val){
+  if(!indicatorOpts[id]) indicatorOpts[id]={};
+  indicatorOpts[id][key]=val;
+  saveIndicatorState();
+  if(mode1kBars.length) renderAll();
+}
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('indPopup'), btn=document.getElementById('btnIndicators');
+  if(pop && pop.classList.contains('show') && !pop.contains(e.target) && !(btn && btn.contains(e.target)))
+    pop.classList.remove('show');
+});
+setTimeout(updateIndicatorBtn,0);
+
+// ---------- 指標①：美股開盤區間 ----------
+const RTH_MINUTES = 390;           // 09:30–16:00 紐約時間
+const _rthCache = {};              // {day: {openIdx, bars:[...] } | null}
+function rthSessionRaw(day){
+  if(day in _rthCache) return _rthCache[day];
+  let res=null;
+  const bars = DATA[day] && DATA[day]['1k'];
+  if(bars && bars.length){
+    const tw=getOpenTW(day);
+    const pos=bars.findIndex(b=>b.ts===tw);
+    if(pos>=0){
+      const openIdx=bars[pos].idx, seg=[];
+      for(let i=pos;i<bars.length && bars[i].idx-openIdx<RTH_MINUTES;i++) seg.push(bars[i]);
+      if(seg.length) res={openIdx, seg};
+    }
+  }
+  _rthCache[day]=res;
+  return res;
+}
+// 依目前播放位置(cap)算出該日開盤區間：高低點只用 cap 以前的K棒
+function rthSessionAt(day, cap){
+  const r=rthSessionRaw(day);
+  if(!r || r.openIdx>cap) return null;
+  let hi=-Infinity, lo=Infinity, endIdx=r.openIdx;
+  for(const b of r.seg){
+    if(b.idx>cap) break;
+    if(b.h>hi) hi=b.h;
+    if(b.l<lo) lo=b.l;
+    endIdx=b.idx;
+  }
+  return {openIdx:r.openIdx, endIdx, hi, lo};
+}
+function drawRthRange(ctx, L, tf, layer){
+  if(!mode1kBars.length || !DAYS.length) return;
+  const cap=mode1kBars[cur1].idx;
+  const view=L.view;
+  const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
+  const showLbl = !!indOpt('rthRange','labels');
+  const di=DAYS.indexOf(currentDay);
+  if(di<0) return;
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT); ctx.clip();
+
+  let nextOpen=Infinity;   // 下一個（較新）交易日的開盤 idx
+  for(let j=di; j>=0 && j>di-400; j--){
+    const s=rthSessionAt(DAYS[j], cap);
+    if(!s) continue;
+    const lineEnd=Math.min(nextOpen-1, cap);
+    nextOpen=s.openIdx;
+    if(lineEnd<vFirst) break;            // 這天以前都在畫面左邊外面
+    if(s.openIdx>vLast) continue;        // 還在畫面右邊外面
+
+    const x1=xForIdxOnLayout(L,s.openIdx)-(s.openIdx>=vFirst?half:0);
+    const xBoxR=xForIdxOnLayout(L,s.endIdx)+(s.endIdx<=vLast?half:0);
+    const xLineR=xForIdxOnLayout(L,lineEnd)+(lineEnd<=vLast?half:0);
+    const yH=L.Y(s.hi), yL=L.Y(s.lo);
+
+    if(layer==='back'){
+      // 方框
+      if(s.endIdx>=vFirst){
+        ctx.fillStyle='rgba(37,99,235,0.13)';
+        ctx.fillRect(x1, yH, Math.max(1,xBoxR-x1), Math.max(1,yL-yH));
+        ctx.strokeStyle='rgba(59,130,246,0.55)'; ctx.lineWidth=1;
+        ctx.strokeRect(x1+0.5, yH+0.5, Math.max(1,xBoxR-x1)-1, Math.max(1,yL-yH)-1);
+      }
+      // 高低點虛線（從開盤延伸到隔天開盤前）
+      ctx.lineWidth=1.2; ctx.setLineDash([5,4]);
+      ctx.strokeStyle='rgba(34,197,94,0.85)';
+      ctx.beginPath(); ctx.moveTo(x1,yH); ctx.lineTo(xLineR,yH); ctx.stroke();
+      ctx.strokeStyle='rgba(239,68,68,0.85)';
+      ctx.beginPath(); ctx.moveTo(x1,yL); ctx.lineTo(xLineR,yL); ctx.stroke();
+      ctx.setLineDash([]);
+    } else if(showLbl){
+      // 價格標籤：放在線的右端
+      const tag=(txt,x,y,col,above)=>{
+        ctx.font='bold 9px sans-serif';
+        const w=ctx.measureText(txt).width+8, h=13;
+        let lx=Math.min(x, plotR)-w-2; if(lx<plotL+2) lx=plotL+2;
+        const ly=above ? y-h-2 : y+2;
+        ctx.fillStyle='rgba(13,13,15,0.85)'; ctx.fillRect(lx,ly,w,h);
+        ctx.strokeStyle=col; ctx.lineWidth=1; ctx.strokeRect(lx+0.5,ly+0.5,w-1,h-1);
+        ctx.fillStyle=col; ctx.textAlign='left'; ctx.fillText(txt,lx+4,ly+9.5);
+      };
+      tag('高 '+s.hi.toFixed(2), xLineR, yH, '#4ade80', true);
+      tag('低 '+s.lo.toFixed(2), xLineR, yL, '#f87171', false);
+    }
+  }
+  ctx.restore();
+}
+
+// ---------- 指標②：美股盤中最大量帶（1分K帶子重疊）----------
+let _hasVol = null;
+function dataHasVolume(){
+  if(_hasVol!==null) return _hasVol;
+  if(!DAYS.length) return false;
+  const bars = DATA[DAYS[DAYS.length-1]] && DATA[DAYS[DAYS.length-1]]['1k'];
+  _hasVol = !!(bars && bars.length && bars[0].v!==undefined);
+  return _hasVol;
+}
+const _vbCache = {};
+function volBandsFor(day){
+  const pct = +indOpt('volBand','pct'), mb = Math.round(+indOpt('volBand','maxBands'));
+  const key = day+'|'+pct+'|'+mb;
+  if(key in _vbCache) return _vbCache[key];
+  let res = null;
+  const r = rthSessionRaw(day);
+  if(r && r.seg.length){
+    // 每根1分K一條帶子：下緣 +量、上緣 -量
+    const ev = [];
+    for(const b of r.seg){
+      const w = (b.v!==undefined && b.v!==null) ? +b.v : 1;
+      if(!(w>0)) continue;
+      const hi = b.h>b.l ? b.h : b.l+0.25;     // 一字K給一個跳動點的厚度
+      ev.push([b.l, w], [hi, -w]);
+    }
+    ev.sort((a,b)=>a[0]-b[0]);
+    // 由下往上掃：每段價格區間的重疊量
+    const seg = []; let cur = 0;
+    for(let k=0;k<ev.length;k++){
+      cur += ev[k][1];
+      if(k<ev.length-1 && ev[k+1][0]>ev[k][0]) seg.push([ev[k][0], ev[k+1][0], cur]);
+    }
+    if(seg.length){
+      let best = -Infinity; seg.forEach(x=>{ if(x[2]>best) best=x[2]; });
+      const thr = best*pct/100 - 1e-9;
+      // 連在一起且重疊量 ≥ 門檻的段落合併成一條帶子
+      const runs = []; let run = null;
+      for(const x of seg){
+        if(x[2]>=thr){
+          if(run && Math.abs(run.hi-x[0])<1e-9){ run.hi=x[1]; run.peak=Math.max(run.peak,x[2]); }
+          else { run={lo:x[0], hi:x[1], peak:x[2]}; runs.push(run); }
+        } else run = null;
+      }
+      // 間隔很小（≤ 2 點）的高量區視為同一區，合併
+      const merged = [];
+      for(const x of runs){
+        const last = merged[merged.length-1];
+        if(last && x.lo-last.hi<=2){ last.hi=x.hi; last.peak=Math.max(last.peak,x.peak); }
+        else merged.push({lo:x.lo, hi:x.hi, peak:x.peak});
+      }
+      runs.length=0; merged.forEach(x=>runs.push(x));
+      runs.sort((a,b)=>b.peak-a.peak);
+      const bands = runs.slice(0, mb).map((x,i)=>({lo:x.lo, hi:x.hi, main:i===0}));
+      res = {openIdx:r.openIdx, endIdx:r.seg[r.seg.length-1].idx, bands};
+    }
+  }
+  _vbCache[key] = res;
+  return res;
+}
+function drawVolBand(ctx, L, tf, layer){
+  if(!mode1kBars.length || !DAYS.length) return;
+  const cap = mode1kBars[cur1].idx, px = mode1kBars[cur1].c;
+  const view = L.view;
+  const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
+  const showLbl = !!indOpt('volBand','labels');
+  const di = DAYS.indexOf(currentDay);
+  if(di<0) return;
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT); ctx.clip();
+  let nextOpen = Infinity;
+  for(let j=di; j>=0 && j>di-400; j--){
+    const r = rthSessionRaw(DAYS[j]);
+    if(!r) continue;
+    const lineEnd = Math.min(nextOpen-1, cap);
+    nextOpen = r.openIdx;
+    if(lineEnd<vFirst) break;
+    const endIdx = r.seg[r.seg.length-1].idx;
+    if(cap<endIdx) continue;                 // 美股還沒收盤：不畫（不看未來）
+    if(r.openIdx>vLast) continue;
+    const vb = volBandsFor(DAYS[j]);
+    if(!vb) continue;
+    const x1 = xForIdxOnLayout(L, r.openIdx)-(r.openIdx>=vFirst?half:0);
+    const x2 = xForIdxOnLayout(L, lineEnd)+(lineEnd<=vLast?half:0);
+    const usedY = [];   // 同一天的標籤避免重疊
+    vb.bands.forEach(bd=>{
+      const yT=L.Y(bd.hi), yB=L.Y(bd.lo);
+      const h=Math.max(2, yB-yT), yTop = (yB-yT<2) ? (yT+yB)/2-1 : yT;
+      if(layer==='back'){
+        ctx.fillStyle = bd.main ? 'rgba(249,115,22,0.30)' : 'rgba(250,204,21,0.20)';
+        ctx.fillRect(x1, yTop, Math.max(1,x2-x1), h);
+        ctx.strokeStyle = bd.main ? 'rgba(249,115,22,0.85)' : 'rgba(250,204,21,0.60)';
+        ctx.lineWidth=1; ctx.strokeRect(x1+0.5, yTop+0.5, Math.max(1,x2-x1)-1, Math.max(1,h-1));
+      } else if(showLbl){
+        const typ = px>=bd.hi ? '支撐' : (px<=bd.lo ? '壓力' : '帶內');
+        const txt = (bd.main?'最大量 ':'高量 ')+typ+' '+bd.lo.toFixed(2)+'–'+bd.hi.toFixed(2);
+        const col = bd.main ? '#fb923c' : '#facc15';
+        ctx.font='bold 9px sans-serif';
+        const w=ctx.measureText(txt).width+8, th=13;
+        let lx=Math.min(x2, plotR)-w-2; if(lx<plotL+2) lx=plotL+2;
+        let ly=(yT+yB)/2-th/2;
+        for(let guard=0; guard<10 && usedY.some(u=>Math.abs(u-ly)<th+2); guard++) ly+=th+2;
+        usedY.push(ly);
+        ctx.fillStyle='rgba(13,13,15,0.85)'; ctx.fillRect(lx,ly,w,th);
+        ctx.strokeStyle=col; ctx.lineWidth=1; ctx.strokeRect(lx+0.5,ly+0.5,w-1,th-1);
+        ctx.fillStyle=col; ctx.textAlign='left'; ctx.fillText(txt,lx+4,ly+9.5);
+      }
+    });
+  }
+  ctx.restore();
 }
 
 </script>
