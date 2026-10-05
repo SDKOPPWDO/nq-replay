@@ -662,7 +662,7 @@ body.sne-popup .sne-shell{max-width:none;}
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：開盤=開盤前一根(5K約21:25)；盤前=盤前時段(5K約15:55，冬夏不同)；早上8點=台北8點(5K約07:55)" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在NQ圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
     <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
-    <button class="day-btn" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
+    <button class="day-btn ind-trigger" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
       <div class="date-display" id="dateDisplay" onclick="toggleCal()">—</div>
@@ -2803,11 +2803,14 @@ function buildReplayPage(){
       <div class="treplay-detail">
         <div class="tresult-tabs" style="margin-bottom:8px;justify-content:space-between;">
           <div class="treplay-detail-hdr" id="treplayHdr">—</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+          <button class="day-btn ind-trigger" id="btnIndicatorsReplay" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
           <div style="display:flex;gap:6px;" id="replayTFButtons">
             <div class="tresult-tab" id="rtf-1k" onclick="toggleReplayTF('1k')" style="padding:5px 12px;font-size:11px;">1K</div>
             <div class="tresult-tab on" id="rtf-5k" onclick="toggleReplayTF('5k')" style="padding:5px 12px;font-size:11px;">5K</div>
             <div class="tresult-tab" id="rtf-15k" onclick="toggleReplayTF('15k')" style="padding:5px 12px;font-size:11px;">15K</div>
             <div class="tresult-tab on" id="rtf-60k" onclick="toggleReplayTF('60k')" style="padding:5px 12px;font-size:11px;">60K</div>
+          </div>
           </div>
         </div>
         <div class="treplay-canvas-multi" id="treplayCanvasMulti"></div>
@@ -2815,6 +2818,7 @@ function buildReplayPage(){
     </div>
   `;
   buildReplayCanvases();
+  updateIndicatorBtn();
   if(trades.length) selectReplayTrade(0);
   syncReplayListHeight();
 }
@@ -3128,7 +3132,10 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
   const rng=hi-lo||1;
   const Y2 = p => P.t + (H-P.t-P.b)*(1-(p-lo)/rng);
   const X2 = i => P.l + i*cw + cw/2;
-  canvas._layout = {P, W, H, segment, X: X2, Y: Y2};
+  // 指標用：view＝這段K線；cap＝這段最後一根（只用畫面上看得到的K棒，不看更後面的資料）
+  const _lastSeg = segment[segment.length-1];
+  canvas._layout = {P, W, H, segment, X: X2, Y: Y2, view: segment,
+    cap: (_lastSeg.idx_end||_lastSeg.idx), capPx: _lastSeg.c, day: t.date};
 
   for(let i=0;i<=4;i++){
     const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
@@ -3137,6 +3144,9 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
     ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
     ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
   }
+
+  // 📐 指標（畫在K棒後面）
+  drawIndicators(ctx, canvas._layout, tf, 'back');
 
   segment.forEach((b,i)=>{
     const x=X2(i), up=b.c>=b.o, col=up?UP:DN;
@@ -3157,6 +3167,9 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
     });
     ctx.stroke();
   });
+
+  // 📐 指標標籤（畫在K棒上面、進出場箭頭下面）
+  drawIndicators(ctx, canvas._layout, tf, 'top');
 
   // 畫出每一次進場/出場（若同一根K棒有多腳，用小偏移避免完全重疊）
   // 標籤位置：多單在箭頭右邊，空單在箭頭左邊；平倉沿用該筆交易原本的多/空方向
@@ -6376,6 +6389,13 @@ function indOpt(id,key){
   return v===undefined ? (o?o.def:undefined) : v;
 }
 
+// 指標要用的「現在」：主圖＝目前播放到的K棒；進場回顧＝該段K線最後一根（L 裡帶 cap/capPx/day）
+function indNow(L){
+  if(L && L.cap!=null) return {cap:L.cap, px:L.capPx, day:L.day};
+  if(!mode1kBars.length) return null;
+  return {cap:mode1kBars[cur1].idx, px:mode1kBars[cur1].c, day:currentDay};
+}
+
 function drawIndicators(ctx, L, tf, layer){
   if(!L || !L.view || !L.view.length) return;
   INDICATORS.forEach(ind=>{
@@ -6387,11 +6407,18 @@ function drawIndicators(ctx, L, tf, layer){
 }
 
 function updateIndicatorBtn(){
-  const b=document.getElementById('btnIndicators');
-  if(!b) return;
   const n=INDICATORS.filter(x=>indicatorOn[x.id]).length;
-  b.textContent = n ? ('📐 指標 ('+n+')') : '📐 指標';
-  b.classList.toggle('ind-on', n>0);
+  document.querySelectorAll('.ind-trigger').forEach(b=>{
+    b.textContent = n ? ('📐 指標 ('+n+')') : '📐 指標';
+    b.classList.toggle('ind-on', n>0);
+  });
+}
+// 進場回顧開著的話，一起重畫
+function rerenderReplayForIndicators(){
+  const page=document.getElementById('pageReplay');
+  if(!page || !page.classList.contains('show')) return;
+  const sel=document.querySelector('.treplay-item.sel');
+  if(sel) renderReplayChart(parseInt(sel.id.replace('treplayItem','')));
 }
 function renderIndicatorMenu(){
   const pop=document.getElementById('indPopup');
@@ -6418,13 +6445,15 @@ function renderIndicatorMenu(){
     if(nt) h+='<div class="ind-note">⚠ '+escapeHtml(nt)+'</div>';
     h+='</div>';
   });
-  h+='<div class="ind-popup-foot">可以同時開多個指標疊加顯示，會出現在所有 NQ 格局（1K／5K／15K／60K）</div>';
+  h+='<div class="ind-popup-foot">可以同時開多個指標疊加顯示，會出現在所有 NQ 格局（1K／5K／15K／60K）和 🎬 進場回顧</div>';
   pop.innerHTML=h;
 }
 function toggleIndicatorMenu(anchor){
   const pop=document.getElementById('indPopup');
   if(!pop) return;
   if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  // 放到 body 底下，這樣在「進場回顧」等全螢幕視窗上面也看得到
+  if(pop.parentElement!==document.body) document.body.appendChild(pop);
   renderIndicatorMenu();
   const r=(anchor||document.getElementById('btnIndicators')).getBoundingClientRect();
   pop.style.left=Math.max(6, Math.min(r.left, window.innerWidth-310))+'px';
@@ -6435,6 +6464,7 @@ function toggleIndicator(id){
   indicatorOn[id]=!indicatorOn[id];
   saveIndicatorState(); renderIndicatorMenu(); updateIndicatorBtn();
   if(mode1kBars.length) renderAll();
+  rerenderReplayForIndicators();
 }
 function setIndicatorNumOpt(id,key,el){
   const ind=INDICATORS.find(x=>x.id===id);
@@ -6451,10 +6481,11 @@ function setIndicatorOpt(id,key,val){
   indicatorOpts[id][key]=val;
   saveIndicatorState();
   if(mode1kBars.length) renderAll();
+  rerenderReplayForIndicators();
 }
 document.addEventListener('click',e=>{
-  const pop=document.getElementById('indPopup'), btn=document.getElementById('btnIndicators');
-  if(pop && pop.classList.contains('show') && !pop.contains(e.target) && !(btn && btn.contains(e.target)))
+  const pop=document.getElementById('indPopup');
+  if(pop && pop.classList.contains('show') && document.contains(e.target) && !pop.contains(e.target) && !(e.target.closest && e.target.closest('.ind-trigger')))
     pop.classList.remove('show');
 });
 setTimeout(updateIndicatorBtn,0);
@@ -6492,14 +6523,15 @@ function rthSessionAt(day, cap){
   return {openIdx:r.openIdx, endIdx, hi, lo};
 }
 function drawRthRange(ctx, L, tf, layer){
-  if(!mode1kBars.length || !DAYS.length) return;
-  const cap=mode1kBars[cur1].idx;
+  const now=indNow(L);
+  if(!now || !DAYS.length) return;
+  const cap=now.cap;
   const view=L.view;
   const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
   const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
   const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
   const showLbl = !!indOpt('rthRange','labels');
-  const di=DAYS.indexOf(currentDay);
+  const di=DAYS.indexOf(now.day);
   if(di<0) return;
 
   ctx.save();
@@ -6610,14 +6642,15 @@ function volBandTransp(ratio){
   return tL - (tL-tD)*norm;
 }
 function drawVolBand(ctx, L, tf, layer){
-  if(!mode1kBars.length || !DAYS.length) return;
-  const cap = mode1kBars[cur1].idx, px = mode1kBars[cur1].c;
+  const now = indNow(L);
+  if(!now || !DAYS.length) return;
+  const cap = now.cap, px = now.px;
   const view = L.view;
   const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
   const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
   const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
   const showLbl = !!indOpt('volBand','labels');
-  const di = DAYS.indexOf(currentDay);
+  const di = DAYS.indexOf(now.day);
   if(di<0) return;
 
   ctx.save();
