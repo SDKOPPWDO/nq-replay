@@ -913,6 +913,9 @@ const MKT_ALL = {
     rthDesc:'框出美股正規盤（夏令 21:30–04:00／冬令 22:30–05:00，台北時間）的走勢。方框上緣＝當日高點、下緣＝當日低點，高低點虛線一路延伸到隔天開盤前。只用目前播放到的K棒計算，不會看到未來。',
     vbName:'美股盤中最大量帶',
     vbDesc:'把美股盤中每根 1 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。收盤後才出現，延伸到隔天美股開盤前。',
+    histBars:0,          // NQ 一天就有 1380 根1分K，不用往前帶
+    daySepTs:null,
+    vbWholeDay:false,
     ptValue:2, commission:1, // MNQ $2/點；手續費每口來回 $1
     backupName:'NQ故事線+交易備份_'
   },
@@ -927,14 +930,17 @@ const MKT_ALL = {
     openTW:d=>'08:45',                 // 日盤開盤
     preOpenTW:d=>'15:00',              // 夜盤開盤（交易日從前一天 15:00 夜盤開始）
     am8TW:d=>_isDST(d)?'21:30':'22:30',// 美股開盤（夜盤中）
-    startLabels:{open:'日盤開盤', preopen:'夜盤開盤', am8:'美股開盤'},
+    startLabels:{open:'日盤開盤', preopen:'夜盤開盤', am8:'美股開盤'},   // 一天都收在隔日 04:55
     arrows:d=>[{ts:'15:00', label:'夜盤', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'美開', color:'#a78bfa'},{ts:'08:45', label:'開盤', color:'#ffffff'}],
     hl60:d=>({s:'08:45',e:'12:45'}),   // 60K 日盤時段淺黃底
     rthOpenTW:d=>'08:45', rthLen:60, tick:1,   // 日盤 08:45–13:45 = 60 根 5分K
     rthName:'日盤區間',
     rthDesc:'框出台指日盤（08:45–13:45）的走勢。方框上緣＝日盤高點、下緣＝日盤低點，高低點虛線一路延伸到隔天日盤開盤前（含夜盤）。只用目前播放到的K棒計算，不會看到未來。',
-    vbName:'日盤最大量帶',
-    vbDesc:'把日盤每根 5 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。日盤收盤後才出現，延伸到隔天日盤開盤前。',
+    vbName:'前日高量帶（日盤＋夜盤）',
+    vbDesc:'把前一天 08:45～隔日 05:00（日盤＋夜盤）每根 5 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子，畫在隔天：從 08:45 開盤一路延伸到 04:55 收盤。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。',
+    histBars:1380,       // 5分K 圖往前帶幾根前幾天的K棒（約6天，跟 NQ 一天的1分K根數一樣）
+    daySepTs:'08:45',    // 每天 08:45 畫分日虛線
+    vbWholeDay:true,     // 最大量帶：用前一天 08:45～隔日 04:55 全部K棒的量，畫在隔天
     ptValue:50, commission:100, // 小台 50 元/點；手續費＋期交稅每口來回約 100 元（可自行修改）
     backupName:'台指故事線+交易備份_'
   }
@@ -973,6 +979,8 @@ const TF_LABELS=MKT.tfLabels;
 const TF_STEP=MKT.tfStep;
 const TF_UNIT={'5k':5,'15k':15,'60k':60};
 
+let dayOff=0; // 今天第一根K棒在 mode1kBars 裡的位置（台指前面會帶前幾天的K棒；NQ 為 0）
+function dayStartIdx(){ return mode1kBars.length ? mode1kBars[Math.min(dayOff,mode1kBars.length-1)].idx : 0; }
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
 let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8') s='am8'; return ['open','preopen','am8'].includes(s)?s:'open'; })(); // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am8'=早上8點(09:55)
@@ -1149,10 +1157,10 @@ function getLive(baseAll,cur1Bars,cur1Idx,unit){
 
 function findOpenIdx(bars,dateStr){
   const tw=getOpenTW(dateStr);
-  const todayStartIdx=mode1kBars.length>0?mode1kBars[0].idx:0;
+  const todayStartIdx=dayStartIdx();
   let best=-1,bestDiff=Infinity;
   bars.forEach((b,i)=>{
-    if(b.ts===tw){
+    if(b.ts===tw && b.idx>=todayStartIdx){
       const diff=Math.abs(b.idx-todayStartIdx);
       if(diff<bestDiff){bestDiff=diff;best=i;}
     }
@@ -1160,21 +1168,37 @@ function findOpenIdx(bars,dateStr){
   // 往前一根，讓起始點停在bucket邊界的最後一根（例如21:30前一根=21:29）
   // 這樣60K單獨播放下一根時，剛好是完整收盤的bucket
   if(best>0) best=best-1;
-  return best>=0?best:0;
+  return best>=0?best:dayOff;
 }
 
 function loadDay(day, startAt){
   if(!DAYS_SET.has(day)) return;
   currentDay=day;
   const d=DATA[day]||{};
-  allBars={'1k':d['1k']||[],'5k':d['5k']||[],'15k':d['15k']||[],'60k':d['60k']||[]};
+  // 最小格局：今天的K棒，前面再接前幾天的K棒（只有台指，讓圖一打開就看得到之前的行情）
+  let base1k=d['1k']||[];
+  dayOff=0;
+  if(MKT.histBars>0 && base1k.length){
+    const pre=[]; let di=DAYS.indexOf(day)-1;
+    while(di>=0 && pre.length<MKT.histBars){
+      const pb=(DATA[DAYS[di]]||{})['1k']||[];
+      if(pb.length && pb[pb.length-1].idx!==base1k[0].idx-1-pre.reduce((a,x)=>a+x.length,0)) break; // 不連續就停
+      pre.unshift(pb); di--;
+      if(pre.reduce((a,x)=>a+x.length,0)>=MKT.histBars) break;
+    }
+    let flat=[].concat(...pre);
+    if(flat.length>MKT.histBars) flat=flat.slice(flat.length-MKT.histBars);
+    dayOff=flat.length;
+    base1k=flat.concat(base1k);
+  }
+  allBars={'1k':base1k,'5k':d['5k']||[],'15k':d['15k']||[],'60k':d['60k']||[]};
   mode1kBars=allBars['1k'];
   // NDX 改為全域連續bucket，不再逐日切；繪圖時依當前idx決定顯示到哪一根
   cur1=0; // will be set after mode check
   hoverBar=null;panOffset={};
   selectedTFs.forEach(tf=>{panOffset[tf]=0;});
   updateDateDisplay();buildUI();
-  if(startAt==='first') cur1=0;
+  if(startAt==='first') cur1=dayOff;
   else if(startAt==='last') cur1=Math.max(0,mode1kBars.length-1);
   else cur1=getModeStartIdx();
   renderAll();
@@ -1400,12 +1424,12 @@ function drawChart(id,bars,cursor,timeStep,pan){
   }
 
   // Day separator: draw line at EVERY session boundary
-  const todayFirstIdx=mode1kBars.length>0?mode1kBars[0].idx:0;
+  const todayFirstIdx=dayStartIdx();
   let todayMarked=false;
   for(let i=1;i<view.length;i++){
     const prevIdx=view[i-1].idx_end||view[i-1].idx;
     const currIdx=view[i].idx;
-    if(currIdx-prevIdx>2){
+    if(currIdx-prevIdx>2 || (MKT.daySepTs && view[i].ts===MKT.daySepTs)){
       const sx=X(i);
       const isToday=currIdx>=todayFirstIdx&&!todayMarked;
       ctx.strokeStyle=isToday?'rgba(100,180,255,0.6)':'rgba(255,255,255,0.2)';
@@ -1456,7 +1480,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   drawIndicators(ctx, cv._layout, tfKey, 'back');
 
   // 盤前／開盤等時段箭頭（依商品設定）
-  const todayStart=mode1kBars.length>0?mode1kBars[0].idx:0;
+  const todayStart=dayStartIdx();
   MKT.arrows(currentDay).forEach(a=>{
     const ai=view.findIndex(b=>b.ts===a.ts&&b.idx>=todayStart);
     if(ai<0) return;
@@ -2333,16 +2357,16 @@ function setMode(mode) {
 
 // 早上8點起始（固定台北08:00，無冬夏差異；取最接近當日開頭的那根再往前一根）
 function findAm8Idx(bars){
-  const todayStartIdx = mode1kBars.length>0 ? mode1kBars[0].idx : 0;
+  const todayStartIdx = dayStartIdx();
   let best=-1, bestDiff=Infinity;
   bars.forEach((b,i)=>{
-    if(b.ts===MKT.am8TW(currentDay)){
+    if(b.ts===MKT.am8TW(currentDay) && b.idx>=todayStartIdx){
       const diff=Math.abs(b.idx-todayStartIdx);
       if(diff<bestDiff){ bestDiff=diff; best=i; }
     }
   });
   if(best>0) best=best-1;
-  return best>=0?best:0;
+  return best>=0?best:dayOff;
 }
 
 function getModeStartIdx() {
@@ -2376,17 +2400,17 @@ function toggleStartMode(){
 
 function findPreOpenIdx(bars, dateStr) {
   const tw = getPreOpenTW(dateStr);   // 盤前：16:00(夏) / 17:00(冬) 台北時間
-  const todayStartIdx = mode1kBars.length>0 ? mode1kBars[0].idx : 0;
+  const todayStartIdx = dayStartIdx();
   let best=-1, bestDiff=Infinity;
   bars.forEach((b,i)=>{
-    if(b.ts===tw){
+    if(b.ts===tw && b.idx>=todayStartIdx){
       const diff=Math.abs(b.idx-todayStartIdx);
       if(diff<bestDiff){ bestDiff=diff; best=i; }
     }
   });
   // 往前一根，跟開盤起始一致（例如5K會停在盤前的前一根15:55）
   if(best>0) best=best-1;
-  return best>=0?best:0;
+  return best>=0?best:dayOff;
 }
 
 function resetToModeStart() {
@@ -6691,6 +6715,58 @@ function drawRthRange(ctx, L, tf, layer){
   ctx.restore();
 }
 
+// 台指版：前一天全日的高量帶，畫在隔天（08:45 開盤 → 04:55 收盤；播放到哪就畫到哪）
+function drawVolBandPrevDay(ctx, L, tf, layer){
+  const now = indNow(L);
+  if(!now || !DAYS.length) return;
+  const cap = now.cap, px = now.px;
+  const view = L.view;
+  const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
+  const showLbl = !!indOpt('volBand','labels');
+  const di = DAYS.indexOf(now.day);
+  if(di<0) return;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT); ctx.clip();
+  for(let j=di; j>=1 && j>di-400; j--){
+    const T = wholeDaySeg(DAYS[j]);           // 要畫在這一天
+    if(!T) continue;
+    const tS = T.openIdx, tE = T.seg[T.seg.length-1].idx;
+    if(cap < tS) continue;                    // 這天還沒開盤
+    const lineEnd = Math.min(tE, cap);        // 收盤後停住
+    if(lineEnd < vFirst) break;
+    if(tS > vLast) continue;
+    const vb = volBandsFor(DAYS[j-1]);        // 用前一天全日的量
+    if(!vb) continue;
+    const x1 = xForIdxOnLayout(L, tS)-(tS>=vFirst?half:0);
+    const x2 = xForIdxOnLayout(L, lineEnd)+(lineEnd<=vLast?half:0);
+    const usedY = [];
+    vb.bands.forEach(bd=>{
+      const yT=L.Y(bd.hi), yB=L.Y(bd.lo);
+      const h=Math.max(2, yB-yT), yTop = (yB-yT<2) ? (yT+yB)/2-1 : yT;
+      if(layer==='back'){
+        ctx.fillStyle = 'rgba(249,115,22,'+((100-volBandTransp(bd.ratio))/100).toFixed(3)+')';
+        ctx.fillRect(x1, yTop, Math.max(1,x2-x1), h);
+      } else if(showLbl){
+        const typ = px>=bd.hi ? '支撐' : (px<=bd.lo ? '壓力' : '帶內');
+        const txt = (bd.main?'前日最大量 ':'前日高量 ')+typ+' '+bd.lo+'–'+bd.hi+'（'+(bd.main?100:Math.min(99,Math.round(bd.ratio*100)))+'%）';
+        const col = '#fb923c';
+        ctx.font='bold 9px sans-serif';
+        const w=ctx.measureText(txt).width+8, th=13;
+        let lx=Math.min(x2, plotR)-w-2; if(lx<plotL+2) lx=plotL+2;
+        let ly=(yT+yB)/2-th/2;
+        for(let guard=0; guard<10 && usedY.some(u=>Math.abs(u-ly)<th+2); guard++) ly+=th+2;
+        usedY.push(ly);
+        ctx.fillStyle='rgba(13,13,15,0.85)'; ctx.fillRect(lx,ly,w,th);
+        ctx.strokeStyle=col; ctx.lineWidth=1; ctx.strokeRect(lx+0.5,ly+0.5,w-1,th-1);
+        ctx.fillStyle=col; ctx.textAlign='left'; ctx.fillText(txt,lx+4,ly+9.5);
+      }
+    });
+  }
+  ctx.restore();
+}
+
 // ---------- 指標②：美股盤中最大量帶（1分K帶子重疊）----------
 let _hasVol = null;
 function dataHasVolume(){
@@ -6706,7 +6782,7 @@ function volBandsFor(day){
   const key = day+'|'+pct+'|'+mb;
   if(key in _vbCache) return _vbCache[key];
   let res = null;
-  const r = rthSessionRaw(day);
+  const r = MKT.vbWholeDay ? wholeDaySeg(day) : rthSessionRaw(day);
   if(r && r.seg.length){
     // 每根1分K一條帶子：下緣 +量、上緣 -量
     const ev = [];
@@ -6748,7 +6824,13 @@ function volBandTransp(ratio){
   const norm = pct>=100 ? 1 : Math.max(0, Math.min(1, (ratio*100-pct)/(100-pct)));
   return tL - (tL-tD)*norm;
 }
+// 台指：一整天（08:45～隔日04:55）的K棒
+function wholeDaySeg(day){
+  const bars = DATA[day] && DATA[day]['1k'];
+  return (bars && bars.length) ? {openIdx:bars[0].idx, seg:bars} : null;
+}
 function drawVolBand(ctx, L, tf, layer){
+  if(MKT.vbWholeDay) return drawVolBandPrevDay(ctx, L, tf, layer);
   const now = indNow(L);
   if(!now || !DAYS.length) return;
   const cap = now.cap, px = now.px;
