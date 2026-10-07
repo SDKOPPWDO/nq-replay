@@ -1,13 +1,12 @@
 // ============================================================
-// NQ／台指 複盤 App - Service Worker
+// NQ 複盤 App - Service Worker
 // 負責把 data.bin（K棒歷史資料）快取在裝置本機，避免每次打開App都要重新下載一次
 // ============================================================
 
 const DATA_CACHE_NAME = 'nq-data-cache-v2';
 const DATA_URL = 'https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/data.bin';
 const NDX_URL  = 'https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/ndx.bin';
-const TX_URL   = 'https://raw.githubusercontent.com/sdkoppwdo/nq-replay/main/tx.bin';   // 台指 5分K
-const CACHED_URLS = [DATA_URL, NDX_URL, TX_URL];
+const CACHED_URLS = [DATA_URL, NDX_URL];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting(); // 安裝後立刻生效，不用等使用者關掉所有分頁
@@ -46,19 +45,15 @@ async function handleDataFetch(request) {
 // 主頁面可以送訊息過來，要求「強制重新抓一次最新資料、更新快取」
 self.addEventListener('message', (e) => {
   if (e.data === 'REFRESH_DATA') {
-    e.waitUntil(doRefresh(CACHED_URLS));
-  } else if (e.data && e.data.type === 'REFRESH_DATA') {
-    // 只更新指定的檔案（例如台指有新版時只重抓 tx.bin，不用重抓 NQ 的大檔）
-    const urls = (e.data.urls || []).filter((u) => CACHED_URLS.includes(u));
-    e.waitUntil(doRefresh(urls.length ? urls : CACHED_URLS));
+    e.waitUntil(doRefresh());
   }
 });
 
-async function doRefresh(urls) {
+async function doRefresh() {
   try {
     const cache = await caches.open(DATA_CACHE_NAME);
-    // NQ(data.bin)、NDX(ndx.bin)、台指(tx.bin) 一起強制重新抓、更新快取
-    await Promise.all(urls.map(async (url) => {
+    // NQ(data.bin) 與 NDX(ndx.bin) 一起強制重新抓、更新快取
+    await Promise.all(CACHED_URLS.map(async (url) => {
       try {
         const resp = await fetch(url, { cache: 'no-store' });
         if (resp && resp.ok) await cache.put(url, resp.clone());
