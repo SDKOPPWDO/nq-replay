@@ -653,6 +653,126 @@ body.sne-popup .sne-shell{max-width:none;}
 .smkt-detail{min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;min-height:0;}
 .smkt-note-info{background:var(--bg3);border-left:3px solid #facc15;border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--t1);line-height:1.5;flex-shrink:0;white-space:pre-wrap;max-height:38vh;overflow-y:auto;}
 
+/* ===== 📷 行情截圖（取代故事線）===== */
+.sn-col{width:300px;}
+.sn-head{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.sn-title{font-size:13px;font-weight:800;color:var(--t1);}
+.sn-now{margin-left:auto;font:700 11px monospace;color:var(--t2);background:var(--bg3);border:1px solid var(--b2);border-radius:5px;padding:2px 6px;white-space:nowrap;}
+.sn-body{flex:1;min-height:0;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:12px;}
+.sn-snap-btn{width:100%;padding:11px 6px;border-radius:8px;border:1px solid #facc15;background:#facc15;color:#000;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+.sn-snap-btn:hover{filter:brightness(1.08);}
+.sn-snap-btn:active{opacity:.75;}
+.sn-key{font:700 10px monospace;border:1px solid rgba(0,0,0,.35);border-radius:4px;padding:0 4px;}
+.sn-draft{display:flex;flex-direction:column;gap:10px;padding:10px;border:1px solid #facc15;border-radius:9px;background:rgba(250,204,21,.05);}
+.sn-draft[hidden],.sn-modal [hidden]{display:none!important;}
+.sn-chartbox{position:relative;overflow:hidden;background:#0d0d0f;}
+.sn-chartbox canvas{position:absolute;inset:0;width:100%;height:100%;}
+.sn-li canvas,.sn-dayitem canvas{position:static;}
+.sn-body>*,.sn-draft>*,.sn-mside>*{flex-shrink:0;}
+.sn-pv{border:1px solid var(--b2);border-radius:6px;overflow:hidden;background:#0d0d0f;cursor:zoom-in;}
+.sn-pv{height:170px;}
+.sn-pv-meta{font:600 10.5px monospace;color:var(--t3);margin-top:-4px;}
+.sn-fld{display:flex;flex-direction:column;gap:5px;}
+.sn-lb{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.04em;}
+.sn-lb-sub{font-weight:600;color:#71717a;letter-spacing:0;margin-left:4px;}
+.sn-inp{background:var(--bg);border:1px solid var(--b2);border-radius:6px;padding:6px 8px;color:var(--t1);font-family:inherit;font-size:12px;min-width:0;color-scheme:dark;}
+.sn-inp:focus{outline:none;border-color:#facc15;}
+select.sn-inp{width:100%;}
+.sn-trow{display:flex;align-items:center;gap:5px;}
+.sn-tm{width:64px;font-family:monospace;font-size:13px;font-weight:700;text-align:center;}
+.sn-tm.bad{border-color:var(--up);}
+.sn-arrow{color:var(--t3);}
+.sn-mini{border:1px solid var(--b2);background:transparent;color:var(--t3);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:11px;margin-left:auto;}
+.sn-dur{font:600 10.5px/1.5 monospace;color:var(--t2);}
+.sn-dur.hint{font-family:inherit;color:var(--t3);font-weight:500;}
+.sn-ta{width:100%;min-height:90px;resize:vertical;line-height:1.55;font-size:12.5px;}
+.sn-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.sn-chip{font-size:11px;font-weight:700;padding:4px 9px;border-radius:12px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;user-select:none;font-family:inherit;}
+.sn-chip:hover{border-color:var(--t3);}
+.sn-chip.on{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.sn-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.sn-btn{border:1px solid var(--b2);background:var(--bg3);color:var(--t1);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sn-btn:hover{border-color:var(--t3);}
+.sn-btn.pri{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.sn-btn.danger{background:transparent;color:#fca5a5;border-color:rgba(239,68,68,.45);}
+.sn-btn.danger.armed{background:var(--up);color:#fff;border-color:var(--up);}
+.sn-day{display:flex;flex-direction:column;gap:6px;}
+.sn-daylist{display:flex;flex-direction:column;gap:6px;}
+.sn-dayitem{display:flex;gap:8px;padding:6px;border:1px solid var(--b1);border-radius:7px;background:var(--bg3);cursor:pointer;text-align:left;font-family:inherit;color:var(--t1);}
+.sn-dayitem:hover{border-color:var(--b2);}
+.sn-col .sn-dayitem canvas{width:84px;height:52px;object-fit:cover;border-radius:4px;flex-shrink:0;background:#0d0d0f;}
+.sn-dayitem-t{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.sn-dayitem-n{font-size:11px;color:var(--t2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sn-empty{font-size:11px;color:var(--t3);line-height:1.6;padding:6px 2px;}
+.sn-seg{font:700 11px monospace;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:1px 5px;white-space:nowrap;align-self:flex-start;}
+.sn-seg.none{background:transparent;border-style:dashed;color:var(--t3);font-weight:600;}
+/* 時間框：反白選取模式 */
+.sn-trow.picking .sn-tm{border-color:#facc15;box-shadow:0 0 0 2px rgba(250,204,21,.25);}
+.sn-pickhint{font-size:10.5px;font-weight:700;color:#facc15;}
+body.sn-picking .cwrap{cursor:col-resize!important;}
+/* 分類頁：清單｜行情圖｜右上筆記／右下分類資料夾 */
+.sn-lib-ov{position:fixed;inset:0;z-index:720;background:#08080a;display:none;padding:12px 14px;}
+.sn-lib-ov.show{display:flex;}
+.sn-lib-card{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
+.sn-lib-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sn-lib-title{font-size:16px;font-weight:800;color:#facc15;margin-right:8px;}
+.sn-lib-q{flex:1;min-width:160px;max-width:380px;}
+.sn-lib-tip{margin-left:auto;font-size:11px;color:var(--t3);}
+.sn-filt{display:flex;align-items:flex-start;gap:8px;}
+.sn-filt-lb{font-size:10.5px;font-weight:700;color:var(--t3);padding-top:5px;width:40px;flex-shrink:0;}
+.sn-fchip{display:inline-flex;align-items:center;gap:5px;}
+.sn-fchip .ct{font:600 10px monospace;opacity:.7;}
+.sn-fchip .ed{display:none;font-size:10px;padding:0 3px;border-radius:3px;opacity:.75;}
+.sn-fchip:hover .ed{display:inline;}
+.sn-fchip .ed:hover{opacity:1;background:rgba(255,255,255,.15);}
+.sn-chip.drop{border-color:#facc15;background:rgba(250,204,21,.18);color:#fff;}
+.sn-chip.add{border-style:dashed;color:var(--t3);background:transparent;}
+.sn-lib-body{flex:1;min-height:0;display:flex;gap:10px;}
+.sn-list{width:230px;flex-shrink:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.sn-list>*{flex-shrink:0;}
+.sn-li{border:1px solid var(--b1);background:var(--bg3);border-radius:8px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;}
+.sn-li:hover{border-color:var(--b2);}
+.sn-li.on{border-color:#facc15;box-shadow:0 0 0 1px #facc15;}
+.sn-li.dragging{opacity:.4;}
+.sn-li canvas{display:block;width:100%;height:90px;background:#0d0d0f;border-bottom:1px solid var(--b1);}
+.sn-li-b{padding:6px 8px;display:flex;flex-direction:column;gap:4px;}
+.sn-li-when{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:600 10.5px monospace;color:var(--t3);}
+.sn-li-n{font-size:11.5px;color:var(--t2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sn-li-m{display:flex;gap:4px;flex-wrap:wrap;}
+.sn-tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--bg2);border:1px solid var(--b2);color:var(--t2);}
+.sn-ftag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.45);color:#c4b5fd;}
+.sn-none{padding:40px 10px;text-align:center;color:var(--t3);font-size:12px;line-height:1.8;}
+.sn-det{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;}
+.sn-det-empty{margin:auto;color:var(--t3);font-size:13px;}
+.sn-det-chart{flex:1;min-height:0;display:flex;flex-direction:column;}
+.sn-det-chart[hidden],.sn-dside[hidden]{display:none!important;}
+.sn-det-head{display:flex;align-items:center;gap:12px;font-size:12.5px;padding:8px 12px;border-bottom:1px solid var(--b1);flex-wrap:wrap;}
+.sn-det-ohlc{font:600 11px monospace;color:var(--t2);font-variant-numeric:tabular-nums;}
+.sn-det-ohlc b{color:var(--t3);font-weight:600;margin-left:6px;}
+.sn-det-pos{margin-left:auto;font:600 11px monospace;color:var(--t3);}
+.sn-det-chart .sn-chartbox{flex:1;min-height:0;cursor:crosshair;}
+.sn-det-chart .sn-chartbox.picking{cursor:col-resize;box-shadow:inset 0 0 0 1px #facc15;}
+.sn-dside{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-height:0;}
+.sn-dside-top,.sn-dside-bot{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:12px;}
+.sn-dside-top{flex:1;min-height:0;}
+.sn-dside-bot{flex-shrink:0;}
+.sn-grow{flex:1;min-height:0;}
+.sn-grow .sn-ta{flex:1;min-height:100px;resize:none;}
+.sn-saved{font-size:11px;color:var(--dn);min-height:14px;}
+/* 草稿放大 */
+.sn-modal{position:fixed;inset:0;z-index:740;background:rgba(0,0,0,.82);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;}
+.sn-modal.show{display:flex;}
+.sn-mbox{width:min(1700px,100%);height:min(820px,90vh);display:flex;flex-direction:column;gap:8px;}
+.sn-mbox .sn-chartbox{flex:1;border-radius:8px;border:1px solid var(--b2);}
+.sn-mcap{font:600 12px monospace;color:var(--t2);text-align:center;}
+.sn-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--b2);color:var(--t1);padding:8px 16px;border-radius:8px;font-size:12.5px;font-weight:700;z-index:800;display:none;}
+.sn-toast.show{display:block;}
+.sn-tfs,.sn-zoom{display:inline-flex;gap:3px;}
+.sn-tfb{border:1px solid var(--b2);background:var(--bg3);color:var(--t2);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sn-tfb:hover{border-color:var(--t3);color:var(--t1);}
+.sn-tfb.on{background:#2563eb;border-color:#2563eb;color:#fff;}
+.sn-det-sub{display:flex;align-items:center;gap:12px;padding:5px 12px;border-bottom:1px solid var(--b1);flex-wrap:wrap;}
+.sn-det-hint{margin-left:auto;font-size:10.5px;color:#71717a;}
 </style>
 </head>
 <body>
@@ -661,9 +781,9 @@ body.sne-popup .sne-shell{max-width:none;}
   <div class="topbar">
     <span class="app-title"><span class="mkt-switch" title="切換商品：NQ／台指（兩邊各自保留進度、筆記、交易紀錄）"><button data-m="nq" onclick="switchMarket('nq')">NQ</button><button data-m="tx" onclick="switchMarket('tx')">台指</button></span><span id="appTitleTxt">複盤</span></span>
     <button class="day-btn" id="btnToggleJournal" onclick="openJournal()" title="開啟學習日誌分頁" style="font-size:12px;padding:0 8px;width:auto;">📔 學習日誌</button>
-    <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側故事線面板" style="font-size:12px;padding:0 8px;width:auto;">📖 故事線</button>
-    <button class="day-btn" onclick="openStoryCls()" title="依分類整理每個時間點的想法" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
-    <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類：選一個分類後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
+    <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側截圖面板" style="font-size:12px;padding:0 8px;width:auto;">📷 截圖</button>
+    <button class="day-btn" onclick="snOpenLib()" title="依分類／資料夾整理截下來的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
+    <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類或資料夾：選好後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在K線圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
     <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
@@ -745,25 +865,51 @@ body.sne-popup .sne-shell{max-width:none;}
       <button class="cbtn dim" id="btnSkip5b">◀◀ -5</button>
       <button class="cbtn dim" id="btnReset">↺ 重置</button>
     </div>
-    <div class="story-col" id="storyCol">
-      <div class="story-hdr" style="display:none;">
-        <span class="story-hdr-title">📖 交易故事線</span>
-        <div class="story-scope">
-          <button class="story-scope-btn on" id="scopeDay" onclick="setStoryScope('day')">本日</button>
-          <button class="story-scope-btn" id="scopeAll" onclick="setStoryScope('all')">全部</button>
+    <div class="story-col sn-col" id="storyCol">
+      <div class="sn-head">
+        <span class="sn-title">📷 行情截圖</span>
+        <span class="sn-now" id="snNow">—</span>
+      </div>
+      <div class="sn-body" id="snBody">
+        <button class="sn-snap-btn" id="snSnapBtn" onclick="snCapture()" title="把目前 5 分 K 圖的畫面截下來（快捷鍵 S）">📷 截下目前畫面 <span class="sn-key">S</span></button>
+        <div class="sn-draft" id="snDraft" hidden>
+          <div class="sn-pv sn-chartbox" id="snPvWrap" onclick="snOpenDraftView()" title="點一下放大"><canvas id="snPv"></canvas></div>
+          <div class="sn-pv-meta" id="snPvMeta"></div>
+          <div class="sn-fld">
+            <div class="sn-lb">要注意的時間段 <span class="sn-lb-sub">圖上會標淡白色</span></div>
+            <div class="sn-trow">
+              <input class="sn-inp sn-tm" id="snFrom" placeholder="開始" maxlength="5" inputmode="numeric" autocomplete="off">
+              <span class="sn-arrow">→</span>
+              <input class="sn-inp sn-tm" id="snTo" placeholder="結束" maxlength="5" inputmode="numeric" autocomplete="off">
+              <button class="sn-mini" onclick="snClearRange()" title="清除時間段">✕</button>
+            </div>
+            <div class="sn-dur" id="snDur"></div>
+          </div>
+          <div class="sn-fld">
+            <div class="sn-lb">筆記</div>
+            <textarea class="sn-inp sn-ta" id="snNote" placeholder="這段行情你看到了什麼？"></textarea>
+          </div>
+          <div class="sn-fld">
+            <div class="sn-lb">分類（可多選）</div>
+            <div class="sn-chips" id="snTags"></div>
+          </div>
+          <div class="sn-fld">
+            <div class="sn-lb">資料夾</div>
+            <select class="sn-inp" id="snFolder"></select>
+          </div>
+          <div class="sn-actions">
+            <button class="sn-btn pri" onclick="snSaveDraft()">儲存</button>
+            <button class="sn-btn" onclick="snDiscardDraft()">取消</button>
+          </div>
+        </div>
+        <div class="sn-day">
+          <div class="sn-lb">這一天的截圖 <span class="sn-lb-sub" id="snDayCnt"></span></div>
+          <div class="sn-daylist" id="snDayList"></div>
         </div>
       </div>
-      <div class="story-input-area">
-        <div class="story-now-bar">
-          <span class="story-now-chip" id="storyNowTime">—</span>
-          <span class="story-now-chip price" id="storyNowPrice">—</span>
-        </div>
-        <button class="story-open-btn" id="storyOpenBtn" onclick="sneFocusOrOpen()">🗗 開啟輸入視窗</button>
-      </div>
-      <div class="story-timeline" id="storyTimeline"></div>
       <div class="story-backup-bar">
-        <button class="story-backup-btn" onclick="exportStoryNotes()" title="備份故事線筆記＋模擬單交易紀錄＋學習日誌">⬇ 備份</button>
-        <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()" title="還原故事線筆記＋模擬單交易紀錄＋學習日誌">⬆ 匯入</button>
+        <button class="story-backup-btn" onclick="exportStoryNotes()" title="備份截圖＋模擬單交易紀錄＋學習日誌">⬇ 備份</button>
+        <button class="story-backup-btn" onclick="document.getElementById('storyImportFile').click()" title="還原截圖＋模擬單交易紀錄＋學習日誌">⬆ 匯入</button>
         <input type="file" id="storyImportFile" accept=".json" style="display:none;" onchange="importStoryNotes(this)">
       </div>
     </div>
@@ -853,6 +999,71 @@ body.sne-popup .sne-shell{max-width:none;}
   </div>
 </div>
 <div class="sne-ov" id="sneOv"></div>
+<div class="sn-lib-ov" id="snLibOv">
+  <div class="sn-lib-card">
+    <div class="sn-lib-top">
+      <span class="sn-lib-title">🗂 行情分類</span>
+      <input class="sn-inp sn-lib-q" id="snQ" placeholder="搜尋筆記…" oninput="snRenderLib()">
+      <select class="sn-inp" id="snSort" onchange="snRenderLib()" style="width:auto">
+        <option value="new">日期新→舊</option><option value="old">日期舊→新</option>
+      </select>
+      <span class="sn-lib-tip">↑ ↓ 切換截圖 · Esc 關閉</span>
+      <button class="sn-btn" onclick="snCloseLib()">✕ 關閉</button>
+    </div>
+    <div class="sn-filt">
+      <span class="sn-filt-lb">資料夾</span><div class="sn-chips" id="snFolders"></div>
+    </div>
+    <div class="sn-filt">
+      <span class="sn-filt-lb">分類</span><div class="sn-chips" id="snTagFilter"></div>
+    </div>
+    <div class="sn-lib-body">
+      <div class="sn-list" id="snList"></div>
+      <section class="sn-det">
+        <div class="sn-det-empty" id="snDEmpty">從左邊的清單點一張截圖，這裡就會顯示</div>
+        <div class="sn-det-chart" id="snDChartCol" hidden>
+          <div class="sn-det-head">
+            <b id="snDWhen"></b>
+            <span class="sn-tfs" id="snDTfs"></span>
+            <span class="sn-zoom"><button class="sn-tfb" onclick="snDZoom(1,null)" title="縮小：看更多 K 棒">小</button><button class="sn-tfb" onclick="snDZoom(-1,null)" title="放大：看更少 K 棒">大</button><button class="sn-tfb" onclick="snDZoomReset()" title="回到一天（24 小時）">↺ 一天</button></span>
+            <button class="sn-tfb ind-trigger" onclick="toggleIndicatorMenu(this)">📐 指標</button>
+            <span class="sn-det-pos" id="snDPos"></span>
+          </div>
+          <div class="sn-det-sub"><span class="sn-det-ohlc" id="snDOhlc"></span><span class="sn-det-hint">滾輪＝放大縮小 · 右鍵拖曳＝左右移動 · 左鍵拖曳＝反白時間段</span></div>
+          <div class="sn-chartbox" id="snDBox"><canvas id="snDCv"></canvas></div>
+        </div>
+      </section>
+      <aside class="sn-dside" id="snDSide" hidden>
+        <div class="sn-dside-top">
+          <div class="sn-fld">
+            <div class="sn-lb">要注意的時間段</div>
+            <div class="sn-trow" id="snDTrow">
+              <input class="sn-inp sn-tm" id="snDFrom" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="開始">
+              <span class="sn-arrow">→</span>
+              <input class="sn-inp sn-tm" id="snDTo" maxlength="5" inputmode="numeric" autocomplete="off" placeholder="結束">
+              <button class="sn-mini" onclick="snDClearRange()" title="清除時間段">✕</button>
+            </div>
+            <div class="sn-dur" id="snDDur"></div>
+          </div>
+          <div class="sn-fld sn-grow"><div class="sn-lb">筆記</div><textarea class="sn-inp sn-ta" id="snDNote"></textarea></div>
+        </div>
+        <div class="sn-dside-bot">
+          <div class="sn-fld"><div class="sn-lb">分類</div><div class="sn-chips" id="snDTags"></div></div>
+          <div class="sn-fld"><div class="sn-lb">資料夾</div><select class="sn-inp" id="snDFolder"></select></div>
+          <div class="sn-actions">
+            <button class="sn-btn pri" onclick="snSaveDetail()">儲存修改</button>
+            <button class="sn-btn" onclick="snJumpTo()" title="切到這一天，K 棒停在截圖當下">↩ 回到這根 K 棒</button>
+            <button class="sn-btn danger" id="snDDel" onclick="snDeleteDetail()">刪除</button>
+          </div>
+          <div class="sn-saved" id="snDSaved"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<div class="sn-modal" id="snModal" onclick="snCloseDraftView()">
+  <div class="sn-mbox"><div class="sn-chartbox"><canvas id="snMCv"></canvas></div><div class="sn-mcap" id="snMCap"></div></div>
+</div>
+<div class="sn-toast" id="snToast"></div>
 <div class="journal-overlay" id="journalOverlay">
   <div class="journal-card">
     <div class="journal-top">
@@ -987,7 +1198,8 @@ let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8'
 let zoneList=[], zoneMode=false, zoneDraft=null, zoneDragging=false, zoneActiveTf=null; // 使用者手畫的灰色方框（時間+價格），純記憶體、關掉即消失
 let panOffset={};
 let calYear=0,calMonth=0;
-let selectedTFs=['1k'];
+let selectedTFs=[Object.keys(MKT.tfDisp).find(k=>MKT.tfDisp[k]==='5K')||'1k']; // 預設打開 5 分 K
+document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('on',selectedTFs.includes(b.dataset.tf)));
 // 分類回測模式：只在「有選定分類的交易日」之間換日，盤中一根一根照舊
 let clsReplayActive=false;
 let clsReplayFolder=null; // 選定的分類名稱
@@ -1412,7 +1624,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   // Anchor: rightmost bar at fixed X position
   const rightAnchorX=W-P.r-PADDING_BARS*CS-CW2/2;
   const X=i=>rightAnchorX-(view.length-1-i)*CS;
-  cv._layout={P,W,H,lo,hi,rng,startIdx,endIdx,view,vis,Y,X,cH,timeStep,pan:panC};
+  cv._layout={P,W,H,lo,hi,rng,startIdx,endIdx,view,vis,Y,X,cH,timeStep,pan:panC,CS};
 
   // grid
   for(let i=0;i<=4;i++){
@@ -1477,6 +1689,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
 
   // 使用者畫的灰色方框（時間+價格區間），畫在K棒後面
   drawZones(ctx, cv._layout);
+  if(typeof snDrawLiveHL==='function') snDrawLiveHL(ctx, cv._layout, tfKey, CS);
   drawIndicators(ctx, cv._layout, tfKey, 'back');
 
   // 盤前／開盤等時段箭頭（依商品設定）
@@ -1571,7 +1784,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   }
 
   // ✨ 故事線筆記（有筆記的K棒發亮；60K 不亮，因為一根涵蓋太多筆記）
-  if(tfKey!=='60k' && typeof storyNotes!=='undefined' && storyNotes[currentDay] && storyNotes[currentDay].length){
+  if(false){ // 故事線已取消：不再讓有筆記的K棒發亮
     const stf = id.replace('cv_','');
     const drawn = new Set();
     storyNotes[currentDay].forEach(n=>{
@@ -1618,14 +1831,19 @@ function drawCrossOnChart(cvId,bi){
   const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,L.W,L.H);
   const{P,W,H,view,X,Y}=L;
   if(bi<0||bi>=view.length) return;
-  const bar=view[bi],sx=X(bi),closeY=Y(bar.c);
+  const bar=view[bi],sx=X(bi);
+  // 滑鼠所在的那張圖：橫線跟著滑鼠高度、標出滑鼠位置的價格；其他格局維持標收盤價
+  const _mouse=(crossMouse && cvId==='cv_'+crossMouse.tf && crossMouse.y>=P.t && crossMouse.y<=H-P.b);
+  const closeY=_mouse?crossMouse.y:Y(bar.c);
+  const _tick=MKT.tick||0.25, _pr=_mouse?Math.round((L.lo+(1-(crossMouse.y-P.t)/L.cH)*L.rng)/_tick)*_tick:bar.c;
+  const _dec=_tick<1?2:0;
   ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
   ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke();
   ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke();
   ctx.setLineDash([]);
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
   ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
-  ctx.fillText(bar.c.toFixed(1),W-P.r+4,closeY+4);
+  ctx.fillText(_pr.toFixed(_dec),W-P.r+4,closeY+4);
   const tlW=36,tlH=14,tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx));
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
   ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
@@ -1684,9 +1902,13 @@ function updateChdrPrice(tf, bar){
   }
   const ktimeEl=document.getElementById('ktimeVal_'+tf);
   if(ktimeEl) ktimeEl.textContent=bar.ts||'—';
+  const kdateEl=document.getElementById('kdateVal_'+tf);
+  if(kdateEl) kdateEl.textContent=(typeof snDateOfIdx==='function'?snDateOfIdx(bar.idx,true):'')||'—';
 }
 
-function handleCross(tf,xFrac){
+let crossMouse=null;
+function handleCross(tf,xFrac,yPx){
+  crossMouse=(yPx==null)?null:{tf:tf,y:yPx};
   const main=document.getElementById('cv_'+tf);
   if(!main||!main._layout) return;
   const{W,view,X}=main._layout;
@@ -1720,6 +1942,7 @@ function handleCross(tf,xFrac){
 }
 
 function clearAllCross(){
+  crossMouse=null;
   selectedTFs.forEach(tf=>{
     const cv=document.getElementById('cv_'+tf+'_cross');
     if(cv) cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
@@ -1751,10 +1974,10 @@ function attachEvents(wrap,tf){
   wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){tTwo=true;tStartX=(e.touches[0].clientX+e.touches[1].clientX)/2;tStartPan=panOffset[tf]||0;}},{passive:true});
   wrap.addEventListener('touchmove',e=>{
     if(tTwo&&e.touches.length===2){e.preventDefault();const cx=(e.touches[0].clientX+e.touches[1].clientX)/2;panOffset[tf]=Math.max(0,tStartPan+Math.round((cx-tStartX)/((6+2)*(zoomLevel[tf]||1))));renderAll();}
-    else if(!tTwo&&e.touches.length===1){e.preventDefault();const t=e.touches[0],r=wrap.getBoundingClientRect();handleCross(tf,(t.clientX-r.left)/r.width);}
+    else if(!tTwo&&e.touches.length===1){e.preventDefault();const t=e.touches[0],r=wrap.getBoundingClientRect();handleCross(tf,(t.clientX-r.left)/r.width,t.clientY-r.top);}
   },{passive:false});
   wrap.addEventListener('touchend',()=>{tTwo=false;wrap._panStart=null;clearAllCross();});
-  wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width);});
+  wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width,e.clientY-r.top);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
 
   // ===== 方框/水平線：畫、移動、調整、刪除（Pointer 事件 + setPointerCapture）=====
@@ -2000,6 +2223,7 @@ function nqPanelInner(tf){
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
           </span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
           <span class="chdr-r" id="hdr_${tf}"></span>
@@ -2026,6 +2250,7 @@ function ndxPanelInner(){
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
           </span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
           <span class="chdr-r" id="hdr_${tf}"></span>
@@ -2311,6 +2536,8 @@ document.addEventListener('keydown',e=>{
   if(document.getElementById('sclsOverlay') && document.getElementById('sclsOverlay').classList.contains('show')) return;
   if(document.getElementById('sneOv') && document.getElementById('sneOv').classList.contains('show')) return;
   if(document.getElementById('journalOverlay') && document.getElementById('journalOverlay').classList.contains('show')) return;
+  if(document.getElementById('snLibOv').classList.contains('show') || document.getElementById('snModal').classList.contains('show')) return;
+  if((e.key==='s'||e.key==='S') && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); if(typeof snCapture==='function') snCapture(); return; }
   if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); stepPlayback(1); }
   else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPlayback(-1); }
   else if(e.key==='ArrowUp'){ e.preventDefault(); if(tradeSystemOn && typeof tradeAction==='function') tradeAction('buy'); }
@@ -5797,24 +6024,8 @@ function sneCommit(){
   }
 }
 
-// ---- 開網頁就自動跳出輸入視窗 ----
-(function sneAutoBoot(){
-  let n=0;
-  const t=setInterval(()=>{
-    n++;
-    if(typeof mode1kBars!=='undefined' && mode1kBars && mode1kBars.length){
-      clearInterval(t);
-      sneUpdateOpenBtn();
-      sneAutoOpen();
-    } else if(n>60){ clearInterval(t); sneUpdateOpenBtn(); }
-  }, 300);
-})();
+// 故事線已取消：不再自動開輸入視窗；換K棒／換日的同步改由檔案最後的「📷 行情截圖」處理
 
-// hooks：切日 / 前進K棒 時同步右側面板
-const _origRenderAllForStory = renderAll;
-renderAll = function(){ _origRenderAllForStory(); updateStoryNowBar(); sneSyncBar(); };
-const _origLoadDayForStory = loadDay;
-loadDay = function(d){ _origLoadDayForStory(d); renderStoryTimeline(); };
 
 
 // ============================================================
@@ -6885,6 +7096,731 @@ function drawVolBand(ctx, L, tf, layer){
   ctx.restore();
 }
 
+
+
+// ============================================================
+// 📷 行情截圖（取代原本的故事線）
+// 截下目前 5 分 K 畫面 → 寫筆記、標要注意的時間段（圖上淡白底）→ 分類＋資料夾
+// 截圖存在瀏覽器的 IndexedDB（圖片太大放不進 localStorage）；NQ／台指分開
+// ============================================================
+const SN_CFG_KEY='nqSnapCfg', SN_DB_NAME='nqSnapDB', SN_STORE='snaps';
+const SN_DEFAULT_TAGS=['突破','假突破','盤整','V 轉','趨勢延續','開盤急拉','數據行情'];
+const SN_DEFAULT_FOLDERS=['我的好單','要再研究'];
+let SN={tags:[],folders:[],snaps:[]};
+let snDraft=null, snSuppress=false, snDb=null, snLibFolder='__all', snLibTag='', snSel=null, snDTags=[], snDEdit=null;
+let snPick=null;   // 'draft'｜'detail'：點了時間框之後，可以在圖上按住左鍵拖曳反白
+
+(function snLoadCfg(){
+  let c=null; try{ c=JSON.parse(localStorage.getItem(SN_CFG_KEY)||'null'); }catch(e){}
+  if(c && Array.isArray(c.tags) && Array.isArray(c.folders)){ SN.tags=c.tags; SN.folders=c.folders; }
+  else { SN.tags=(storyFolders&&storyFolders.length)?[...storyFolders]:[...SN_DEFAULT_TAGS]; SN.folders=[...SN_DEFAULT_FOLDERS]; snSaveCfg(); }
+})();
+function snSaveCfg(){ try{ localStorage.setItem(SN_CFG_KEY, JSON.stringify({tags:SN.tags, folders:SN.folders})); }catch(e){} }
+
+// ---- IndexedDB ----
+function snOpenDb(){
+  return new Promise((res,rej)=>{
+    if(!('indexedDB' in window)) return rej(new Error('no indexedDB'));
+    const r=indexedDB.open(SN_DB_NAME,1);
+    r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains(SN_STORE)) db.createObjectStore(SN_STORE,{keyPath:'id'}); };
+    r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+  });
+}
+function snDbPut(rec){
+  if(!snDb) return Promise.resolve();
+  return new Promise((res,rej)=>{ const tx=snDb.transaction(SN_STORE,'readwrite'); tx.objectStore(SN_STORE).put(rec); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })
+    .catch(e=>{ console.error(e); snToast('⚠ 儲存失敗：'+(e&&e.name==='QuotaExceededError'?'瀏覽器空間不夠了，先備份再刪掉一些截圖':e.message)); });
+}
+function snDbDel(id){
+  if(!snDb) return Promise.resolve();
+  return new Promise(res=>{ const tx=snDb.transaction(SN_STORE,'readwrite'); tx.objectStore(SN_STORE).delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>res(); });
+}
+snOpenDb().then(db=>{
+  snDb=db;
+  const tx=db.transaction(SN_STORE,'readonly'); const rq=tx.objectStore(SN_STORE).getAll();
+  rq.onsuccess=()=>{ SN.snaps=(rq.result||[]).filter(r=>(r.mkt||'nq')===MARKET); snRenderDay(); if(snIsLibOpen()) snRenderLib(); };
+}).catch(e=>{ console.warn('[截圖] IndexedDB 無法使用，截圖只會留在這次開啟的頁面', e); });
+
+// ---- 小工具 ----
+function snToast(t){ const el=document.getElementById('snToast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2000); }
+function snUid(){ return 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function snUnitMin(tf){ return (MKT.id==='tx'?5:1)*(TF_UNITS_MAP[tf]||1); }
+function snTmin(ts){ const m=/^(\d{1,2}):(\d{2})/.exec(String(ts||'')); return m?(+m[1])*60+(+m[2]):null; }
+function snNormT(v){
+  v=String(v||'').trim().replace('：',':'); if(!v) return '';
+  let m=/^(\d{1,2}):?(\d{2})$/.exec(v); if(!m) return null;
+  const h=+m[1], mi=+m[2]; if(h>23||mi>59) return null;
+  return String(h).padStart(2,'0')+':'+String(mi).padStart(2,'0');
+}
+function snDayFmt(d){ return String(d||'').slice(5).replace('-','/'); }
+function snKLabel(tf){ return (MKT.tfLabels&&MKT.tfLabels[tf])||tfDisp(tf); }
+
+// ---- K棒的日期：用每個交易日第一根的 idx 推算（idx 在交易日內是連續的）----
+let _snDayStarts=null;
+function snDayStarts(){
+  if(_snDayStarts && _snDayStarts.n===DAYS.length) return _snDayStarts.a;
+  const a=[];
+  DAYS.forEach(d=>{ const b=((DATA[d]||{})['1k']||[])[0]; if(b) a.push([b.idx,d,snTmin(b.ts)||0]); });
+  a.sort((x,y)=>x[0]-y[0]); _snDayStarts={n:DAYS.length,a:a}; return a;
+}
+const SN_WD='日一二三四五六';
+function snDateOfIdx(idx, withWd){
+  const a=snDayStarts(); if(!a.length||idx==null||idx<a[0][0]) return '';
+  let lo=0,hi=a.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(a[m][0]<=idx) lo=m; else hi=m-1; }
+  const [first,day,fm]=a[lo];
+  const unit=(MKT.id==='tx')?5:1;
+  let base=new Date(day+'T12:00:00');
+  if(MKT.id==='tx' && fm>=12*60) base.setDate(base.getDate()-1);   // 台指交易日從前一天 15:00 夜盤開始
+  base.setDate(base.getDate()+Math.floor((fm+(idx-first)*unit)/1440));
+  const s=String(base.getMonth()+1).padStart(2,'0')+'/'+String(base.getDate()).padStart(2,'0');
+  return withWd?s+'('+SN_WD[base.getDay()]+')':s;
+}
+
+// ---- 找出時間段在一串K棒裡的位置 ----
+// list 每個元素要有 ts、idx、idx_end；s 有 from/to（時間字串）和 fromIdx/toIdx（拖曳反白時記下的精確位置）
+function snResolve(list, s, um){
+  if(!list.length || !s || !s.from) return null;
+  if(s.fromIdx!=null){
+    const find=x=>{ for(let i=0;i<list.length;i++){ const b=list[i]; if(b.idx<=x && x<=(b.idx_end||b.idx)) return i; } return -1; };
+    const A=Math.min(s.fromIdx, s.toIdx!=null?s.toIdx:s.fromIdx), B=Math.max(s.fromIdx, s.toIdx!=null?s.toIdx:s.fromIdx);
+    let a=find(A), b=find(B), clip=false, open=false;
+    const lastEnd=(list[list.length-1].idx_end||list[list.length-1].idx);
+    if(a<0 && A<list[0].idx){ a=0; clip=true; }
+    if(b<0 && B>lastEnd){ b=list.length-1; open=true; }
+    if(a<0||b<0||B<list[0].idx||A>lastEnd) return null;
+    return {a,b,clip,open};
+  }
+  const fm=snTmin(snNormT(s.from)), tm=snTmin(snNormT(s.to));
+  if(fm==null) return null;
+  const has=(i,t)=>{ const st=snTmin(list[i].ts); if(st==null) return false; const d=((t-st)%1440+1440)%1440; return d<um; };
+  if(tm==null){ for(let i=list.length-1;i>=0;i--) if(has(i,fm)) return {a:i,b:i}; return null; }
+  let b=-1; for(let i=list.length-1;i>=0;i--) if(has(i,tm)){ b=i; break; }
+  let open=false; if(b<0){ b=list.length-1; open=true; }
+  for(let i=b;i>=0;i--) if(has(i,fm)) return {a:i,b:b,open:open};
+  if(!open) return {a:0,b:b,clip:true};
+  return null;
+}
+function snSegHtml(s){
+  if(!s.from) return '<span class="sn-seg none">未標時間段</span>';
+  const d=(s.fromIdx!=null)?snDateOfIdx(s.fromIdx):'';
+  return '<span class="sn-seg">'+(d?d+' ':'')+s.from+(s.to&&s.to!==s.from?' → '+s.to:'')+'</span>';
+}
+// K棒 idx → 絕對分鐘（台北時間），用來抓「截圖當下往前 24 小時」
+function snAbs(idx){
+  const a=snDayStarts(); if(!a.length) return idx;
+  let lo=0,hi=a.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(a[m][0]<=idx) lo=m; else hi=m-1; }
+  const [first,day,fm]=a[lo], unit=(MKT.id==='tx')?5:1;
+  const p=day.split('-').map(Number); let base=Date.UTC(p[0],p[1]-1,p[2])/60000;
+  if(MKT.id==='tx' && fm>=12*60) base-=1440;
+  return base+fm+(idx-first)*unit;
+}
+
+// ---- 截圖當下為止的 K 棒（最後一根照當下還沒收完的樣子）----
+const snSerCache={};
+function snSeries(s, tf){
+  tf=tf||s.tf;
+  if(!s || !DATA || !DATA[s.day]) return null;
+  const key=s.day+'|'+tf+'|'+s.capIdx;
+  if(snSerCache[key]) return snSerCache[key];
+  const d=DATA[s.day], base=d[tf]; if(!base||!base.length) return null;
+  let bars;
+  if(tf==='1k'){
+    const di=DAYS.indexOf(s.day), prev=di>0?((DATA[DAYS[di-1]]||{})['1k']||[]):[];
+    bars=prev.concat(base.filter(b=>b.idx<=s.capIdx));     // 1分K 一天不夠 24 小時，往前接前一天
+  } else {
+    const b1=d['1k']||[], i=b1.findIndex(b=>b.idx===s.capIdx);
+    bars = i>=0 ? getLive(base,b1,i,TF_UNITS_MAP[tf]) : base.filter(b=>(b.idx_end||b.idx)<=s.capIdx);
+  }
+  if(!bars.length) return null;
+  snSerCache[key]=bars; return bars;
+}
+// 最後 24 小時有幾根
+function snWin24(series){
+  const T=snAbs(series[series.length-1].idx); let n=0;
+  for(let i=series.length-1;i>=0;i--){ if(snAbs(series[i].idx)>=T-1440) n++; else break; }
+  return Math.max(1,n);
+}
+function snBarsFor(s){ const ser=snSeries(s); return ser?ser.slice(ser.length-snWin24(ser)):null; }
+function snTfDefault(){ return Object.keys(MKT.tfDisp).find(k=>MKT.tfDisp[k]==='5K')||'1k'; }
+
+// ---- 畫行情圖（分類頁大圖、右側預覽、清單縮圖共用）----
+// opt.mini：縮圖；opt.tf：格局；opt.n／opt.end：顯示幾根、最右邊是第幾根（放大縮小、平移）；opt.cross：十字線
+function snDrawChart(cv, s, opt){
+  opt=opt||{};
+  const W=cv.clientWidth||cv.parentElement.clientWidth||300, H=cv.clientHeight||cv.parentElement.clientHeight||150;
+  const dpr=window.devicePixelRatio||2;
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#0d0d0f'; ctx.fillRect(0,0,W,H);
+  const tf=opt.tf||s.tf, series=snSeries(s,tf);
+  if(!series){ ctx.fillStyle='#71717a'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText(DAYS.length?'資料裡沒有 '+s.day+' 這一天':'K 棒資料載入中…',W/2,H/2); cv._snL=null; return; }
+  const mini=!!opt.mini, len=series.length, w24=snWin24(series);
+  const n=mini?w24:Math.max(8,Math.min(len,Math.round(opt.n||w24)));
+  const end=mini?len-1:Math.max(n-1,Math.min(len-1,opt.end==null?len-1:opt.end));
+  const start=end-n+1, bars=series.slice(start,end+1);
+  const P=mini?{t:4,r:4,b:4,l:4}:{t:22,r:66,b:24,l:6};
+  const cW=W-P.l-P.r, cH=H-P.t-P.b;
+  const CS=cW/(n+(mini?0.5:2)), bw=Math.max(1,Math.min(CS*0.7,18));
+  const X=i=>P.l+CS*(i+0.5);
+  let lo=Infinity,hi=-Infinity; bars.forEach(b=>{ if(b.l<lo) lo=b.l; if(b.h>hi) hi=b.h; });
+  const pd=(hi-lo)*0.06||1; lo-=pd; hi+=pd; const rg=hi-lo||1;
+  const Y=p=>P.t+cH*(1-(p-lo)/rg);
+  const capBar=series[len-1];
+  // 指標也用這個 layout（跟主圖、進場回顧同一套欄位）
+  const L={bars,series,start,end,len,w24,n,X,Y,P,W,H,CS,lo,hi,rg,rng:rg,cH,view:bars,vis:series.slice(0,end+1),
+    cap:(capBar.idx_end||capBar.idx), capPx:capBar.c, day:s.day, tf};
+  cv._snL=L;
+  const um=snUnitMin(tf), dates=bars.map(b=>snDateOfIdx(b.idx,true));
+  if(!mini){
+    const raw=rg/6, mag=Math.pow(10,Math.floor(Math.log10(raw))), step=[1,2,2.5,5,10].map(k=>k*mag).find(v=>v>=raw)||raw;
+    ctx.font='10px monospace'; ctx.textAlign='left';
+    for(let v=Math.ceil(lo/step)*step; v<hi; v+=step){
+      const y=Math.round(Y(v))+.5; ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.setLineDash([4,5]);
+      ctx.beginPath(); ctx.moveTo(P.l,y); ctx.lineTo(W-P.r,y); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#d0d0e0'; ctx.fillText(v.toFixed(step<1?2:0),W-P.r+5,y+4);
+    }
+  }
+  for(let i=1;i<n;i++) if(dates[i]!==dates[i-1]){
+    const x=Math.round(X(i)-CS/2)+.5; ctx.strokeStyle='rgba(100,180,255,0.45)'; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(x,P.t); ctx.lineTo(x,H-P.b); ctx.stroke(); ctx.setLineDash([]);
+    if(!mini){ ctx.fillStyle='rgba(100,180,255,0.95)'; ctx.font='bold 10px sans-serif'; ctx.textAlign='left'; ctx.fillText(dates[i],x+4,P.t-8); }
+  }
+  if(!mini){ ctx.fillStyle='rgba(100,180,255,0.75)'; ctx.font='bold 10px sans-serif'; ctx.textAlign='left'; ctx.fillText(dates[0],P.l+2,P.t-8); }
+  // 要注意的時間段：淡白底（在整段資料裡找，再對到畫面上）
+  const r=snResolve(series, s, um);
+  if(r && r.b>=start && r.a<=end){
+    const a=Math.max(r.a,start)-start, b=Math.min(r.b,end)-start;
+    const x1=(r.clip||r.a<start)?P.l:X(a)-CS/2, x2=r.b>end?W-P.r:X(b)+CS/2;
+    snPaintBand(ctx,x1,x2,P.t,H-P.b,mini?H-P.b:H);
+  }
+  if(!mini) drawIndicators(ctx, L, tf, 'back');
+  bars.forEach((b,i)=>{
+    const x=Math.round(X(i))+.5, col=b.c>=b.o?UP:DN;
+    ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,Y(b.h)); ctx.lineTo(x,Y(b.l)); ctx.stroke();
+    const t=Math.min(Y(b.o),Y(b.c)), bh=Math.max(Math.abs(Y(b.c)-Y(b.o)),1.2);
+    ctx.fillStyle=col; ctx.fillRect(x-bw/2,t,bw,bh);
+  });
+  ['m5','m10','m20','m60'].forEach((k,mi)=>{
+    const ma=maConfig[mi]; if(!ma||!ma.on) return;
+    ctx.strokeStyle=ma.c; ctx.lineWidth=mini?1:(mi===3?2:1.5); ctx.beginPath(); let st=false;
+    bars.forEach((b,i)=>{ const v=b[k]; if(v==null) return; st?ctx.lineTo(X(i),Y(v)):(ctx.moveTo(X(i),Y(v)),st=true); });
+    ctx.stroke();
+  });
+  if(mini) return;
+  drawIndicators(ctx, L, tf, 'top');
+  const perHour=60/um, pxHour=perHour*CS, hs=[1,2,3,4,6,12,24].find(h=>h*pxHour>=64);
+  ctx.fillStyle='#d0d0e0'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+  if(hs) bars.forEach((b,i)=>{ const m=snTmin(b.ts); if(m!=null && m%60===0 && (m/60)%hs===0) ctx.fillText(b.ts,X(i),H-7); });
+  else { const every=Math.ceil(70/CS); bars.forEach((b,i)=>{ if((start+i)%every===0) ctx.fillText(b.ts,X(i),H-7); }); }
+  // 截圖當下的價格（最後一根在畫面上才畫）
+  const last=bars[n-1];
+  if(end===len-1){
+    const ly=Y(last.c);
+    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(P.l,ly); ctx.lineTo(W-P.r,ly); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=last.c>=last.o?UP:DN; ctx.fillRect(W-P.r+1,ly-9,P.r-3,18);
+    ctx.fillStyle='#fff'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(last.c.toFixed((MKT.tick||1)<1?2:0),W-P.r+4,ly+4);
+  }
+  let hb=null, hi2=n-1;
+  if(opt.cross && opt.cross.x>=P.l && opt.cross.x<=W-P.r){
+    const i=Math.max(0,Math.min(n-1,Math.round((opt.cross.x-P.l)/CS-0.5))), sx=Math.round(X(i))+.5;
+    hb=bars[i]; hi2=i;
+    const cy=Math.max(P.t,Math.min(H-P.b,opt.cross.y)), tick=MKT.tick||0.25, pr=Math.round((lo+(1-(cy-P.t)/cH)*rg)/tick)*tick;
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(sx,P.t); ctx.lineTo(sx,H-P.b); ctx.moveTo(P.l,cy); ctx.lineTo(W-P.r,cy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(W-P.r+1,cy-9,P.r-3,18);
+    ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(tick<1?2:0),W-P.r+4,cy+4);
+    const lbl=dates[i]+' '+hb.ts, tw=ctx.measureText(lbl).width+12, tx=Math.max(P.l+tw/2,Math.min(W-P.r-tw/2,sx));
+    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tx-tw/2,H-P.b,tw,16);
+    ctx.fillStyle='#000'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.fillText(lbl,tx,H-P.b+12);
+  }
+  if(opt.onHover) opt.onHover(hb||last, dates[hi2]);
+}
+function snBarAtX(cv, clientX){
+  const L=cv._snL; if(!L) return -1; const r=cv.getBoundingClientRect();
+  return Math.max(0,Math.min(L.bars.length-1,Math.round((clientX-r.left-L.P.l)/L.CS-0.5)));
+}
+
+// ---- 主圖上的淡白底（畫在 K 棒後面）----
+function snDrawLiveHL(ctx, L, tf, CS){
+  if(snSuppress || !snDraft || !L || !L.vis || !L.view.length) return;
+  const r=snResolve(L.vis, snDraft, snUnitMin(tf)); if(!r) return;
+  const A=L.vis[r.a].idx, B=(L.vis[r.b].idx_end||L.vis[r.b].idx);
+  const vF=L.view[0].idx, vL=(L.view[L.view.length-1].idx_end||L.view[L.view.length-1].idx);
+  if(B<vF || A>vL) return;
+  const x1=(A<vF?L.P.l:xForIdxOnLayout(L,A)-CS/2), x2=(B>vL?L.W-L.P.r:xForIdxOnLayout(L,B)+CS/2);
+  snPaintBand(ctx, x1, x2, L.P.t, L.H-L.P.b, L.H);
+}
+function snPaintBand(ctx,x1,x2,top,bot,H){
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.085)'; ctx.fillRect(x1,top,Math.max(2,x2-x1),bot-top);
+  if(H>bot){ ctx.fillStyle='rgba(255,255,255,0.16)'; ctx.fillRect(x1,bot,Math.max(2,x2-x1),H-bot); }
+  ctx.strokeStyle='rgba(255,255,255,0.32)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(Math.round(x1)+.5,top); ctx.lineTo(Math.round(x1)+.5,bot); ctx.moveTo(Math.round(x2)-.5,top); ctx.lineTo(Math.round(x2)-.5,bot); ctx.stroke();
+  ctx.restore();
+}
+
+// ---- 截圖：記下「哪一天、停在哪一根」，之後直接用 K 棒資料重畫，畫面跟主圖一樣清楚 ----
+function snMainTf(){ return selectedTFs.includes('5k')?'5k':selectedTFs[0]; }
+function snCapture(){
+  if(!mode1kBars.length) return;
+  const tf=snMainTf(), bars=getBarsForTF(tf), last=bars[bars.length-1], b1=mode1kBars[cur1];
+  if(!last){ snToast('找不到 K 線圖'); return; }
+  const keep=snDraft||{from:'',to:'',fromIdx:null,toIdx:null,note:'',tags:[],folder:''};
+  snDraft={id:null, mkt:MARKET, day:currentDay, tf:tf, capIdx:b1.idx, capTs:last.ts, capDate:snDateOfIdx(last.idx), price:b1.c,
+    from:keep.from, to:keep.to, fromIdx:keep.fromIdx, toIdx:keep.toIdx, note:keep.note, tags:[...keep.tags], folder:keep.folder};
+  const col=document.getElementById('storyCol');
+  if(col.classList.contains('hidden')) toggleStoryPanel(); else renderAll();
+  snShowDraft();
+  if(!snDraft.from){ document.getElementById('snFrom').focus(); }
+  snToast('已截下 '+(snDraft.capDate||snDayFmt(currentDay))+' '+last.ts+' 的行情');
+}
+function snShowDraft(){
+  const box=document.getElementById('snDraft');
+  if(!snDraft){ box.hidden=true; snSetPick(null); return; }
+  box.hidden=false;
+  document.getElementById('snFrom').value=snDraft.from||'';
+  document.getElementById('snTo').value=snDraft.to||'';
+  document.getElementById('snNote').value=snDraft.note||'';
+  document.getElementById('snPvMeta').textContent=(snDraft.capDate||snDayFmt(snDraft.day))+' 截於 '+snDraft.capTs+' · '+snKLabel(snDraft.tf)+' · 往前 24 小時';
+  snFillFolderSel(document.getElementById('snFolder'), snDraft.folder);
+  snRenderTagChips(document.getElementById('snTags'), snDraft.tags);
+  snDraftRangeChanged();
+}
+function snDraftRangeChanged(){
+  if(!snDraft) return;
+  snDrawChart(document.getElementById('snPv'), snDraft, {mini:true});
+  if(document.getElementById('snModal').classList.contains('show')) snDrawChart(document.getElementById('snMCv'), snDraft, {});
+  snDurText(document.getElementById('snDur'), snDraft, snPick==='draft');
+  renderAll();
+}
+function snDurText(el, s, picking){
+  const pickTxt='<span class="sn-pickhint">● 現在可以在'+(el.id==='snDur'?'左邊 K 線圖':'行情圖')+'上按住左鍵拖曳，反白要注意的那一段</span>';
+  if(!s.from){ el.className='sn-dur hint'; el.innerHTML=picking?pickTxt:'點一下時間框，再到圖上按住左鍵拖曳反白；也可以直接打時間，例如 2215'; return; }
+  const list=snBarsFor(s)||[]; const r=snResolve(list, s, snUnitMin(s.tf));
+  el.className='sn-dur';
+  if(!r){ el.innerHTML='<span style="color:var(--up)">這 24 小時裡找不到 '+(snNormT(s.from)||s.from)+'</span>'+(picking?'<br>'+pickTxt:''); return; }
+  const n=r.b-r.a+1, d1=snDateOfIdx(list[r.a].idx), d2=snDateOfIdx(list[r.b].idx);
+  el.innerHTML=escapeHtml((d1?d1+' ':'')+list[r.a].ts+' → '+(d2&&d2!==d1?d2+' ':'')+list[r.b].ts+' · 共 '+n+' 根 '+snKLabel(s.tf).replace(/\s/g,'')
+    +(r.open?'（結束時間還沒走到）':'')+(r.clip?'（開始在 24 小時以前）':''))+(picking?'<br>'+pickTxt:'');
+}
+function snClearRange(){ if(!snDraft) return; Object.assign(snDraft,{from:'',to:'',fromIdx:null,toIdx:null}); snShowDraft(); }
+function snDiscardDraft(){ snDraft=null; snShowDraft(); renderAll(); }
+function snSaveDraft(){
+  if(!snDraft) return;
+  const d=snDraft; d.from=snNormT(d.from)||''; d.to=snNormT(d.to)||'';
+  d.note=document.getElementById('snNote').value.trim(); d.folder=document.getElementById('snFolder').value;
+  const rec={...d, id:snUid(), created:Date.now()};
+  SN.snaps.push(rec); snDbPut(rec);
+  snDraft=null; snShowDraft(); renderAll(); snRenderDay(); if(snIsLibOpen()) snRenderLib();
+  snToast(rec.folder?('已存到「'+rec.folder+'」'):'已存到行情分類');
+}
+
+// ---- 時間框：點了之後進入「反白選取」模式 ----
+function snSetPick(mode){
+  snPick=mode;
+  document.body.classList.toggle('sn-picking', mode==='draft');
+  const r1=document.getElementById('snFrom').closest('.sn-trow'); if(r1) r1.classList.toggle('picking', mode==='draft');
+  const r2=document.getElementById('snDTrow'); if(r2) r2.classList.toggle('picking', mode==='detail');
+  const w=document.getElementById('snDBox'); if(w) w.classList.toggle('picking', mode==='detail');
+  if(snDraft) snDurText(document.getElementById('snDur'), snDraft, mode==='draft');
+  if(snDEdit) snDurText(document.getElementById('snDDur'), snDEdit, mode==='detail');
+}
+function snBindTimeInputs(fromId, toId, mode, getS, onChange){
+  [fromId,toId].forEach(id=>{
+    const el=document.getElementById(id), key=id===fromId?'from':'to';
+    el.addEventListener('focus',()=>{ if(getS()) snSetPick(mode); });
+    el.addEventListener('mousedown',()=>{ if(getS()) snSetPick(mode); });
+    el.addEventListener('input',()=>{ const s=getS(); if(!s) return; const v=el.value.trim(); el.classList.toggle('bad', !!v && snNormT(v)==null); s[key]=v; s.fromIdx=null; s.toIdx=null; onChange(); });
+    el.addEventListener('blur',()=>{ const s=getS(); if(!s) return; const n=snNormT(el.value); if(n){ el.value=n; s[key]=n; } });
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); snSetPick(null); } if(e.key==='Escape'){ snSetPick(null); } });
+  });
+}
+snBindTimeInputs('snFrom','snTo','draft',()=>snDraft,snDraftRangeChanged);
+snBindTimeInputs('snDFrom','snDTo','detail',()=>snDEdit,()=>snDRedraw());
+// 點到其他輸入欄位 → 結束反白模式
+document.addEventListener('focusin',e=>{ if(snPick && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && !/^sn(D)?(From|To)$/.test(e.target.id||'')) snSetPick(null); });
+// 把拖曳範圍套到 s（a、b 是同一串 list 裡的位置）
+function snApplyDrag(s, list, i0, i1){
+  const a=Math.min(i0,i1), b=Math.max(i0,i1);
+  s.from=list[a].ts; s.to=list[b].ts; s.fromIdx=list[a].idx; s.toIdx=(list[b].idx_end||list[b].idx);
+}
+// 主圖：按住左鍵拖曳反白（反白模式時優先於畫方框）
+(function(){
+  let drag=null;
+  const col=document.getElementById('chartsCol');
+  col.addEventListener('pointerdown',e=>{
+    if(snPick!=='draft' || !snDraft || e.button!==0) return;
+    const w=e.target.closest('.cwrap'); if(!w) return;
+    const tf=w.id.replace('wrap_',''), cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
+    e.preventDefault(); e.stopPropagation();
+    const r=w.getBoundingClientRect(), p=nqPointFromLayout(cv._layout, e.clientX-r.left, e.clientY-r.top);
+    drag={w,cv,i0:p.bi};
+    snApplyDrag(snDraft, cv._layout.view, p.bi, p.bi); snSyncDraftInputs();
+  },true);
+  window.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    const r=drag.w.getBoundingClientRect(), p=nqPointFromLayout(drag.cv._layout, e.clientX-r.left, e.clientY-r.top);
+    snApplyDrag(snDraft, drag.cv._layout.view, drag.i0, p.bi); snSyncDraftInputs();
+  });
+  window.addEventListener('pointerup',()=>{
+    if(!drag) return; drag=null; snSetPick(null);
+    snToast('時間段：'+snDraft.from+' → '+snDraft.to);
+    document.getElementById('snNote').focus();
+  });
+})();
+function snSyncDraftInputs(){
+  document.getElementById('snFrom').value=snDraft.from; document.getElementById('snTo').value=snDraft.to;
+  snDraftRangeChanged();
+}
+// 分類頁大圖：十字線、左鍵拖曳反白、滾輪放大縮小、右鍵拖曳平移
+let snDV={tf:null,n:null,end:null};   // 大圖目前的格局／顯示幾根／最右邊第幾根
+(function(){
+  let drag=null, pan=null, cross=null;
+  const box=document.getElementById('snDBox'), cv=document.getElementById('snDCv');
+  box.addEventListener('contextmenu',e=>e.preventDefault());
+  box.addEventListener('mousemove',e=>{ const r=box.getBoundingClientRect(); cross={x:e.clientX-r.left,y:e.clientY-r.top}; if(!pan) snDRedraw(cross); });
+  box.addEventListener('mouseleave',()=>{ cross=null; if(!drag&&!pan) snDRedraw(null); });
+  box.addEventListener('pointerdown',e=>{
+    if(!snDEdit || !cv._snL) return;
+    if(e.button===2){ e.preventDefault(); const L=cv._snL; pan={x:e.clientX,end:L.end,CS:L.CS}; box.style.cursor='grabbing'; return; }
+    if(e.button!==0) return; e.preventDefault();
+    const L=cv._snL, i=snBarAtX(cv,e.clientX); drag={i0:i}; snSetPick('detail');
+    snApplyDrag(snDEdit, L.bars, i, i); snDSyncInputs(cross);
+  });
+  window.addEventListener('pointermove',e=>{
+    if(pan && snDEdit){ snDV.end=pan.end-Math.round((e.clientX-pan.x)/pan.CS); snDRedraw(null); return; }
+    if(!drag||!snDEdit||!cv._snL) return;
+    const r=box.getBoundingClientRect(); cross={x:e.clientX-r.left,y:e.clientY-r.top};
+    snApplyDrag(snDEdit, cv._snL.bars, drag.i0, snBarAtX(cv,e.clientX)); snDSyncInputs(cross);
+  });
+  window.addEventListener('pointerup',()=>{
+    if(pan){ pan=null; box.style.cursor=''; const L=cv._snL; if(L) snDV.end=L.end; snDRedraw(cross); return; }
+    if(!drag) return; drag=null; snSetPick(null); snDMarkDirty();
+  });
+  box.addEventListener('wheel',e=>{
+    if(!snDEdit || !cv._snL) return; e.preventDefault();
+    const r=box.getBoundingClientRect(); snDZoom(e.deltaY>0?1:-1, e.clientX-r.left);
+  },{passive:false});
+})();
+// dir>0 縮小（看更多根）、dir<0 放大（看更少根）；mx＝以滑鼠位置為中心
+function snDZoom(dir, mx){
+  const cv=document.getElementById('snDCv'), L=cv._snL; if(!L) return;
+  const f=dir>0?1.25:0.8, nn=Math.max(15,Math.min(L.len,Math.round(L.n*f)));
+  if(nn===L.n) return;
+  const frac=mx==null?1:Math.max(0,Math.min(1,(mx-L.P.l)/(L.W-L.P.l-L.P.r)));
+  const anchor=L.start+frac*(L.n-1);
+  let end=Math.round(anchor+(1-frac)*(nn-1));
+  snDV.n=nn; snDV.end=Math.max(nn-1,Math.min(L.len-1,end));
+  snDRedraw(null);
+}
+function snDZoomReset(){ snDV.n=null; snDV.end=null; snDRedraw(null); }
+function snDSetTf(tf){ snDV={tf:tf,n:null,end:null}; snRenderTfBtns(); snDRedraw(null); }
+function snRenderTfBtns(){
+  const box=document.getElementById('snDTfs'); if(!box) return;
+  box.innerHTML=['1k','5k','15k','60k'].map(t=>'<button class="sn-tfb'+(snDV.tf===t?' on':'')+'" onclick="snDSetTf(\''+t+'\')">'+tfDisp(t)+'</button>').join('');
+}
+function snDSyncInputs(cross){ document.getElementById('snDFrom').value=snDEdit.from; document.getElementById('snDTo').value=snDEdit.to; snDRedraw(cross); }
+
+document.getElementById('snNote').addEventListener('input',e=>{ if(snDraft) snDraft.note=e.target.value; });
+document.getElementById('snFolder').addEventListener('change',e=>{ if(snDraft) snDraft.folder=e.target.value; });
+
+function snOpenDraftView(){
+  if(!snDraft) return;
+  document.getElementById('snModal').classList.add('show');
+  document.getElementById('snMCap').textContent=(snDraft.capDate||'')+' 截於 '+snDraft.capTs+' · 往前 24 小時　（點任何地方關閉）';
+  snDrawChart(document.getElementById('snMCv'), snDraft, {});
+}
+function snCloseDraftView(){ document.getElementById('snModal').classList.remove('show'); }
+
+// ---- 分類 chips / 資料夾選單 ----
+function snRenderTagChips(box, arr, onChange){
+  box.innerHTML='';
+  SN.tags.forEach(t=>{
+    const c=document.createElement('button'); c.type='button'; c.className='sn-chip'+(arr.includes(t)?' on':''); c.textContent=t;
+    c.onclick=()=>{ const i=arr.indexOf(t); i<0?arr.push(t):arr.splice(i,1); c.classList.toggle('on'); if(onChange) onChange(); };
+    box.appendChild(c);
+  });
+  const add=document.createElement('button'); add.type='button'; add.className='sn-chip add'; add.textContent='＋ 新分類';
+  add.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(!SN.tags.includes(v)){ SN.tags.push(v); snSaveCfg(); } if(!arr.includes(v)) arr.push(v); snRenderTagChips(box,arr,onChange); if(onChange) onChange(); if(snIsLibOpen()) snRenderFilters(); };
+  box.appendChild(add);
+}
+function snFillFolderSel(sel, val){
+  sel.innerHTML='<option value="">（不放資料夾）</option>'+SN.folders.map(f=>'<option>'+escapeHtml(f)+'</option>').join('');
+  sel.value=val||'';
+}
+
+// 縮圖：捲到看得到才畫，清單很長也不會卡
+const snThumbObs=('IntersectionObserver' in window)?new IntersectionObserver(es=>{
+  es.forEach(en=>{ if(!en.isIntersecting) return; const cv=en.target; snThumbObs.unobserve(cv); const s=SN.snaps.find(x=>x.id===cv.dataset.sid); if(s) snDrawChart(cv,s,{mini:true}); });
+},{rootMargin:'200px'}):null;
+function snThumb(cv, s){ cv.dataset.sid=s.id; if(snThumbObs) snThumbObs.observe(cv); else snDrawChart(cv,s,{mini:true}); }
+
+// ---- 右側：這一天的截圖 ----
+function snRenderDay(){
+  const box=document.getElementById('snDayList'); if(!box) return;
+  const list=SN.snaps.filter(s=>s.day===currentDay).sort((a,b)=>a.capIdx-b.capIdx);
+  document.getElementById('snDayCnt').textContent=list.length?(list.length+' 張'):'';
+  if(!list.length){ box.innerHTML='<div class="sn-empty">這一天還沒有截圖。<br>一根一根看，覺得值得記的時候按上面的 📷（或鍵盤 S）。</div>'; return; }
+  box.innerHTML='';
+  list.forEach(s=>{
+    const b=document.createElement('button'); b.className='sn-dayitem';
+    b.innerHTML='<canvas></canvas><span class="sn-dayitem-t">'+snSegHtml(s)+'<span class="sn-dayitem-n">'+(escapeHtml(s.note)||'<span style="color:var(--t3)">（沒有筆記）</span>')+'</span></span>';
+    b.onclick=()=>snOpenLib(s.id);
+    box.appendChild(b); snThumb(b.querySelector('canvas'), s);
+  });
+}
+function snUpdateNow(){
+  const el=document.getElementById('snNow'); if(!el||!mode1kBars.length) return;
+  const tf=snMainTf(), bars=getBarsForTF(tf), b=bars[bars.length-1]||mode1kBars[cur1];
+  el.textContent=(snDateOfIdx(b.idx)||snDayFmt(currentDay))+' '+(b?b.ts:'')+' · '+mode1kBars[cur1].c.toFixed((MKT.tick||1)<1?2:0);
+}
+
+// ---- 🗂 行情分類（整頁）：清單｜行情圖｜右上 時間段＋筆記／右下 分類＋資料夾 ----
+function snIsLibOpen(){ return document.getElementById('snLibOv').classList.contains('show'); }
+function snOpenLib(id){
+  if(id){ snSel=id; snLibFolder='__all'; snLibTag=''; document.getElementById('snQ').value=''; }
+  document.getElementById('snLibOv').classList.add('show'); snRenderLib();
+}
+function snCloseLib(){ snSetPick(null); document.getElementById('snLibOv').classList.remove('show'); }
+function snFilteredList(){
+  const q=document.getElementById('snQ').value.trim().toLowerCase();
+  let list=SN.snaps.filter(s=>(snLibFolder==='__all'||(s.folder||'')===snLibFolder)&&(!snLibTag||(s.tags||[]).includes(snLibTag))&&(!q||String(s.note||'').toLowerCase().includes(q)));
+  const asc=document.getElementById('snSort').value==='old';
+  list.sort((a,b)=>(a.day===b.day?a.capIdx-b.capIdx:(a.day<b.day?-1:1))*(asc?1:-1));
+  return list;
+}
+function snFilterChip(label, count, on, onClick, edit){
+  const c=document.createElement('button'); c.type='button'; c.className='sn-chip sn-fchip'+(on?' on':'');
+  c.innerHTML='<span>'+escapeHtml(label)+'</span><span class="ct">'+count+'</span>'+(edit?'<span class="ed" data-a="ren" title="改名">✎</span><span class="ed" data-a="del" title="刪除">✕</span>':'');
+  c.onclick=e=>{ const a=e.target.dataset&&e.target.dataset.a; if(a&&edit) edit(a); else onClick(); };
+  return c;
+}
+function snRenderFilters(){
+  const fl=document.getElementById('snFolders'); fl.innerHTML='';
+  [['__all','全部'],['','未放資料夾'],...SN.folders.map(f=>[f,'📁 '+f])].forEach(([v,n])=>{
+    const cnt=v==='__all'?SN.snaps.length:SN.snaps.filter(s=>(s.folder||'')===v).length;
+    const edit=(v&&v!=='__all')?(a=>{
+      if(a==='ren'){ const nn=(prompt('資料夾新名稱',v)||'').trim(); if(!nn||nn===v) return; if(SN.folders.includes(nn)){ snToast('已經有這個資料夾'); return; }
+        SN.folders[SN.folders.indexOf(v)]=nn; SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=nn; snDbPut(s); } }); if(snLibFolder===v) snLibFolder=nn; snSaveCfg(); snRenderLib(); }
+      if(a==='del'){ if(!confirm('刪除資料夾「'+v+'」？裡面的 '+cnt+' 張截圖不會刪掉，會移到「未放資料夾」。')) return;
+        SN.folders=SN.folders.filter(x=>x!==v); SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=''; snDbPut(s); } }); if(snLibFolder===v) snLibFolder='__all'; snSaveCfg(); snRenderLib(); }
+    }):null;
+    const c=snFilterChip(n,cnt,snLibFolder===v,()=>{ snLibFolder=v; snRenderLib(); },edit);
+    if(v!=='__all'){
+      c.addEventListener('dragover',e=>{ e.preventDefault(); c.classList.add('drop'); });
+      c.addEventListener('dragleave',()=>c.classList.remove('drop'));
+      c.addEventListener('drop',e=>{ e.preventDefault(); c.classList.remove('drop'); const s=SN.snaps.find(x=>x.id===e.dataTransfer.getData('text/plain')); if(s){ s.folder=v; snDbPut(s); snRenderLib(); snToast(v?('已移到「'+v+'」'):'已移出資料夾'); } });
+    }
+    fl.appendChild(c);
+  });
+  const af=document.createElement('button'); af.className='sn-chip add'; af.textContent='＋ 資料夾';
+  af.onclick=()=>{ const v=(prompt('新資料夾名稱')||'').trim(); if(!v) return; if(SN.folders.includes(v)){ snToast('已經有這個資料夾'); return; } SN.folders.push(v); snSaveCfg(); snRenderLib(); if(snDraft) snFillFolderSel(document.getElementById('snFolder'), snDraft.folder); };
+  fl.appendChild(af);
+  const tf=document.getElementById('snTagFilter'); tf.innerHTML='';
+  tf.appendChild(snFilterChip('全部',SN.snaps.length,!snLibTag,()=>{ snLibTag=''; snRenderLib(); },null));
+  SN.tags.forEach(t=>{
+    const cnt=SN.snaps.filter(s=>(s.tags||[]).includes(t)).length;
+    tf.appendChild(snFilterChip(t,cnt,snLibTag===t,()=>{ snLibTag=(snLibTag===t?'':t); snRenderLib(); },a=>{
+      if(a==='ren'){ const nn=(prompt('分類新名稱',t)||'').trim(); if(!nn||nn===t) return; if(SN.tags.includes(nn)){ snToast('已經有這個分類'); return; }
+        SN.tags[SN.tags.indexOf(t)]=nn; SN.snaps.forEach(s=>{ const i=(s.tags||[]).indexOf(t); if(i>=0){ s.tags[i]=nn; snDbPut(s); } }); if(snLibTag===t) snLibTag=nn; snSaveCfg(); snRenderLib(); }
+      if(a==='del'){ if(!confirm('刪除分類「'+t+'」？截圖不會刪掉，只是拿掉這個分類。')) return;
+        SN.tags=SN.tags.filter(x=>x!==t); SN.snaps.forEach(s=>{ if((s.tags||[]).includes(t)){ s.tags=s.tags.filter(x=>x!==t); snDbPut(s); } }); if(snLibTag===t) snLibTag=''; snSaveCfg(); snRenderLib(); }
+    }));
+  });
+  const at=document.createElement('button'); at.className='sn-chip add'; at.textContent='＋ 分類';
+  at.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(SN.tags.includes(v)){ snToast('已經有這個分類'); return; } SN.tags.push(v); snSaveCfg(); snRenderLib(); if(snDraft) snRenderTagChips(document.getElementById('snTags'), snDraft.tags); };
+  tf.appendChild(at);
+}
+function snRenderLib(){
+  snRenderFilters();
+  const list=snFilteredList();
+  const box=document.getElementById('snList'); box.innerHTML='';
+  if(!list.length) box.innerHTML='<div class="sn-none">這裡還沒有截圖。<br>回到 K 線圖，看到值得記的地方按 📷 截下目前畫面。</div>';
+  if(!list.find(s=>s.id===snSel)) snSel=list.length?list[0].id:null;
+  list.forEach(s=>{
+    const c=document.createElement('div'); c.className='sn-li'+(s.id===snSel?' on':''); c.draggable=true; c.dataset.id=s.id;
+    c.innerHTML='<canvas></canvas><div class="sn-li-b"><div class="sn-li-when">'+snSegHtml(s)+'</div><div class="sn-li-when"><span>'+(s.capDate||snDayFmt(s.day))+' 截於 '+s.capTs+'</span></div>'
+      +'<div class="sn-li-n">'+(escapeHtml(s.note)||'<span style="color:var(--t3)">（沒有筆記）</span>')+'</div>'
+      +'<div class="sn-li-m">'+(s.folder?'<span class="sn-ftag">📁 '+escapeHtml(s.folder)+'</span>':'')+(s.tags||[]).map(t=>'<span class="sn-tag">'+escapeHtml(t)+'</span>').join('')+'</div></div>';
+    c.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',s.id); c.classList.add('dragging'); });
+    c.addEventListener('dragend',()=>c.classList.remove('dragging'));
+    c.onclick=()=>snSelect(s.id);
+    box.appendChild(c); snThumb(c.querySelector('canvas'), s);
+  });
+  snRenderDetail();
+}
+function snSelect(id){
+  snSel=id;
+  document.querySelectorAll('#snList .sn-li').forEach(el=>el.classList.toggle('on', el.dataset.id===id));
+  const el=document.querySelector('#snList .sn-li.on'); if(el) el.scrollIntoView({block:'nearest'});
+  snRenderDetail();
+}
+function snRenderDetail(){
+  const s=SN.snaps.find(x=>x.id===snSel);
+  document.getElementById('snDEmpty').hidden=!!s; document.getElementById('snDChartCol').hidden=!s; document.getElementById('snDSide').hidden=!s;
+  snSetPick(null);
+  if(!s){ snDEdit=null; return; }
+  snDEdit={...s, tags:[...(s.tags||[])]};
+  snDV={tf:snTfDefault(),n:null,end:null}; snRenderTfBtns();
+  const list=snFilteredList(), pos=list.findIndex(x=>x.id===s.id);
+  document.getElementById('snDWhen').textContent=(s.capDate||s.day)+' 截於 '+s.capTs;
+  document.getElementById('snDPos').textContent=pos>=0?((pos+1)+' / '+list.length):'';
+  document.getElementById('snDFrom').value=s.from||''; document.getElementById('snDTo').value=s.to||'';
+  document.getElementById('snDNote').value=s.note||'';
+  snRenderTagChips(document.getElementById('snDTags'), snDEdit.tags, snDMarkDirty);
+  snFillFolderSel(document.getElementById('snDFolder'), s.folder);
+  const del=document.getElementById('snDDel'); del.classList.remove('armed'); del.textContent='刪除';
+  document.getElementById('snDSaved').textContent='';
+  requestAnimationFrame(()=>snDRedraw(null));
+}
+function snDRedraw(cross){
+  if(!snDEdit) return;
+  snDrawChart(document.getElementById('snDCv'), snDEdit, {tf:snDV.tf, n:snDV.n, end:snDV.end, cross:cross, onHover:(b,d)=>{
+    const dec=(MKT.tick||1)<1?2:0, chg=b.c-b.o;
+    document.getElementById('snDOhlc').innerHTML=escapeHtml(d+' '+b.ts)+'<b>開</b> '+b.o.toFixed(dec)+'<b>高</b> '+b.h.toFixed(dec)+'<b>低</b> '+b.l.toFixed(dec)
+      +'<b>收</b> <span style="color:'+(chg>=0?'var(--up)':'var(--dn)')+'">'+b.c.toFixed(dec)+' ('+(chg>=0?'+':'')+chg.toFixed(dec)+')</span>';
+  }});
+  snDurText(document.getElementById('snDDur'), snDEdit, snPick==='detail');
+}
+function snDMarkDirty(){ const el=document.getElementById('snDSaved'); el.style.color='#facc15'; el.textContent='有修改，記得按「儲存修改」'; }
+document.getElementById('snDNote').addEventListener('input',snDMarkDirty);
+document.getElementById('snDFolder').addEventListener('change',snDMarkDirty);
+['snDFrom','snDTo'].forEach(id=>document.getElementById(id).addEventListener('input',snDMarkDirty));
+function snDClearRange(){ if(!snDEdit) return; Object.assign(snDEdit,{from:'',to:'',fromIdx:null,toIdx:null}); document.getElementById('snDFrom').value=''; document.getElementById('snDTo').value=''; snDRedraw(null); snDMarkDirty(); }
+function snSaveDetail(){
+  const s=SN.snaps.find(x=>x.id===snSel); if(!s||!snDEdit) return;
+  s.from=snNormT(document.getElementById('snDFrom').value)||''; s.to=snNormT(document.getElementById('snDTo').value)||'';
+  s.fromIdx=snDEdit.fromIdx; s.toIdx=snDEdit.toIdx;
+  s.note=document.getElementById('snDNote').value.trim(); s.tags=[...snDEdit.tags]; s.folder=document.getElementById('snDFolder').value;
+  snDbPut(s); snRenderDay(); snRenderLib();
+  const el=document.getElementById('snDSaved'); el.style.color='var(--dn)'; el.textContent='已儲存';
+}
+function snDeleteDetail(){
+  const btn=document.getElementById('snDDel');
+  if(!btn.classList.contains('armed')){ btn.classList.add('armed'); btn.textContent='再按一次確定刪除'; return; }
+  const s=SN.snaps.find(x=>x.id===snSel); if(!s) return;
+  const list=snFilteredList(), i=list.findIndex(x=>x.id===s.id), next=list[i+1]||list[i-1];
+  SN.snaps=SN.snaps.filter(x=>x!==s); snDbDel(s.id);
+  snSel=next?next.id:null; snRenderDay(); snRenderLib(); snToast('已刪除');
+}
+function snJumpTo(){
+  const s=SN.snaps.find(x=>x.id===snSel); if(!s) return;
+  if(!DAYS_SET.has(s.day)){ snToast('資料裡沒有 '+s.day+' 這一天'); return; }
+  snCloseLib();
+  if(currentDay!==s.day) loadDay(s.day);
+  cur1=idx1kFromGlobal(s.capIdx); hoverBar=null; renderAll();
+  snToast('已回到 '+(s.capDate||snDayFmt(s.day))+' '+s.capTs);
+}
+window.addEventListener('resize',()=>{ if(snIsLibOpen()) snDRedraw(null); if(snDraft){ snDrawChart(document.getElementById('snPv'), snDraft, {mini:true}); if(document.getElementById('snModal').classList.contains('show')) snDrawChart(document.getElementById('snMCv'), snDraft, {}); } });
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('snModal').classList.contains('show')){ if(e.key==='Escape') snCloseDraftView(); return; }
+  if(!snIsLibOpen()) return;
+  if(e.key==='Escape'){ if(snPick) snSetPick(null); else snCloseLib(); return; }
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();
+    const list=snFilteredList(), i=list.findIndex(x=>x.id===snSel), n=list[i+(e.key==='ArrowDown'?1:-1)];
+    if(n) snSelect(n.id);
+  }
+});
+
+// ---- 換K棒／換日時同步 ----
+const _snOrigRenderAll=renderAll;
+renderAll=function(){ _snOrigRenderAll.apply(this,arguments); snUpdateNow(); };
+const _snOrigLoadDay=loadDay;
+loadDay=function(){ _snOrigLoadDay.apply(this,arguments); snRenderDay(); };
+snShowDraft(); snRenderDay();
+
+// ---- 備份／匯入：把截圖一起帶進去 ----
+exportStoryNotes=function(){
+  const payload={
+    type:'nq-story-backup', version:5, market:MARKET, exportedAt:new Date().toISOString(),
+    notes:storyNotes, folders:storyFolders,   // 舊的故事線資料照樣備份，不會遺失
+    trades:{positions:dayPositions, closed:dayClosedTrades, markers:dayMarkers, active:dayActiveTrade},
+    journal:journalEntries,
+    snaps:SN.snaps, snapCfg:{tags:SN.tags, folders:SN.folders}
+  };
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=MKT.backupName.replace('故事線','截圖')+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+const _snOrigImport=importStoryNotes;
+importStoryNotes=function(input){
+  const f=input.files&&input.files[0];
+  if(f) f.text().then(t=>{
+    let p; try{ p=JSON.parse(t); }catch(e){ return; }
+    if(p.market && p.market!==MARKET) return;
+    let n=0;
+    if(p.snapCfg){ (p.snapCfg.tags||[]).forEach(x=>{ if(x&&!SN.tags.includes(x)) SN.tags.push(x); }); (p.snapCfg.folders||[]).forEach(x=>{ if(x&&!SN.folders.includes(x)) SN.folders.push(x); }); snSaveCfg(); }
+    if(Array.isArray(p.snaps)){ const ids=new Set(SN.snaps.map(s=>s.id)); p.snaps.forEach(s=>{ if(s&&s.id&&s.img&&!ids.has(s.id)){ s.mkt=MARKET; SN.snaps.push(s); snDbPut(s); n++; } }); }
+    if(n){ snRenderDay(); if(snIsLibOpen()) snRenderLib(); snToast('匯入 '+n+' 張截圖'); }
+  });
+  _snOrigImport(input);
+};
+
+// ---- 🎯 分類回測：原本故事線的分類照樣能用，另外加上截圖的資料夾／分類 ----
+// key：'o:名稱'＝舊故事線分類、'f:名稱'＝截圖資料夾、't:名稱'＝截圖分類
+let snRpKeys=[];
+function snRpLabel(k){ if(!k) return ''; return ({o:'📖 ',f:'📁 ',t:'🏷 '}[k[0]]||'')+k.slice(2); }
+function snRpDays(k){
+  const set=new Set(), name=k.slice(2);
+  if(k[0]==='o'){ Object.keys(storyNotes).forEach(d=>{ if(DAYS_SET.has(d) && (storyNotes[d]||[]).some(n=>noteInFolder(n,name))) set.add(d); }); }
+  else SN.snaps.forEach(s=>{ if(DAYS_SET.has(s.day) && (k[0]==='f'?s.folder===name:(s.tags||[]).includes(name))) set.add(s.day); });
+  return [...set].sort();
+}
+function clsReplayFolderDayCount(k){ return snRpDays(k).length; }
+function clsReplayDayList(){ return (clsReplayActive&&clsReplayFolder)?snRpDays(clsReplayFolder):[]; }
+function openClsReplayPicker(anchor){
+  const pop=document.getElementById('clsReplayPicker'); if(!pop) return;
+  if(clsReplayActive){ exitClsReplay(); return; }
+  if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  snRpKeys=[];
+  let html='<div class="clsrp-popup-title">🎯 選一個分類來回測</div>'
+    +'<div class="clsrp-popup-sub">選好之後，日期的 ‹ › 只會停在有這個分類的交易日，盤中一樣一根一根看。</div>';
+  const group=(title,keys)=>{
+    if(!keys.length) return;
+    html+='<div class="clsrp-popup-sub" style="margin-top:6px;font-weight:700;color:var(--t2)">'+title+'</div>';
+    keys.forEach(k=>{
+      const i=snRpKeys.push(k)-1, cnt=clsReplayFolderDayCount(k);
+      html+='<button class="clsrp-folder" '+(cnt?'':'disabled style="opacity:.45;cursor:default;" ')+'onclick="'+(cnt?('pickClsReplayFolder('+i+')'):'')+'">'
+        +'<span>'+escapeHtml(snRpLabel(k))+'</span><span class="clsrp-folder-cnt">'+(cnt?(cnt+' 天'):'無資料')+'</span></button>';
+    });
+  };
+  group('原本故事線的分類', storyFolders.map(f=>'o:'+f));
+  group('截圖資料夾', SN.folders.map(f=>'f:'+f));
+  group('截圖分類', SN.tags.map(t=>'t:'+t));
+  if(!snRpKeys.length) html+='<div class="clsrp-popup-empty">還沒有任何分類</div>';
+  html+='<div class="clsrp-popup-close" onclick="document.getElementById(\'clsReplayPicker\').classList.remove(\'show\')">關閉</div>';
+  pop.innerHTML=html;
+  pop.style.maxHeight='70vh'; pop.style.overflowY='auto';
+  const r=(anchor||document.getElementById('btnClsReplay')).getBoundingClientRect();
+  pop.style.left=Math.max(6,Math.min(r.left, window.innerWidth-310))+'px'; pop.style.top=(r.bottom+6)+'px';
+  pop.classList.add('show');
+}
+function pickClsReplayFolder(i){ document.getElementById('clsReplayPicker').classList.remove('show'); const k=snRpKeys[i]; if(k) enterClsReplay(k); }
+function enterClsReplay(k){
+  clsReplayFolder=k; clsReplayActive=true;
+  const days=clsReplayDayList();
+  if(!days.length){ clsReplayActive=false; clsReplayFolder=null; snToast(snRpLabel(k)+' 還沒有資料'); return; }
+  if(days.indexOf(currentDay)<0) loadDay(days[0]); else updateDateDisplay();
+  updateClsReplayBar();
+}
+function exitClsReplay(){ clsReplayActive=false; clsReplayFolder=null; updateClsReplayBar(); updateDateDisplay(); }
+function updateClsReplayBar(){
+  const bar=document.getElementById('clsReplayBar'), btn=document.getElementById('btnClsReplay'); if(!bar) return;
+  if(!clsReplayActive){ bar.classList.remove('show'); if(btn){ btn.classList.remove('on'); btn.textContent='🎯 分類回測'; } return; }
+  const days=clsReplayDayList(); const pos=days.indexOf(currentDay);
+  const info=document.getElementById('clsReplayInfo');
+  if(info) info.textContent='🎯 '+snRpLabel(clsReplayFolder)+'　第 '+(pos>=0?(pos+1):'-')+' / '+days.length+' 天';
+  const pv=document.getElementById('clsReplayPrev'), nx=document.getElementById('clsReplayNext');
+  if(pv) pv.disabled=(pos<=0); if(nx) nx.disabled=(pos<0||pos>=days.length-1);
+  bar.classList.add('show'); if(btn){ btn.classList.add('on'); btn.textContent='🎯 分類回測中'; }
+}
+
+// 指標開關／設定改了 → 行情分類的大圖也跟著重畫
+const _snOrigRerenderInd=rerenderReplayForIndicators;
+rerenderReplayForIndicators=function(){ _snOrigRerenderInd.apply(this,arguments); if(snIsLibOpen()) snDRedraw(null); if(snDraft && document.getElementById('snModal').classList.contains('show')) snDrawChart(document.getElementById('snMCv'), snDraft, {}); };
 </script>
 </body>
 </html>
