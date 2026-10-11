@@ -773,6 +773,25 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
 .sn-tfb.on{background:#2563eb;border-color:#2563eb;color:#fff;}
 .sn-det-sub{display:flex;align-items:center;gap:12px;padding:5px 12px;border-bottom:1px solid var(--b1);flex-wrap:wrap;}
 .sn-det-hint{margin-left:auto;font-size:10.5px;color:#71717a;}
+/* ☁ GitHub 同步 */
+.sns-status{font-family:inherit;cursor:pointer;}
+.sns-bar{margin:6px 10px 0;padding:5px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t3);font-size:11px;font-weight:700;text-align:left;flex-shrink:0;}
+.sns-status.ok{color:#86efac;}
+.sns-status.err{color:#fca5a5;border-color:rgba(239,68,68,.5);}
+.sns-ov{position:fixed;inset:0;z-index:760;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:16px;}
+.sns-ov.show{display:flex;}
+.sns-box{width:min(560px,100%);max-height:100%;overflow-y:auto;background:var(--bg2);border:1px solid var(--b2);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;}
+.sns-h{font-size:15px;font-weight:800;color:var(--t1);}
+.sns-p{font-size:12px;color:var(--t2);line-height:1.6;}
+.sns-l{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:700;color:var(--t3);flex:1;min-width:0;}
+.sns-l .sn-inp{font-size:13px;}
+.sns-row{display:flex;gap:10px;}
+.sns-tip{font-size:11px;color:var(--t3);line-height:1.6;margin-top:-4px;}
+.sns-tip b{color:var(--t2);}
+.sns-msg{font-size:12px;line-height:1.6;min-height:18px;}
+.sns-bad{color:#fca5a5;}
+.sns-good{color:#86efac;}
+.sns-warn{color:#fbbf24;margin-top:4px;}
 </style>
 </head>
 <body>
@@ -870,6 +889,7 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
         <span class="sn-title">📷 行情截圖</span>
         <span class="sn-now" id="snNow">—</span>
       </div>
+      <button class="sns-status sns-bar" onclick="snsOpen()">☁ 同步：未設定</button>
       <div class="sn-body" id="snBody">
         <button class="sn-snap-btn" id="snSnapBtn" onclick="snCapture()" title="把目前 5 分 K 圖的畫面截下來（快捷鍵 S）">📷 截下目前畫面 <span class="sn-key">S</span></button>
         <div class="sn-draft" id="snDraft" hidden>
@@ -1008,6 +1028,7 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
         <option value="new">日期新→舊</option><option value="old">日期舊→新</option>
       </select>
       <span class="sn-lib-tip">↑ ↓ 切換截圖 · Esc 關閉</span>
+      <button class="sn-btn sns-status" onclick="snsOpen()">☁ 同步：未設定</button>
       <button class="sn-btn" onclick="snCloseLib()">✕ 關閉</button>
     </div>
     <div class="sn-filt">
@@ -1064,6 +1085,27 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
   <div class="sn-mbox"><div class="sn-chartbox"><canvas id="snMCv"></canvas></div><div class="sn-mcap" id="snMCap"></div></div>
 </div>
 <div class="sn-toast" id="snToast"></div>
+<div class="sns-ov" id="snsOv" onclick="if(event.target===this)snsClose()">
+  <div class="sns-box">
+    <div class="sns-h">☁ 同步到 GitHub</div>
+    <div class="sns-p">截圖、筆記、分類、資料夾、模擬單交易紀錄、學習日誌會存成一個 JSON 檔放到你的 GitHub repo。換電腦或換瀏覽器時，填一樣的設定就會自動抓回來。</div>
+    <label class="sns-l">Repo（帳號/名稱）<input class="sn-inp" id="snsRepo" placeholder="例如 sdkoppwdo/nq-notes" autocomplete="off"></label>
+    <div class="sns-tip">建議另外開一個<b>私人 repo</b>。放 K 棒的 nq-replay 是公開的，存在那裡任何人都看得到筆記。</div>
+    <label class="sns-l">Token<input class="sn-inp" id="snsToken" type="password" placeholder="github_pat_…" autocomplete="off"></label>
+    <div class="sns-tip">到 GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token：Repository access 只選這一個 repo，Permissions 的 <b>Contents</b> 設成 <b>Read and write</b>。token 只存在這台電腦的瀏覽器裡。</div>
+    <div class="sns-row">
+      <label class="sns-l">分支<input class="sn-inp" id="snsBranch" placeholder="main"></label>
+      <label class="sns-l" style="flex:2">檔案路徑<input class="sn-inp" id="snsPath"></label>
+    </div>
+    <div class="sns-msg" id="snsMsg"></div>
+    <div class="sn-actions">
+      <button class="sn-btn pri" onclick="snsApply()">儲存並同步</button>
+      <button class="sn-btn" onclick="snsSync(true)">立即同步</button>
+      <button class="sn-btn danger" onclick="snsDisconnect()">在這台電腦移除 token</button>
+      <button class="sn-btn" onclick="snsClose()" style="margin-left:auto">關閉</button>
+    </div>
+  </div>
+</div>
 <div class="journal-overlay" id="journalOverlay">
   <div class="journal-card">
     <div class="journal-top">
@@ -7108,6 +7150,7 @@ const SN_DEFAULT_TAGS=['突破','假突破','盤整','V 轉','趨勢延續','開
 const SN_DEFAULT_FOLDERS=['我的好單','要再研究'];
 let SN={tags:[],folders:[],snaps:[]};
 let snDraft=null, snSuppress=false, snDb=null, snLibFolder='__all', snLibTag='', snSel=null, snDTags=[], snDEdit=null;
+let snLoaded=false;
 let snPick=null;   // 'draft'｜'detail'：點了時間框之後，可以在圖上按住左鍵拖曳反白
 
 (function snLoadCfg(){
@@ -7138,8 +7181,8 @@ function snDbDel(id){
 snOpenDb().then(db=>{
   snDb=db;
   const tx=db.transaction(SN_STORE,'readonly'); const rq=tx.objectStore(SN_STORE).getAll();
-  rq.onsuccess=()=>{ SN.snaps=(rq.result||[]).filter(r=>(r.mkt||'nq')===MARKET); snRenderDay(); if(snIsLibOpen()) snRenderLib(); };
-}).catch(e=>{ console.warn('[截圖] IndexedDB 無法使用，截圖只會留在這次開啟的頁面', e); });
+  rq.onsuccess=()=>{ SN.snaps=(rq.result||[]).filter(r=>(r.mkt||'nq')===MARKET); snLoaded=true; snRenderDay(); if(snIsLibOpen()) snRenderLib(); };
+}).catch(e=>{ snLoaded=true; console.warn('[截圖] IndexedDB 無法使用，截圖只會留在這次開啟的頁面', e); });
 
 // ---- 小工具 ----
 function snToast(t){ const el=document.getElementById('snToast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2000); }
@@ -7821,6 +7864,259 @@ function updateClsReplayBar(){
 // 指標開關／設定改了 → 行情分類的大圖也跟著重畫
 const _snOrigRerenderInd=rerenderReplayForIndicators;
 rerenderReplayForIndicators=function(){ _snOrigRerenderInd.apply(this,arguments); if(snIsLibOpen()) snDRedraw(null); if(snDraft && document.getElementById('snModal').classList.contains('show')) snDrawChart(document.getElementById('snMCv'), snDraft, {}); };
+
+
+// ============================================================
+// ☁ GitHub 同步：截圖、筆記、分類、資料夾、模擬單、學習日誌存到你自己的 GitHub repo（一個 JSON 檔）
+// token 只存在這台電腦的瀏覽器（localStorage），不會寫進 app.html
+// 兩台電腦都改過時：每張截圖看誰比較新；刪掉的會記下來，不會被另一台「救回來」
+// ============================================================
+const SNS_KEY='nqSnapSync';
+let SNS=(function(){ try{ return JSON.parse(localStorage.getItem(SNS_KEY)||'{}')||{}; }catch(e){ return {}; } })();
+SNS.repo=SNS.repo||''; SNS.branch=SNS.branch||'main'; SNS.path=SNS.path||('nq-replay-notes/snaps-'+MARKET+'.json');
+SNS.deleted=SNS.deleted||{}; SNS.cfgUpdated=SNS.cfgUpdated||0;
+function snsSave(){ try{ localStorage.setItem(SNS_KEY, JSON.stringify(SNS)); }catch(e){} }
+function snsOn(){ return !!(SNS.token && SNS.repo); }
+
+// ---- 每次修改都記時間，刪除留下紀錄 ----
+const _snsOrigPut=snDbPut, _snsOrigDel=snDbDel, _snsOrigCfg=snSaveCfg;
+snDbPut=function(rec, keepTime){ if(!keepTime) rec.updated=Date.now(); const p=_snsOrigPut(rec); snsSchedule(); return p; };
+snDbDel=function(id){ SNS.deleted[id]=Date.now(); snsSave(); const p=_snsOrigDel(id); snsSchedule(); return p; };
+snSaveCfg=function(keepTime){ if(!keepTime){ SNS.cfgUpdated=Date.now(); snsSave(); } _snsOrigCfg(); if(!keepTime) snsSchedule(); };
+
+// ---- GitHub API ----
+function snsB64Enc(str){ const b=new TextEncoder().encode(str); let s=''; for(let i=0;i<b.length;i+=0x8000) s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000)); return btoa(s); }
+function snsB64Dec(b64){ const s=atob(String(b64).replace(/\s/g,'')); const b=new Uint8Array(s.length); for(let i=0;i<s.length;i++) b[i]=s.charCodeAt(i); return new TextDecoder().decode(b); }
+async function snsApi(method, url, body){
+  const r=await fetch('https://api.github.com'+url+(method==='GET'?(url.includes('?')?'&':'?')+'_='+Date.now():''),{
+    method, cache:'no-store',
+    headers:{'Authorization':'Bearer '+SNS.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
+    body: body?JSON.stringify(body):undefined
+  });
+  let j=null; try{ j=await r.json(); }catch(e){}
+  return {status:r.status, ok:r.ok, json:j};
+}
+// 檔案超過 1MB 時 GitHub 不會直接給內容，改用 raw 方式抓
+async function snsRaw(){
+  const r=await fetch('https://api.github.com'+snsContentsUrl()+'?ref='+encodeURIComponent(SNS.branch)+'&_='+Date.now(),{cache:'no-store',
+    headers:{'Authorization':'Bearer '+SNS.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}});
+  if(!r.ok) throw new Error('GitHub 回應 '+r.status); return await r.text();
+}
+function snsErrText(res){
+  if(!res) return '連不上 GitHub';
+  if(res.status===401) return 'token 無效或過期了';
+  if(res.status===403) return 'token 沒有寫入這個 repo 的權限';
+  if(res.status===404) return '找不到這個 repo（名稱打錯，或 token 沒有開這個 repo 的權限）';
+  return 'GitHub 回應 '+res.status+((res.json&&res.json.message)?'：'+res.json.message:'');
+}
+function snsContentsUrl(){ return '/repos/'+SNS.repo+'/contents/'+SNS.path.split('/').map(encodeURIComponent).join('/'); }
+
+// ---- 同步 ----
+let snsBusy=false, snsAgain=false, snsTimer=null, snsLastAt=0;
+function snsSchedule(){ if(!snsOn()) return; clearTimeout(snsTimer); snsSetStatus('wait'); snsTimer=setTimeout(snsSync,3000); }
+function snsPayload(){
+  return {type:'nq-snaps-sync', version:1, market:MARKET, updatedAt:new Date().toISOString(),
+    cfg:{tags:SN.tags, folders:SN.folders, updated:SNS.cfgUpdated},
+    snaps:SN.snaps.map(s=>{ const o={...s}; delete o.img; delete o.lay; return o; }),
+    deleted:SNS.deleted, ...snrPayloadPart()};
+}
+function snsMerge(remote){
+  let changed=false;
+  const rDel=remote.deleted||{};
+  Object.keys(rDel).forEach(id=>{ if(!SNS.deleted[id] || rDel[id]>SNS.deleted[id]) SNS.deleted[id]=rDel[id]; });
+  (remote.snaps||[]).forEach(r=>{
+    if(!r||!r.id) return;
+    const ru=r.updated||r.created||0;
+    if(SNS.deleted[r.id] && SNS.deleted[r.id]>=ru) return;
+    const i=SN.snaps.findIndex(x=>x.id===r.id), l=i>=0?SN.snaps[i]:null;
+    if(!l || ru>(l.updated||l.created||0)){
+      r.mkt=MARKET; if(l&&l.img&&!r.img) r.img=l.img;
+      if(i>=0) SN.snaps[i]=r; else SN.snaps.push(r);
+      _snsOrigPut(r); changed=true;
+    }
+  });
+  SN.snaps=SN.snaps.filter(s=>{
+    const d=SNS.deleted[s.id]; if(d && d>=(s.updated||s.created||0)){ _snsOrigDel(s.id); changed=true; return false; } return true;
+  });
+  const rc=remote.cfg;
+  if(rc && (rc.updated||0)>SNS.cfgUpdated && Array.isArray(rc.tags) && Array.isArray(rc.folders)){
+    SN.tags=rc.tags; SN.folders=rc.folders; SNS.cfgUpdated=rc.updated; _snsOrigCfg(); changed=true;
+  }
+  snsSave();
+  return changed;
+}
+async function snsSync(manual){
+  if(!snsOn()) return;
+  if(snsBusy){ snsAgain=true; return; }
+  snsBusy=true; snsSetStatus('busy');
+  try{
+    for(let attempt=0; attempt<3; attempt++){
+      const g=await snsApi('GET', snsContentsUrl()+'?ref='+encodeURIComponent(SNS.branch));
+      let sha=null, remote=null, remoteText='';
+      if(g.ok){ sha=g.json.sha; remoteText=g.json.content?snsB64Dec(g.json.content):(g.json.size?await snsRaw():''); try{ remote=JSON.parse(remoteText); }catch(e){ remote=null; } }
+      else if(g.status!==404) throw new Error(snsErrText(g));
+      else { const rr=await snsApi('GET','/repos/'+SNS.repo); if(!rr.ok) throw new Error(snsErrText(rr)); }
+      if(remote && snrMerge(remote)){} 
+      if(remote && snsMerge(remote)){ snRenderDay(); if(snIsLibOpen()) snRenderLib(); if(snDraft){ snFillFolderSel(document.getElementById('snFolder'), snDraft.folder); snRenderTagChips(document.getElementById('snTags'), snDraft.tags); } }
+      const body=snsPayload();
+      const same=remote && JSON.stringify({c:remote.cfg,s:remote.snaps,d:remote.deleted,r:remote.recs,rd:remote.recDel})===JSON.stringify({c:body.cfg,s:body.snaps,d:body.deleted,r:body.recs,rd:body.recDel});
+      if(same) break;
+      const p=await snsApi('PUT', snsContentsUrl(), {message:'更新行情截圖筆記（'+MKT.name+'）', content:snsB64Enc(JSON.stringify(body)), branch:SNS.branch, ...(sha?{sha}:{})});
+      if(p.ok) break;
+      if(p.status===409||p.status===422) continue;   // 另一台剛好也存了 → 重新抓一次再合併
+      throw new Error(snsErrText(p));
+    }
+    snsLastAt=Date.now(); SNS.lastOk=snsLastAt; SNS.lastErr=''; snsSave(); snsSetStatus('ok');
+    if(manual) snToast('☁ 已同步');
+  }catch(e){
+    SNS.lastErr=(e&&e.message)||'同步失敗'; snsSave(); snsSetStatus('err');
+    if(manual) snToast('⚠ '+SNS.lastErr);
+  }finally{
+    snsBusy=false;
+    if(snsAgain){ snsAgain=false; setTimeout(snsSync,500); }
+  }
+}
+
+// ---- 狀態顯示 ----
+function snsSetStatus(st){
+  const t=new Date(SNS.lastOk||0), hm=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+  const txt=!snsOn()?'☁ 同步：未設定'
+    : st==='busy'?'☁ 同步中…'
+    : st==='wait'?'☁ 等一下就同步'
+    : st==='err'?'⚠ 同步失敗'
+    : (SNS.lastOk?'☁ 已同步 '+hm:'☁ 已設定');
+  document.querySelectorAll('.sns-status').forEach(el=>{ el.textContent=txt; el.classList.toggle('err',st==='err'); el.classList.toggle('ok',st==='ok'); el.title=st==='err'?SNS.lastErr:'GitHub 同步設定'; });
+}
+
+// ---- 設定視窗 ----
+function snsOpen(){
+  document.getElementById('snsRepo').value=SNS.repo; document.getElementById('snsBranch').value=SNS.branch;
+  document.getElementById('snsPath').value=SNS.path; document.getElementById('snsToken').value=SNS.token||'';
+  document.getElementById('snsMsg').innerHTML=SNS.lastErr?'<span class="sns-bad">上次同步失敗：'+escapeHtml(SNS.lastErr)+'</span>':'';
+  document.getElementById('snsOv').classList.add('show');
+}
+function snsClose(){ document.getElementById('snsOv').classList.remove('show'); }
+async function snsApply(){
+  const repo=document.getElementById('snsRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,'');
+  const token=document.getElementById('snsToken').value.trim();
+  const msg=document.getElementById('snsMsg');
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ msg.innerHTML='<span class="sns-bad">repo 要寫成「帳號/repo 名稱」，例如 sdkoppwdo/nq-notes</span>'; return; }
+  if(!token){ msg.innerHTML='<span class="sns-bad">請貼上 token</span>'; return; }
+  SNS.repo=repo; SNS.token=token;
+  SNS.branch=document.getElementById('snsBranch').value.trim()||'main';
+  SNS.path=document.getElementById('snsPath').value.trim().replace(/^\/+/,'')||('nq-replay-notes/snaps-'+MARKET+'.json');
+  snsSave();
+  msg.textContent='檢查中…';
+  const r=await snsApi('GET','/repos/'+SNS.repo);
+  if(!r.ok){ msg.innerHTML='<span class="sns-bad">'+escapeHtml(snsErrText(r))+'</span>'; snsSetStatus('err'); return; }
+  let warn='';
+  if(r.json && r.json.private===false) warn='<div class="sns-warn">⚠ 這個 repo 是公開的，任何人都看得到你的筆記。建議改用私人 repo。</div>';
+  if(r.json && r.json.permissions && !r.json.permissions.push){ msg.innerHTML='<span class="sns-bad">這個 token 只能讀、不能寫入 '+escapeHtml(SNS.repo)+'</span>'+warn; return; }
+  msg.innerHTML='<span class="sns-good">連線成功，同步中…</span>'+warn;
+  await snsSync(true);
+  msg.innerHTML=(SNS.lastErr?'<span class="sns-bad">'+escapeHtml(SNS.lastErr)+'</span>':'<span class="sns-good">✓ 已同步到 '+escapeHtml(SNS.repo)+' / '+escapeHtml(SNS.path)+'</span>')+warn;
+}
+function snsDisconnect(){
+  delete SNS.token; SNS.lastErr=''; SNS.lastOk=0; snsSave();
+  document.getElementById('snsToken').value='';
+  document.getElementById('snsMsg').innerHTML='<span class="sns-good">已在這台電腦移除 token，之後不會再同步。GitHub 上的檔案還在。</span>';
+  snsSetStatus();
+}
+
+// ---- 什麼時候同步：打開時、改了東西 3 秒後、切回這個視窗時 ----
+(function snsBoot(){
+  snsSetStatus(SNS.lastErr?'err':'ok');
+  let n=0; const t=setInterval(()=>{ n++; if(snLoaded || n>80){ clearInterval(t); if(snsOn()) setTimeout(()=>snsSync(),300); } },250);
+  window.addEventListener('focus',()=>{ if(snsOn() && Date.now()-snsLastAt>30000) snsSync(); });
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && snsTimer){ clearTimeout(snsTimer); snsSync(); } });
+})();
+
+
+// ============================================================
+// 📊 模擬單交易紀錄＋📔 學習日誌：存在這台電腦（重新整理不會不見），也跟著 ☁ 同步
+// 以「一天的交易」和「一則日誌」為單位：誰最後改的就用誰的；刪掉／重置的也會同步過去
+// ============================================================
+const SNR_TRADES_KEY='nqTradesStore';
+SNS.rec=SNS.rec||{}; SNS.recDel=SNS.recDel||{};
+// 啟動時把上次的模擬單紀錄讀回來（原本只存在記憶體，重新整理就沒了）
+(function snrLoadTrades(){
+  try{
+    const t=JSON.parse(localStorage.getItem(SNR_TRADES_KEY)||'null');
+    if(t && typeof t==='object'){
+      dayPositions=t.positions||{}; dayClosedTrades=t.closed||{}; dayMarkers=t.markers||{}; dayActiveTrade=t.active||{};
+      setTimeout(()=>{ try{ refreshTradePosDisplay(); if(mode1kBars.length) renderAll(); }catch(e){} },0);
+    }
+  }catch(e){}
+})();
+function snrSaveTrades(){
+  try{ localStorage.setItem(SNR_TRADES_KEY, JSON.stringify({positions:dayPositions, closed:dayClosedTrades, markers:dayMarkers, active:dayActiveTrade})); }
+  catch(e){ console.warn('[模擬單] 儲存失敗', e); }
+}
+// 目前所有紀錄 → {key: 內容}；key：'t:日期'＝那天的交易、'j:id'＝一則日誌
+function snrDayTrades(d){
+  const v={}, has=o=>Array.isArray(o&&o[d])&&o[d].length;
+  if(has(dayPositions)) v.positions=dayPositions[d];
+  if(has(dayClosedTrades)) v.closed=dayClosedTrades[d];
+  if(has(dayMarkers)) v.markers=dayMarkers[d];
+  if(dayActiveTrade && dayActiveTrade[d]) v.active=dayActiveTrade[d];
+  return Object.keys(v).length?v:null;
+}
+function snrCollect(){
+  const m={};
+  const days=new Set([...Object.keys(dayPositions||{}),...Object.keys(dayClosedTrades||{}),...Object.keys(dayMarkers||{}),...Object.keys(dayActiveTrade||{})]);
+  days.forEach(d=>{ const v=snrDayTrades(d); if(v) m['t:'+d]=v; });
+  (journalEntries||[]).forEach(e=>{ if(e&&e.id) m['j:'+e.id]=e; });
+  return m;
+}
+function snrStr(m){ const o={}; Object.keys(m).forEach(k=>o[k]=JSON.stringify(m[k])); return o; }
+let snrLast=snrStr(snrCollect());
+// 第一次：還沒有時間的紀錄給一個很舊的時間（另一台有改過的版本會優先）
+Object.keys(snrLast).forEach(k=>{ if(!SNS.rec[k]) SNS.rec[k]=(k[0]==='j'&&journalEntries.find(e=>'j:'+e.id===k)||{}).updatedAt||1; });
+snsSave();
+// 每 2 秒看一下有沒有變動（下單、平倉、上一步、重置、寫日誌、刪日誌…都會被抓到）
+function snrCheck(){
+  const cur=snrStr(snrCollect()), now=Date.now(); let changed=false, tChanged=false;
+  Object.keys(cur).forEach(k=>{ if(cur[k]!==snrLast[k]){ SNS.rec[k]=now; delete SNS.recDel[k]; changed=true; if(k[0]==='t') tChanged=true; } });
+  Object.keys(snrLast).forEach(k=>{ if(!(k in cur)){ SNS.recDel[k]=now; delete SNS.rec[k]; changed=true; if(k[0]==='t') tChanged=true; } });
+  snrLast=cur;
+  if(changed){ snsSave(); if(tChanged) snrSaveTrades(); snsSchedule(); }
+}
+setInterval(snrCheck,2000);
+window.addEventListener('beforeunload',()=>{ try{ snrCheck(); snrSaveTrades(); }catch(e){} });
+
+// 套用另一台的紀錄
+function snrApply(k, v){
+  if(k[0]==='t'){
+    const d=k.slice(2), set=(o,val)=>{ if(val==null) delete o[d]; else o[d]=val; };
+    set(dayPositions, v&&v.positions); set(dayClosedTrades, v&&v.closed); set(dayMarkers, v&&v.markers); set(dayActiveTrade, v&&v.active);
+  } else {
+    const id=k.slice(2), i=journalEntries.findIndex(e=>e.id===id);
+    if(v==null){ if(i>=0) journalEntries.splice(i,1); }
+    else if(i>=0) journalEntries[i]=v; else journalEntries.push(v);
+  }
+}
+function snrMerge(remote){
+  const rr=remote.recs||{}, rd=remote.recDel||{}; let tCh=false, jCh=false;
+  Object.keys(rd).forEach(k=>{
+    if((SNS.recDel[k]||0)<rd[k]) SNS.recDel[k]=rd[k];
+    if((SNS.rec[k]||0)<=rd[k] && (k in snrLast)){ snrApply(k,null); delete SNS.rec[k]; k[0]==='t'?tCh=true:jCh=true; }
+  });
+  Object.keys(rr).forEach(k=>{
+    const u=rr[k].u||0;
+    if((SNS.recDel[k]||0)>=u) return;
+    if(u>(SNS.rec[k]||0)){ snrApply(k, rr[k].v); SNS.rec[k]=u; k[0]==='t'?tCh=true:jCh=true; }
+  });
+  snrLast=snrStr(snrCollect());   // 套用進來的不算本機修改
+  snsSave();
+  if(tCh){ snrSaveTrades(); try{ refreshTradePosDisplay(); if(mode1kBars.length) renderAll(); }catch(e){} }
+  if(jCh){ try{ localStorage.setItem('nqJournalEntries', JSON.stringify(journalEntries)); renderJournal(); }catch(e){} }
+  return tCh||jCh;
+}
+function snrPayloadPart(){
+  const cur=snrCollect(), recs={};
+  Object.keys(cur).forEach(k=>{ recs[k]={u:SNS.rec[k]||1, v:cur[k]}; });
+  return {recs, recDel:SNS.recDel};
+}
 </script>
 </body>
 </html>
