@@ -165,9 +165,9 @@ canvas.cross{pointer-events:none;}
 .trade-pos-pnl-row{display:flex;justify-content:space-between;align-items:center;margin-top:3px;padding-top:3px;border-top:1px solid rgba(255,255,255,0.08);font-size:10px;}
 .trade-pos-pnl-val{font-weight:800;font-variant-numeric:tabular-nums;}
 /* RESULT MODAL */
-.tresult-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at top, #14141a 0%, #050508 70%);z-index:600;display:none;flex-direction:column;align-items:center;padding:24px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.tresult-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at top, #14141a 0%, #050508 70%);z-index:600;display:none;flex-direction:column;align-items:center;padding:20px 1.2vw;overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
 .tresult-overlay.show{display:flex;}
-.tresult-card{width:100%;max-width:1200px;}
+.tresult-card{width:100%;max-width:min(1800px,97vw);}
 .tresult-header{text-align:center;margin-bottom:24px;}
 .tresult-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:.3px;}
 .tresult-sub{font-size:13px;color:var(--t2);font-weight:500;}
@@ -222,7 +222,7 @@ canvas.cross{pointer-events:none;}
 .tresult-dir-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;color:#fff;}
 .tresult-dir-tag.long{background:var(--up);}
 .tresult-dir-tag.short{background:var(--dn);}
-.tresult-close-btn{width:100%;max-width:1200px;margin-top:8px;padding:15px;background:var(--blue);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(37,99,235,0.4);}
+.tresult-close-btn{width:100%;max-width:min(1800px,97vw);margin-top:8px;padding:15px;background:var(--blue);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(37,99,235,0.4);}
 .tresult-empty{text-align:center;color:var(--t2);padding:80px 20px;font-size:14px;font-weight:500;}
 .tresult-curve-split{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 .butterfly-hdr{display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;margin-bottom:8px;padding:0 4px;text-align:center;}
@@ -314,6 +314,42 @@ canvas.cross{pointer-events:none;}
 .notrade-days-summary b{color:#fff;font-size:15px;}
 .notrade-days-list{display:flex;flex-wrap:wrap;gap:6px;max-height:180px;overflow-y:auto;}
 .notrade-day-chip{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--t2);font-weight:600;}
+/* ===== 總體行情回顧 ===== */
+.notrade-day-chip{cursor:pointer;transition:all .12s;}
+.notrade-day-chip:hover{border-color:var(--blue);color:#fff;background:rgba(37,99,235,.18);}
+.mkov-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:stretch;height:72vh;min-height:420px;}
+.mkov-left{display:flex;flex-direction:column;gap:10px;min-height:0;}
+.mkov-cal{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:10px;flex-shrink:0;}
+.mkov-cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px;}
+.mkov-cal-title{font-size:13px;font-weight:800;color:#fff;cursor:pointer;}
+.mkov-cal-nav{width:26px;height:26px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;}
+.mkov-cal-nav:disabled{opacity:.3;cursor:not-allowed;}
+.mkov-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.mkov-cal-wd{font-size:9px;color:var(--t3);text-align:center;font-weight:700;padding:2px 0;}
+.mkov-cal-d{position:relative;aspect-ratio:1/1;border-radius:6px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);opacity:.35;border:1px solid transparent;}
+.mkov-cal-d.has{opacity:1;color:#fff;background:var(--bg3);cursor:pointer;}
+.mkov-cal-d.has:hover{border-color:var(--b2);background:rgba(255,255,255,.08);}
+.mkov-cal-d.win{background:rgba(239,68,68,.22);}
+.mkov-cal-d.loss{background:rgba(34,197,94,.22);}
+.mkov-cal-d.flat{background:rgba(250,204,21,.16);}
+.mkov-cal-d.sel{border-color:#facc15;box-shadow:0 0 0 1px #facc15 inset;}
+.mkov-cal-d .dot{width:4px;height:4px;border-radius:50%;background:#facc15;margin-top:2px;}
+.mkov-cal-d.notrade .dot{background:transparent;}
+.mkov-cal-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:9px;color:var(--t3);}
+.mkov-cal-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px;}
+.mkov-info{flex:1;min-height:0;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;}
+.mkov-trade-row{display:flex;align-items:center;gap:6px;padding:6px;border-radius:6px;font-size:10px;cursor:pointer;color:var(--t2);}
+.mkov-trade-row:hover{background:rgba(255,255,255,.06);}
+.mkov-trade-row b{color:#fff;}
+.mkov-detail{min-width:0;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;display:flex;flex-direction:column;min-height:0;}
+.mkov-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.mkov-daynav{display:flex;align-items:center;gap:6px;}
+.mkov-daynav button{height:26px;padding:0 9px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:#fff;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;}
+.mkov-daynav button:disabled{opacity:.3;cursor:not-allowed;}
+.mkov-hint{font-size:9.5px;color:var(--t3);}
+.mkov-canvas-body{position:relative;flex:1;min-height:0;cursor:crosshair;}
+.mkov-canvas-body.drag{cursor:grabbing;}
+@media(max-width:820px){.mkov-layout{grid-template-columns:1fr;height:auto;}.mkov-detail{height:70vh;}}
 /* Trade markers on chart */
 .trade-marker-tip{position:absolute;background:rgba(255,255,255,0.95);color:#000;font-size:9px;font-weight:700;padding:3px 6px;border-radius:4px;pointer-events:none;z-index:50;white-space:nowrap;display:none;}
 /* Result tabs */
@@ -953,11 +989,12 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
   <div class="cpopup-close" onclick="closeCP()">✕ 關閉</div>
 </div>
 <div class="tresult-overlay" id="tresultOverlay">
-  <div class="tresult-card" style="max-width:1200px;">
+  <div class="tresult-card">
     <div class="tresult-tabs" id="tresultTabs" style="display:none;">
       <div class="tresult-tab on" id="tabStats" onclick="switchTResultTab('stats')">📊 績效統計</div>
       <div class="tresult-tab" id="tabRanking" onclick="switchTResultTab('ranking')">🏆 排行榜</div>
       <div class="tresult-tab" id="tabReplay" onclick="switchTResultTab('replay')">🎬 進場回顧</div>
+      <div class="tresult-tab" id="tabMkov" onclick="switchTResultTab('mkov')">🌐 總體行情回顧</div>
     </div>
     <div class="tresult-daterange" id="tresultDateRange" style="display:none;">
       <span class="tresult-daterange-lbl">統計範圍：</span>
@@ -970,8 +1007,9 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
     <div class="tresult-page show" id="pageStats"></div>
     <div class="tresult-page" id="pageRanking"></div>
     <div class="tresult-page" id="pageReplay"></div>
+    <div class="tresult-page" id="pageMktOverview"></div>
   </div>
-  <div style="display:flex;gap:8px;width:100%;max-width:1200px;">
+  <div style="display:flex;gap:8px;width:100%;max-width:min(1800px,97vw);">
     <button class="tresult-close-btn" onclick="closeTradeResult()" style="flex:1;">關閉</button>
   </div>
 </div>
@@ -2949,7 +2987,10 @@ function switchTResultTab(tab){
   document.getElementById('pageStats').classList.toggle('show', tab==='stats');
   document.getElementById('pageRanking').classList.toggle('show', tab==='ranking');
   document.getElementById('pageReplay').classList.toggle('show', tab==='replay');
+  document.getElementById('tabMkov').classList.toggle('on', tab==='mkov');
+  document.getElementById('pageMktOverview').classList.toggle('show', tab==='mkov');
   if(tab === 'replay') buildReplayPage();
+  if(tab === 'mkov') buildMktOverviewPage();
   if(tab === 'ranking') buildRankingPage();
 }
 
@@ -3109,13 +3150,510 @@ function buildRankingPage(){
       <div class="ranking-zone-title">🗓️ 沒有交易的日子</div>
       <div class="ranking-section">
         <div class="notrade-days-wrap">
-          <div class="notrade-days-summary">統計區間 ${rangeFrom} ~ ${rangeTo} 內，共 <b>${noTradeDays.length}</b> 天沒有任何已平倉交易</div>
-          ${noTradeDays.length ? `<div class="notrade-days-list">${noTradeDays.map(d=>`<div class="notrade-day-chip">📅 ${d}</div>`).join('')}</div>` : '<div class="treplay-empty" style="padding:10px 0;">區間內每個交易日都有交易紀錄</div>'}
+          <div class="notrade-days-summary">統計區間 ${rangeFrom} ~ ${rangeTo} 內，共 <b>${noTradeDays.length}</b> 天沒有任何已平倉交易 <span style="color:var(--t3);font-size:10.5px;">（點日期看當天整體行情，檢查是不是漏了訊號）</span></div>
+          ${noTradeDays.length ? `<div class="notrade-days-list">${noTradeDays.map(d=>`<div class="notrade-day-chip" onclick="jumpToMarketDay('${d}')" title="打開這天的總體行情">📅 ${d}</div>`).join('')}</div>` : '<div class="treplay-empty" style="padding:10px 0;">區間內每個交易日都有交易紀錄</div>'}
         </div>
       </div>
     </div>
   `;
 }
+
+// ================= 🌐 總體行情回顧 =================
+// 每一天的完整行情（預設 5K），當天有進場的話把所有進出場點標上去；左邊日曆選日期，指標共用主畫面設定
+let mkovDay = null;
+let mkovMonth = null;              // 'YYYY-MM'
+// 找出顯示成「5K」的格局槽位（NQ 是 5k 槽，台指 5 分K 在 1k 槽）
+function defaultFiveKTF(){ return TF_ORDER.find(tf=>tfDisp(tf)==='5K') || '5k'; }
+let mkovTFs = null;                // 預設只看 5K（最多同時 2 個格局）
+let mkovView = {};                 // 每個格局各自的可視範圍 {n, end}
+let mkovHits = {};                 // 每個格局畫面上的進出場標記位置（點了可跳到進場回顧）
+
+function mkovTradesOf(d){
+  const out=[];
+  _allClosedTradesCache.forEach((t,i)=>{ if(t.date===d) out.push({t,i}); });
+  return out.sort((a,b)=>a.t.entryIdx-b.t.entryIdx);
+}
+function mkovDayPnlMap(){
+  const m={};
+  _allClosedTradesCache.forEach(t=>{ m[t.date]=(m[t.date]||0)+t.pnl; });
+  return m;
+}
+
+function buildMktOverviewPage(){
+  const page=document.getElementById('pageMktOverview');
+  if(!DAYS.length){ page.innerHTML='<div class="tresult-empty">尚無行情資料</div>'; return; }
+  if(!mkovDay || !DATA[mkovDay]){
+    const td=_allClosedTradesCache.map(t=>t.date).sort();
+    mkovDay = td.length ? td[td.length-1] : DAYS[DAYS.length-1];
+  }
+  mkovMonth = mkovDay.slice(0,7);
+  if(!mkovTFs) mkovTFs = [defaultFiveKTF()];
+  page.innerHTML = `
+    <div class="mkov-layout">
+      <div class="mkov-left">
+        <div class="mkov-cal" id="mkovCal"></div>
+        <div class="mkov-info" id="mkovInfo"></div>
+      </div>
+      <div class="mkov-detail">
+        <div class="mkov-toolbar">
+          <div class="mkov-daynav">
+            <button onclick="mkovStepDay(-1)" id="mkovPrev" title="上一個交易日（←）">‹</button>
+            <div class="treplay-detail-hdr" id="mkovHdr">—</div>
+            <button onclick="mkovStepDay(1)" id="mkovNext" title="下一個交易日（→）">›</button>
+            <span class="mkov-hint">滾輪縮放・拖曳平移・點標記跳到進場回顧</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
+            <div style="display:flex;gap:6px;" id="mkovTFButtons">
+              ${TF_ORDER.map(tf=>`<div class="tresult-tab${mkovTFs.includes(tf)?' on':''}" id="mkovtf-${tf}" onclick="toggleMkovTF('${tf}')" style="padding:5px 12px;font-size:11px;">${tfDisp(tf)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="treplay-canvas-multi" id="mkovCanvasMulti"></div>
+      </div>
+    </div>`;
+  buildMkovCanvases();
+  updateIndicatorBtn();
+  mkovSelectDay(mkovDay);
+  syncMkovHeight();
+}
+
+function syncMkovHeight(){
+  requestAnimationFrame(()=>{
+    const layout=document.querySelector('.mkov-layout');
+    if(!layout || window.innerWidth<=820) return;
+    const rect=layout.getBoundingClientRect();
+    layout.style.height=Math.max(420, window.innerHeight-rect.top-16)+'px';
+    mkovRenderAll();
+  });
+}
+
+function renderMkovCalendar(){
+  const el=document.getElementById('mkovCal');
+  if(!el) return;
+  const [Y,M]=mkovMonth.split('-').map(Number);
+  const first=new Date(Y,M-1,1), nDays=new Date(Y,M,0).getDate();
+  const pnl=mkovDayPnlMap();
+  const firstM=DAYS[0].slice(0,7), lastM=DAYS[DAYS.length-1].slice(0,7);
+  let cells='';
+  ['日','一','二','三','四','五','六'].forEach(w=>cells+=`<div class="mkov-cal-wd">${w}</div>`);
+  for(let i=0;i<first.getDay();i++) cells+='<div></div>';
+  for(let d=1;d<=nDays;d++){
+    const ds=`${mkovMonth}-${String(d).padStart(2,'0')}`;
+    const has=DAYS_SET.has(ds);
+    let cls='mkov-cal-d', tip='';
+    if(has){
+      cls+=' has';
+      if(pnl[ds]!==undefined){
+        cls+= pnl[ds]>0?' win':(pnl[ds]<0?' loss':' flat');
+        tip=`${ds} 有交易 ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`;
+      } else { cls+=' notrade'; tip=`${ds} 沒有交易`; }
+    }
+    if(ds===mkovDay) cls+=' sel';
+    cells+=`<div class="${cls}" title="${tip}" ${has?`onclick="mkovSelectDay('${ds}')"`:''}>${d}${has?'<span class="dot"></span>':''}</div>`;
+  }
+  el.innerHTML=`
+    <div class="mkov-cal-hdr">
+      <button class="mkov-cal-nav" onclick="mkovStepMonth(-1)" ${mkovMonth<=firstM?'disabled':''}>‹</button>
+      <div class="mkov-cal-title">${Y} 年 ${M} 月</div>
+      <button class="mkov-cal-nav" onclick="mkovStepMonth(1)" ${mkovMonth>=lastM?'disabled':''}>›</button>
+    </div>
+    <div class="mkov-cal-grid">${cells}</div>
+    <div class="mkov-cal-legend">
+      <span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span>
+      <span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span>
+      <span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒交易</span>
+    </div>`;
+}
+
+function mkovStepMonth(dir){
+  let [Y,M]=mkovMonth.split('-').map(Number);
+  M+=dir; if(M<1){M=12;Y--;} if(M>12){M=1;Y++;}
+  mkovMonth=`${Y}-${String(M).padStart(2,'0')}`;
+  renderMkovCalendar();
+}
+function mkovStepDay(dir){
+  const i=DAYS.indexOf(mkovDay);
+  const j=i+dir;
+  if(j>=0 && j<DAYS.length) mkovSelectDay(DAYS[j]);
+}
+
+function mkovSelectDay(d){
+  if(!DATA[d]) return;
+  mkovDay=d; mkovMonth=d.slice(0,7);
+  mkovView={};
+  renderMkovCalendar();
+  renderMkovInfo();
+  const i=DAYS.indexOf(d);
+  const wd=['日','一','二','三','四','五','六'][new Date(d+'T00:00:00').getDay()];
+  const hdr=document.getElementById('mkovHdr');
+  if(hdr) hdr.innerHTML=`📅 ${d}（${wd}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">07:00 → 隔天 03:00</span>`;
+  const p=document.getElementById('mkovPrev'), n=document.getElementById('mkovNext');
+  if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1;
+  mkovRenderAll();
+}
+
+function renderMkovInfo(){
+  const el=document.getElementById('mkovInfo');
+  if(!el) return;
+  const d=mkovDay, items=mkovTradesOf(d);
+  // 當日行情概況（用 5K 或 1K 算當日 OHLC）
+  const src=mkovBars('1k');
+  let mkt='';
+  if(src.length){
+    const o=src[0].o, c=src[src.length-1].c;
+    const h=Math.max(...src.map(b=>b.h)), l=Math.min(...src.map(b=>b.l));
+    const chg=c-o;
+    mkt=`
+      <div class="treplay-day-summary-title">📈 當日行情 <span style="font-size:9px;color:var(--t3);font-weight:600;">07:00～隔天 03:00</span></div>
+      <div class="treplay-day-summary-grid" style="margin-bottom:12px;">
+        <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">開 / 收</div><div class="treplay-day-stat-val" style="font-size:11px;">${o.toFixed(1)} / ${c.toFixed(1)}</div></div>
+        <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">漲跌</div><div class="treplay-day-stat-val" style="color:${chg>=0?UP:DN}">${chg>=0?'+':''}${chg.toFixed(1)}</div></div>
+        <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">高 / 低</div><div class="treplay-day-stat-val" style="font-size:11px;">${h.toFixed(1)} / ${l.toFixed(1)}</div></div>
+        <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">振幅</div><div class="treplay-day-stat-val">${(h-l).toFixed(1)} pt</div></div>
+      </div>`;
+  }
+  let tr;
+  if(!items.length){
+    tr=`<div class="treplay-day-summary-title">🎯 當日交易</div>
+      <div style="font-size:11px;color:#facc15;background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.25);border-radius:8px;padding:10px;line-height:1.6;">
+        這天沒有進場。<br><span style="color:var(--t2)">看看整天的走勢：是沒有出現訊號，還是訊號出現了但沒做？</span>
+      </div>`;
+  } else {
+    const tot=items.reduce((a,x)=>a+x.t.pnl,0);
+    tr=`<div class="treplay-day-summary-title">🎯 當日交易 ${items.length} 筆 ・ <span style="color:${tot>=0?'#22c55e':'#ef4444'}">${tot>=0?'+':''}$${tot.toFixed(0)}</span></div>
+      ${items.map(({t,i})=>`
+        <div class="mkov-trade-row" onclick="jumpToReplayTrade(${i})" title="到進場回顧看這筆">
+          <span style="color:var(--t3);width:20px;">#${i+1}</span>
+          <span class="tresult-dir-tag ${t.dir}">${t.dir==='long'?'多':'空'}</span>
+          <span><b>${t.entryTime}</b> → ${t.exitTime}</span>
+          <span style="margin-left:auto;font-weight:800;color:${t.pnl>=0?'#22c55e':'#ef4444'}">${t.pnl>=0?'+':''}${t.pnl.toFixed(0)}</span>
+        </div>`).join('')}`;
+  }
+  el.innerHTML=mkt+tr;
+}
+
+function toggleMkovTF(tf){
+  if(mkovTFs.includes(tf)){
+    if(mkovTFs.length===1) return;
+    mkovTFs=mkovTFs.filter(x=>x!==tf);
+  } else {
+    if(mkovTFs.length>=2) mkovTFs.shift(); // 最多兩個：自動換掉最早選的
+    mkovTFs.push(tf);
+  }
+  mkovTFs.sort((a,b)=>TF_ORDER.indexOf(a)-TF_ORDER.indexOf(b));
+  document.querySelectorAll('#mkovTFButtons .tresult-tab').forEach(el=>{
+    el.classList.toggle('on', mkovTFs.includes(el.id.replace('mkovtf-','')));
+  });
+  buildMkovCanvases();
+  mkovRenderAll();
+}
+
+function buildMkovCanvases(){
+  const wrap=document.getElementById('mkovCanvasMulti');
+  if(!wrap) return;
+  wrap.innerHTML=mkovTFs.map(tf=>`
+    <div class="treplay-canvas-wrap">
+      <div class="treplay-canvas-hdr">
+        <span class="chdr-l">${TF_LABELS[tf]||tfDisp(tf)}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="chdr-price" id="mprice_${tf}"><span class="chdr-price-lbl">漲跌</span><span class="chdr-price-val" id="mpriceVal_${tf}">—</span></span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">價</span><span class="chdr-time-val" id="mpx_${tf}">—</span></span>
+          <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="mktime_${tf}">—</span></span>
+          <div class="treplay-canvas-zoom">
+            <button class="zoom-btn" onclick="mkovZoom('${tf}',1/1.4)" title="顯示更多K棒">小</button>
+            <button class="zoom-btn" onclick="mkovZoom('${tf}',1.4)" title="顯示較少K棒">大</button>
+            <button class="zoom-btn" onclick="mkovResetView('${tf}')" title="顯示全天" style="width:auto;padding:0 6px;">全</button>
+          </div>
+        </div>
+      </div>
+      <div class="treplay-canvas-body mkov-canvas-body" id="mkovBody_${tf}">
+        <canvas id="mkovCanvas_${tf}" style="width:100%;height:100%;"></canvas>
+        <canvas id="mkovCanvas_${tf}_cross" class="cross"></canvas>
+      </div>
+    </div>`).join('');
+  mkovTFs.forEach(tf=>attachMkovEvents(tf));
+}
+
+// 當天 07:00 ～ 隔天 03:00 的 1K idx 範圍（每天的 1K 資料本來就從早上開到隔天清晨，idx 是全域連續編號）
+let _mkovWinCache = {};
+function mkovDayWindow(d){
+  if(_mkovWinCache[d]) return _mkovWinCache[d];
+  const base = (DATA[d] && DATA[d]['1k']) || [];
+  let crossed=false, prev=null, lo=null, hi=null;
+  base.forEach(b=>{
+    if(prev!==null && b.ts<prev) crossed=true;   // 時間變小＝跨過午夜
+    prev=b.ts;
+    const inWin = crossed ? (b.ts<'03:00') : (b.ts>='07:00');
+    if(inWin){ if(lo===null) lo=b.idx; hi=(b.idx_end||b.idx); }
+  });
+  return (_mkovWinCache[d] = {lo, hi});
+}
+function mkovBars(tf){
+  const day=DATA[mkovDay]; if(!day) return [];
+  const key=mkovDay+'|'+tf;
+  if(_mkovWinCache[key]) return _mkovWinCache[key];
+  const w=mkovDayWindow(mkovDay), all=day[tf]||[];
+  const out = w.lo===null ? [] : all.filter(b=>b.idx>=w.lo && b.idx<=w.hi);
+  return (_mkovWinCache[key]=out);
+}
+function mkovGetView(tf){
+  const bars=mkovBars(tf);
+  let v=mkovView[tf];
+  if(!v) v={n:bars.length, end:bars.length-1};
+  v.n=Math.max(Math.min(20,bars.length), Math.min(bars.length, Math.round(v.n)));
+  v.end=Math.max(v.n-1, Math.min(bars.length-1, Math.round(v.end)));
+  mkovView[tf]=v;
+  return v;
+}
+function mkovZoom(tf, f, anchorFrac){
+  const v=mkovGetView(tf);
+  const a = anchorFrac==null ? 1 : anchorFrac;
+  const anchorIdx = v.end-v.n+1 + a*(v.n-1);
+  const n2 = v.n/f;
+  mkovView[tf]={n:n2, end:anchorIdx + (1-a)*(n2-1)};
+  mkovRender(tf);
+}
+function mkovResetView(tf){ delete mkovView[tf]; mkovRender(tf); }
+function mkovRenderAll(){ mkovTFs.forEach(tf=>mkovRender(tf)); }
+
+// 找出某個 1K idx 落在這個格局的哪一根（從後面找，台指大格局會帶前幾天的K棒）
+function mkovFindPos(bars, idx, tf){
+  if(idx==null) return -1;
+  if(tf==='1k'){ for(let i=bars.length-1;i>=0;i--) if(bars[i].idx===idx) return i; return -1; }
+  for(let i=bars.length-1;i>=0;i--){ const b=bars[i]; if(b.idx<=idx && idx<=(b.idx_end||b.idx)) return i; }
+  return -1;
+}
+
+function mkovRender(tf){
+  const canvas=document.getElementById('mkovCanvas_'+tf);
+  if(!canvas) return;
+  const wrap=canvas.parentElement, dpr=window.devicePixelRatio||2;
+  const W=wrap.clientWidth, H=wrap.clientHeight;
+  if(!W||!H) return;
+  canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0d0d0f'; ctx.fillRect(0,0,W,H);
+  const bars=mkovBars(tf);
+  if(!bars.length){
+    canvas._layout=null;
+    ctx.fillStyle='#666';ctx.font='12px sans-serif';ctx.textAlign='center';
+    ctx.fillText(`此日無 ${tfDisp(tf)} 資料`,W/2,H/2); return;
+  }
+  const v=mkovGetView(tf);
+  const startPos=v.end-v.n+1;
+  const segment=bars.slice(startPos, v.end+1);
+  const P={t:14,r:60,b:24,l:4};
+  const cw=(W-P.l-P.r)/segment.length;
+  const allP=segment.flatMap(b=>[b.h,b.l]);
+  let lo=Math.min(...allP), hi=Math.max(...allP);
+  const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;
+  const rng=hi-lo||1;
+  const Y2=p=>P.t+(H-P.t-P.b)*(1-(p-lo)/rng);
+  const X2=i=>P.l+i*cw+cw/2;
+  const last=bars[bars.length-1];
+  canvas._layout={P,W,H,segment,X:X2,Y:Y2,view:segment,cw,startPos,
+    cap:(last.idx_end||last.idx), capPx:last.c, day:mkovDay};
+
+  for(let i=0;i<=4;i++){
+    const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
+  }
+  drawIndicators(ctx, canvas._layout, tf, 'back');
+
+  // 當日進場持倉區間底色（進場→出場）
+  const items=mkovTradesOf(mkovDay);
+  items.forEach(({t})=>{
+    const a=mkovFindPos(bars,t.entryIdx,tf)-startPos, b=mkovFindPos(bars,t.exitIdx,tf)-startPos;
+    if(a<-1e6||b<-1e6) return;
+    const x1=Math.max(P.l, X2(Math.max(a,0))-cw/2), x2=Math.min(W-P.r, X2(Math.min(b,segment.length-1))+cw/2);
+    if(x2<=x1 || b<0 || a>=segment.length) return;
+    ctx.fillStyle=t.dir==='long'?'rgba(239,68,68,0.07)':'rgba(34,197,94,0.07)';
+    ctx.fillRect(x1,P.t,x2-x1,H-P.t-P.b);
+  });
+
+  const bw=Math.max(1, Math.min(cw*0.7, 14));
+  segment.forEach((b,i)=>{
+    const x=X2(i), col=b.c>=b.o?UP:DN;
+    ctx.strokeStyle=col;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,Y2(b.h));ctx.lineTo(x,Y2(b.l));ctx.stroke();
+    const ty=Math.min(Y2(b.o),Y2(b.c)), bh=Math.max(Math.abs(Y2(b.c)-Y2(b.o)),1.2);
+    ctx.fillStyle=col;ctx.fillRect(x-bw/2,ty,bw,bh);
+  });
+  const rmk=['m5','m10','m20','m60'];
+  maConfig.forEach((ma,mi)=>{
+    if(!ma.on) return;
+    ctx.strokeStyle=ma.c;ctx.lineWidth=mi===3?1.8:1.2;ctx.beginPath();
+    let st=false;
+    segment.forEach((b,i)=>{const v=b[rmk[mi]]??null;if(v==null) return; st?ctx.lineTo(X2(i),Y2(v)):(ctx.moveTo(X2(i),Y2(v)),st=true);});
+    ctx.stroke();
+  });
+  drawIndicators(ctx, canvas._layout, tf, 'top');
+
+  // 進出場標記
+  const hits=[]; const seen={};
+  items.forEach(({t,i:ti})=>{
+    const legs=(t.legs&&t.legs.length)?t.legs:[
+      {type:'entry',qty:t.qty,price:t.entryPrice,idx:t.entryIdx},
+      {type:'exit',qty:t.qty,price:t.exitPrice,idx:t.exitIdx}];
+    legs.forEach(l=>{
+      const rel=mkovFindPos(bars,l.idx,tf)-startPos;
+      if(rel<0||rel>=segment.length) return;
+      const b=segment[rel], x=X2(rel);
+      const key=rel+'_'+l.type+'_'+(l.type==='entry'?t.dir:''); const sn=seen[key]||0; seen[key]=sn+1;
+      const off=sn*13, onRight=t.dir==='long', lx=onRight?x+9:x-9;
+      ctx.font='bold 9px sans-serif'; ctx.textAlign=onRight?'left':'right';
+      let ey;
+      if(l.type==='entry'){
+        if(t.dir==='long'){
+          ey=Y2(b.l)+14+off;
+          ctx.fillStyle=UP;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey+10);ctx.lineTo(x+6,ey+10);ctx.closePath();ctx.fill();
+          ctx.fillStyle='#fff';ctx.fillText(`#${ti+1} 多${l.qty}`,lx,ey+8); ey+=5;
+        } else {
+          ey=Y2(b.h)-14-off;
+          ctx.fillStyle=DN;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey-10);ctx.lineTo(x+6,ey-10);ctx.closePath();ctx.fill();
+          ctx.fillStyle='#fff';ctx.fillText(`#${ti+1} 空${l.qty}`,lx,ey-6); ey-=5;
+        }
+      } else {
+        ey=Y2(b.c)-14-off;
+        ctx.fillStyle='#a855f7';ctx.beginPath();ctx.moveTo(x,ey+10);ctx.lineTo(x-6,ey);ctx.lineTo(x+6,ey);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#fff';ctx.fillText(`平${l.qty}`,lx,ey+3); ey+=5;
+      }
+      // 進出價位小橫線
+      if(l.price!=null){
+        ctx.strokeStyle=l.type==='entry'?(t.dir==='long'?UP:DN):'#a855f7';ctx.lineWidth=1.5;
+        const hw=Math.min(Math.max(cw*0.45,5),12); ctx.beginPath();ctx.moveTo(x-hw,Y2(l.price));ctx.lineTo(x+hw,Y2(l.price));ctx.stroke();
+      }
+      hits.push({x,y:ey,ti});
+    });
+  });
+  mkovHits[tf]=hits;
+
+  ctx.fillStyle='#999';ctx.font='8px sans-serif';ctx.textAlign='center';
+  const step=Math.max(1,Math.ceil(40/cw));
+  segment.forEach((b,i)=>{ if((startPos+i)%step===0) ctx.fillText(b.ts,X2(i),H-6); });
+  mkovUpdateChdr(tf, segment[segment.length-1]);
+}
+
+function mkovUpdateChdr(tf, bar){
+  if(!bar) return;
+  const pe=document.getElementById('mprice_'+tf), pv=document.getElementById('mpriceVal_'+tf);
+  if(pe&&pv){ const chg=bar.c-bar.o, up=chg>=0; pe.className='chdr-price '+(up?'up':'dn'); pv.textContent=(up?'+':'')+chg.toFixed(2); pv.style.color=up?'var(--up)':'var(--dn)'; }
+  const px=document.getElementById('mpx_'+tf); if(px) px.textContent=bar.c.toFixed(1);
+  const te=document.getElementById('mktime_'+tf); if(te) te.textContent=bar.ts||'—';
+}
+
+function mkovCrossAt(idx){
+  mkovTFs.forEach(tf=>{
+    const main=document.getElementById('mkovCanvas_'+tf), cv=document.getElementById('mkovCanvas_'+tf+'_cross');
+    if(!main||!cv||!main._layout) return;
+    const L=main._layout, dpr=window.devicePixelRatio||2;
+    cv.width=main.width; cv.height=main.height; cv.style.width=main.style.width; cv.style.height=main.style.height;
+    const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+    const pos=mkovFindPos(mkovBars(tf), idx, tf)-L.startPos;
+    if(pos<0||pos>=L.segment.length) return;
+    const bar=L.segment[pos], sx=L.X(pos), cy=L.Y(bar.c), {P,W,H}=L;
+    ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(P.l,cy);ctx.lineTo(W-P.r,cy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,cy-9,P.r-3,18);
+    ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';ctx.fillText(bar.c.toFixed(1),W-P.r+4,cy+4);
+    const tlW=36,tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx));
+    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-P.b,tlW,14);
+    ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(bar.ts,tlX,H-P.b+10);
+    mkovUpdateChdr(tf, bar);
+  });
+}
+function mkovClearCross(){
+  mkovTFs.forEach(tf=>{
+    const cv=document.getElementById('mkovCanvas_'+tf+'_cross'); if(cv) cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
+    const m=document.getElementById('mkovCanvas_'+tf); if(m&&m._layout) mkovUpdateChdr(tf, m._layout.segment[m._layout.segment.length-1]);
+  });
+}
+
+function attachMkovEvents(tf){
+  const body=document.getElementById('mkovBody_'+tf);
+  if(!body) return;
+  let drag=null;
+  const L=()=>{ const m=document.getElementById('mkovCanvas_'+tf); return m&&m._layout; };
+  const barAt=(clientX)=>{
+    const l=L(); if(!l) return null;
+    const r=body.getBoundingClientRect(), mx=clientX-r.left;
+    const i=Math.max(0,Math.min(l.segment.length-1, Math.round((mx-l.P.l-l.cw/2)/l.cw)));
+    return l.segment[i];
+  };
+  body.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const l=L(); if(!l) return;
+    const r=body.getBoundingClientRect();
+    const frac=Math.max(0,Math.min(1,(e.clientX-r.left-l.P.l)/(l.W-l.P.l-l.P.r)));
+    mkovZoom(tf, e.deltaY<0?1.2:1/1.2, frac);
+  }, {passive:false});
+  body.addEventListener('mousedown', e=>{
+    const v=mkovGetView(tf); drag={x:e.clientX, end:v.end, moved:false};
+  });
+  window.addEventListener('mouseup', ()=>{ if(drag){ body.classList.remove('drag'); setTimeout(()=>drag=null,0);} });
+  body.addEventListener('mousemove', e=>{
+    if(drag && (e.buttons&1)){
+      const l=L(); if(!l) return;
+      const dx=e.clientX-drag.x;
+      if(Math.abs(dx)>3){ drag.moved=true; body.classList.add('drag'); }
+      if(drag.moved){
+        mkovView[tf].end=drag.end - dx/l.cw;
+        mkovRender(tf); mkovClearCross(); return;
+      }
+    }
+    const b=barAt(e.clientX); if(b) mkovCrossAt(b.idx);
+  });
+  body.addEventListener('mouseleave', mkovClearCross);
+  body.addEventListener('click', e=>{
+    if(drag && drag.moved) return;
+    const hits=mkovHits[tf]||[], r=body.getBoundingClientRect();
+    const mx=e.clientX-r.left, my=e.clientY-r.top;
+    let best=null, bd=18*18;
+    hits.forEach(h=>{ const d=(h.x-mx)**2+(h.y-my)**2; if(d<bd){bd=d;best=h;} });
+    if(best) jumpToReplayTrade(best.ti);
+  });
+  body.addEventListener('touchmove', e=>{
+    if(e.touches.length!==1) return; e.preventDefault();
+    const b=barAt(e.touches[0].clientX); if(b) mkovCrossAt(b.idx);
+  }, {passive:false});
+  body.addEventListener('touchend', mkovClearCross);
+}
+
+// 從排行榜「沒有交易的日子」點進來
+function jumpToMarketDay(d){
+  mkovDay=d;
+  switchTResultTab('mkov');
+}
+
+window.addEventListener('keydown', e=>{
+  const page=document.getElementById('pageMktOverview');
+  if(!page || !page.classList.contains('show')) return;
+  if(/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowLeft'){ mkovStepDay(-1); e.preventDefault(); }
+  if(e.key==='ArrowRight'){ mkovStepDay(1); e.preventDefault(); }
+});
+// 視窗大小改變：績效統計的曲線圖寬度跟著重算（保留目前捲動位置）
+let _statsResizeTimer=null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_statsResizeTimer);
+  _statsResizeTimer=setTimeout(()=>{
+    const ov=document.getElementById('tresultOverlay'), pg=document.getElementById('pageStats');
+    if(!ov || !ov.classList.contains('show') || !pg || !pg.classList.contains('show')) return;
+    if(!_allClosedTradesCache.length) return;
+    const st=ov.scrollTop;
+    renderTradeResultWithTrades(_allClosedTradesCache);
+    ov.scrollTop=st;
+  }, 250);
+});
+window.addEventListener('resize', ()=>{
+  const page=document.getElementById('pageMktOverview');
+  if(page && page.classList.contains('show')) syncMkovHeight();
+});
 
 function jumpToReplayTrade(i){
   switchTResultTab('replay');
@@ -3147,7 +3685,7 @@ function buildReplayPage(){
     page.innerHTML = '<div class="treplay-empty">尚無交易紀錄</div>';
     return;
   }
-  selectedReplayTFs = ['5k','60k'];
+  selectedReplayTFs = [defaultFiveKTF()];
   replayZoom = 1;
 
   // group by date
@@ -3199,9 +3737,9 @@ function buildReplayPage(){
           <button class="day-btn ind-trigger" id="btnIndicatorsReplay" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
           <div style="display:flex;gap:6px;" id="replayTFButtons">
             <div class="tresult-tab" id="rtf-1k" onclick="toggleReplayTF('1k')" style="padding:5px 12px;font-size:11px;">${tfDisp('1k')}</div>
-            <div class="tresult-tab on" id="rtf-5k" onclick="toggleReplayTF('5k')" style="padding:5px 12px;font-size:11px;">${tfDisp('5k')}</div>
+            <div class="tresult-tab" id="rtf-5k" onclick="toggleReplayTF('5k')" style="padding:5px 12px;font-size:11px;">${tfDisp('5k')}</div>
             <div class="tresult-tab" id="rtf-15k" onclick="toggleReplayTF('15k')" style="padding:5px 12px;font-size:11px;">${tfDisp('15k')}</div>
-            <div class="tresult-tab on" id="rtf-60k" onclick="toggleReplayTF('60k')" style="padding:5px 12px;font-size:11px;">${tfDisp('60k')}</div>
+            <div class="tresult-tab" id="rtf-60k" onclick="toggleReplayTF('60k')" style="padding:5px 12px;font-size:11px;">${tfDisp('60k')}</div>
           </div>
           </div>
         </div>
@@ -3209,6 +3747,9 @@ function buildReplayPage(){
       </div>
     </div>
   `;
+  document.querySelectorAll('#replayTFButtons .tresult-tab').forEach(el=>{
+    el.classList.toggle('on', selectedReplayTFs.includes(el.id.replace('rtf-','')));
+  });
   buildReplayCanvases();
   updateIndicatorBtn();
   if(trades.length) selectReplayTrade(0);
@@ -3438,8 +3979,7 @@ function renderDaySummaryPanel(dateStr){
       <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">總口數</div><div class="treplay-day-stat-val">${s.totalQty} 口</div></div>
       <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">MAE / MFE 均值</div><div class="treplay-day-stat-val" style="font-size:10.5px;"><span style="color:#ef4444">$${s.avgMae.toFixed(0)}</span> / <span style="color:#22c55e">$${s.avgMfe.toFixed(0)}</span></div></div>
       <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">均獲 / 均虧 (PT)</div><div class="treplay-day-stat-val" style="font-size:10.5px;"><span style="color:#22c55e">+${s.avgWinPts.toFixed(1)}</span> / <span style="color:#ef4444">${s.avgLossPts.toFixed(1)}</span></div></div>
-      <div class="treplay-day-stat"><div class="treplay-day-stat-lbl">獲利回吐率</div><div class="treplay-day-stat-val" style="color:#a855f7;">${s.hasGiveback ? s.avgGiveback.toFixed(1)+'%' : '—'}</div></div>
-      <div class="treplay-day-stat" style="grid-column:1/-1;"><div class="treplay-day-stat-lbl">理想RR / 實際RR</div><div class="treplay-day-stat-val" style="font-size:10.5px;">${s.hasRR ? `理想 <span style="color:#facc15">${s.avgIdealRR.toFixed(2)}</span> ・ 實際 <span style="color:${s.avgActualRR>=0?'#22c55e':'#ef4444'}">${s.avgActualRR.toFixed(2)}</span>` : '—'}</div></div>
+      <div class="treplay-day-stat" style="grid-column:1/-1;"><div class="treplay-day-stat-lbl">獲利回吐率</div><div class="treplay-day-stat-val" style="color:#a855f7;">${s.hasGiveback ? s.avgGiveback.toFixed(1)+'%' : '—'}</div></div>
     </div>
   `;
   syncReplayListHeight();
@@ -3939,8 +4479,6 @@ function renderTradeResultWithTrades(trades){
       <div class="ls-metric-grid cols2">
         <div class="ls-metric"><span class="ls-metric-lbl">獲利回吐率</span><b>${stats.giveBackRate.toFixed(1)}%</b></div>
         <div class="ls-metric"><span class="ls-metric-lbl">平均MAE(pt)</span><b style="color:var(--dn)">${stats.avgMAEpts.toFixed(1)}</b></div>
-        <div class="ls-metric"><span class="ls-metric-lbl">理想R:R</span><b style="color:${stats.idealRR>=1?'var(--up)':'var(--dn)'}">${stats.idealRR.toFixed(2)}x</b></div>
-        <div class="ls-metric"><span class="ls-metric-lbl">實際R:R</span><b style="color:${stats.actualRR>=0?'var(--up)':'var(--dn)'}">${stats.actualRR.toFixed(2)}x</b></div>
       </div>
     </div>`;
   }
@@ -4047,22 +4585,6 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
         </div>
       </div>
       <div class="eff-row">
-        <div class="eff-row-icon">👑</div>
-        <div class="eff-row-body">
-          <div class="eff-row-lbl">理想報酬風險比</div>
-          <div class="eff-row-val" style="color:${color}">${stats.idealRR.toFixed(2)}x</div>
-          <div class="eff-row-sub">最大獲利÷最大虧損</div>
-        </div>
-      </div>
-      <div class="eff-row">
-        <div class="eff-row-icon">💰</div>
-        <div class="eff-row-body">
-          <div class="eff-row-lbl">實際報酬風險比</div>
-          <div class="eff-row-val" style="color:${color}">${stats.actualRR.toFixed(2)}x</div>
-          <div class="eff-row-sub">出場損益 ÷ 最大虧損</div>
-        </div>
-      </div>
-      <div class="eff-row">
         <div class="eff-row-icon">📉</div>
         <div class="eff-row-body">
           <div class="eff-row-lbl">單筆最大回撤</div>
@@ -4093,7 +4615,10 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
     if(!map[b]) map[b] = [];
     map[b].push(t);
   });
-  const allBucketKeys = [...new Set([...Object.keys(longBuckets), ...Object.keys(shortBuckets)].map(Number))].sort((a,b)=>b-a);
+  // ★ 區間連續：最高到最低之間每一格都要列出來，沒有交易的區間也留空列（不能 40 之後直接跳 120）
+  const _bk = [...new Set([...Object.keys(longBuckets), ...Object.keys(shortBuckets)].map(Number))];
+  const allBucketKeys = [];
+  if(_bk.length){ for(let b=Math.max(..._bk); b>=Math.min(..._bk); b-=bucketSize) allBucketKeys.push(b); }
   const maxBucketCount = Math.max(1, ...allBucketKeys.map(k => Math.max((longBuckets[k]||[]).length, (shortBuckets[k]||[]).length)));
 
   const fmtMoney = v => `${v>=0?'+':''}$${Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0)}`;
@@ -4140,20 +4665,28 @@ function chartClickData(title, items){
   return JSON.stringify({title, items}).replace(/"/g, '&quot;');
 }
 
+// 依目前視窗寬度決定曲線圖的實際寬度，讓圖左右撐滿區塊（不再固定 720 寬、兩側留白）
+function equityCurveTargetWidth(chartId){
+  const card = Math.min(1800, window.innerWidth*0.97);
+  const full = Math.max(600, card - 42);
+  if(chartId==='eqOverall') return Math.round(full);
+  return Math.round(Math.max(320, (full - 10)/2 - 42));
+}
+
 function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, chartId){
-  const W=720, H=320, PAD=30;
+  const W=equityCurveTargetWidth(chartId), H=320, PAD=30, PADL=58;
   const allVals = [0, ...curveArr, ...(highArr||[]), ...(lowArr||[])];
   const minV = Math.min(...allVals), maxV = Math.max(...allVals);
   const pd = (maxV-minV)*0.1 || 100;
   const rng = (maxV - minV + pd*2) || 1;
   const dispMin = minV - pd, dispMax = maxV + pd;
-  const xStep = (W - 2*PAD) / (curveArr.length - 1 || 1);
+  const xStep = (W - PADL - PAD) / (curveArr.length - 1 || 1);
   const yPos = v => PAD + (H - 2*PAD) * (1 - (v - dispMin) / rng);
   const zeroY = yPos(0);
   const lastVal = curveArr[curveArr.length-1] || 0;
   const curveColor = customColor || (lastVal >= 0 ? '#22c55e' : '#ef4444');
 
-  const pts = curveArr.map((v,i) => [PAD+i*xStep, yPos(v)]);
+  const pts = curveArr.map((v,i) => [PADL+i*xStep, yPos(v)]);
   const pathD = pts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   const areaD = pathD + ` L${pts[pts.length-1][0].toFixed(1)},${zeroY.toFixed(1)} L${pts[0][0].toFixed(1)},${zeroY.toFixed(1)} Z`;
 
@@ -4161,11 +4694,11 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
   const HIGH_COLOR = '#22d3ee', LOW_COLOR = '#fb7185';
   let highPathD = '', lowPathD = '';
   if(highArr && highArr.length === curveArr.length){
-    const hPts = highArr.map((v,i) => [PAD+i*xStep, yPos(v)]);
+    const hPts = highArr.map((v,i) => [PADL+i*xStep, yPos(v)]);
     highPathD = hPts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   }
   if(lowArr && lowArr.length === curveArr.length){
-    const lPts = lowArr.map((v,i) => [PAD+i*xStep, yPos(v)]);
+    const lPts = lowArr.map((v,i) => [PADL+i*xStep, yPos(v)]);
     lowPathD = lPts.map((p,i)=>`${i===0?'M':'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   }
 
@@ -4176,8 +4709,8 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
   for(let gv=gridStart; gv>=gridEnd; gv-=GRID_STEP){
     const gy = yPos(gv);
     if(gy < PAD-5 || gy > H-PAD+5) continue;
-    gridLinesH += `<line x1="${PAD}" y1="${gy.toFixed(1)}" x2="${W-PAD}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
-    gridLinesH += `<text x="2" y="${(gy+3).toFixed(1)}" fill="#777" font-size="9" font-family="monospace" font-weight="600">$${gv.toFixed(0)}</text>`;
+    gridLinesH += `<line x1="${PADL}" y1="${gy.toFixed(1)}" x2="${W-PAD}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    gridLinesH += `<text x="${PADL-6}" text-anchor="end" y="${(gy+3).toFixed(1)}" fill="#777" font-size="9" font-family="monospace" font-weight="600">$${gv.toFixed(0)}</text>`;
   }
   // ★ 效能：不再畫「每筆交易一條」的垂直網格線，交易筆數一多(好幾個月的回測常常上百筆)
   //   單張圖就會多出上百個SVG節點，累積損益/多/空三張圖加起來就是好幾百個，是造成匯出報告滾動卡頓的主因之一。
@@ -4186,8 +4719,36 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
   const V_LINES = 5;
   for(let k=1; k<V_LINES; k++){
     const idx = Math.round((curveArr.length-1) * k / V_LINES);
-    const gx = PAD + idx*xStep;
+    const gx = PADL + idx*xStep;
     gridLinesV += `<line x1="${gx.toFixed(1)}" y1="${PAD}" x2="${gx.toFixed(1)}" y2="${H-PAD}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
+  }
+
+  // ★ X 軸月份標示：交易日期換月的地方畫一條分隔線，區段下方標「1月、2月…」（換年或第一段加上年份）
+  let monthMarks = '';
+  if(datesArr && datesArr.length){
+    const segs = [];
+    datesArr.forEach((d,k)=>{
+      if(!d) return;
+      const ym = String(d).slice(0,7);
+      const i = k+1; // 第 k 筆交易對應曲線第 k+1 個點
+      if(!segs.length || segs[segs.length-1].ym!==ym) segs.push({ym, from:i, to:i});
+      else segs[segs.length-1].to = i;
+    });
+    const xOf = i => PADL + i*xStep;
+    segs.forEach((g,si)=>{
+      const x1 = si===0 ? PADL : xOf(g.from) - xStep/2;
+      const x2 = si===segs.length-1 ? W-PAD : xOf(g.to) + xStep/2;
+      const [Y,M] = g.ym.split('-');
+      if(si>0){
+        monthMarks += `<line x1="${x1.toFixed(1)}" y1="${PAD}" x2="${x1.toFixed(1)}" y2="${H-PAD+4}" stroke="rgba(250,204,21,0.28)" stroke-width="1" stroke-dasharray="3,3"/>`;
+      }
+      if(si%2===1) monthMarks += `<rect x="${x1.toFixed(1)}" y="${PAD}" width="${Math.max(0,x2-x1).toFixed(1)}" height="${H-2*PAD}" fill="rgba(255,255,255,0.018)"/>`;
+      const w = x2-x1;
+      const prevY = si>0 ? segs[si-1].ym.slice(0,4) : null;
+      const full = (si===0 || prevY!==Y) ? `${Y}年${+M}月` : `${+M}月`;
+      const lbl = w >= 58 ? full : (w >= 22 ? `${+M}月` : '');
+      if(lbl) monthMarks += `<text x="${((x1+x2)/2).toFixed(1)}" y="${H-PAD+17}" fill="#cbd5e1" font-size="11" font-weight="700" text-anchor="middle">${lbl}</text>`;
+    });
   }
 
   let pointDots = '';
@@ -4210,7 +4771,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
   let hitZones = '';
   curveArr.forEach((v,i) => {
     if(i===0) return;
-    const gx = PAD+i*xStep;
+    const gx = PADL+i*xStep;
     const delta = v - curveArr[i-1];
     const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
     const items = [];
@@ -4240,8 +4801,9 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
       </linearGradient>
     </defs>
     ${gridLinesV}
+    ${monthMarks}
     ${gridLinesH}
-    <line x1="${PAD}" y1="${zeroY}" x2="${W-PAD}" y2="${zeroY}" stroke="rgba(255,255,255,0.4)" stroke-width="1.3" stroke-dasharray="5,3"/>
+    <line x1="${PADL}" y1="${zeroY}" x2="${W-PAD}" y2="${zeroY}" stroke="rgba(255,255,255,0.4)" stroke-width="1.3" stroke-dasharray="5,3"/>
     <path d="${areaD}" fill="url(#grad-${idSuffix})"/>
     ${highPathD ? `<path d="${highPathD}" fill="none" stroke="${HIGH_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
     ${lowPathD ? `<path d="${lowPathD}" fill="none" stroke="${LOW_COLOR}" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>` : ''}
@@ -4250,7 +4812,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${PAD}" x2="0" y2="${H-PAD}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
     ${pointDots}
     ${hitZones}
-    <text x="${PAD}" y="${zeroY-8}" fill="rgba(255,255,255,0.6)" font-size="10" font-family="monospace" font-weight="700">$0</text>
+    <text x="${PADL+4}" y="${zeroY-8}" fill="rgba(255,255,255,0.6)" font-size="10" font-family="monospace" font-weight="700">$0</text>
   </svg>`;
 }
 
@@ -6804,6 +7366,11 @@ function rerenderReplayForIndicators(){
   const sel=document.querySelector('.treplay-item.sel');
   if(sel) renderReplayChart(parseInt(sel.id.replace('treplayItem','')));
 }
+// 總體行情回顧開著的話也一起重畫
+function rerenderMkovForIndicators(){
+  const page=document.getElementById('pageMktOverview');
+  if(page && page.classList.contains('show')) mkovRenderAll();
+}
 function renderIndicatorMenu(){
   const pop=document.getElementById('indPopup');
   if(!pop) return;
@@ -6848,7 +7415,7 @@ function toggleIndicator(id){
   indicatorOn[id]=!indicatorOn[id];
   saveIndicatorState(); renderIndicatorMenu(); updateIndicatorBtn();
   if(mode1kBars.length) renderAll();
-  rerenderReplayForIndicators();
+  rerenderReplayForIndicators(); rerenderMkovForIndicators();
 }
 function setIndicatorNumOpt(id,key,el){
   const ind=INDICATORS.find(x=>x.id===id);
@@ -6865,7 +7432,7 @@ function setIndicatorOpt(id,key,val){
   indicatorOpts[id][key]=val;
   saveIndicatorState();
   if(mode1kBars.length) renderAll();
-  rerenderReplayForIndicators();
+  rerenderReplayForIndicators(); rerenderMkovForIndicators();
 }
 document.addEventListener('click',e=>{
   const pop=document.getElementById('indPopup');
