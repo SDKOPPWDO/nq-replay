@@ -984,8 +984,8 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
       <div class="btn-sep"></div>
       <div style="flex:1;min-height:0;"></div>
       <div class="nav-grp-lbl">換日</div>
-      <button class="cbtn dim" id="btnPrevDay2">‹ 昨天</button>
-      <button class="cbtn dim" id="btnNextDay2">› 明天</button>
+      <button class="cbtn dim" id="btnPrevDay2" title="鍵盤 －">‹ 昨天</button>
+      <button class="cbtn dim" id="btnNextDay2" title="鍵盤 ＋">› 明天</button>
       <div class="nav-gap"></div>
       <div class="nav-grp-lbl">換K棒</div>
       <button class="cbtn next" id="btnNext">▶ +1</button>
@@ -2696,6 +2696,8 @@ document.addEventListener('keydown',e=>{
   if(document.getElementById('journalOverlay') && document.getElementById('journalOverlay').classList.contains('show')) return;
   if(document.getElementById('snLibOv').classList.contains('show') || document.getElementById('snModal').classList.contains('show')) return;
   if((e.key==='s'||e.key==='S') && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); if(typeof snCapture==='function') snCapture(); return; }
+  if(isNextDayKey(e)){ e.preventDefault(); goNextDay(); return; }
+  if(isPrevDayKey(e)){ e.preventDefault(); goPrevDay(); return; }
   if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); stepPlayback(1); }
   else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPlayback(-1); }
   else if(e.key==='ArrowUp'){ e.preventDefault(); if(tradeSystemOn && typeof tradeAction==='function') tradeAction('buy'); }
@@ -3640,10 +3642,10 @@ function buildMktOverviewPage(){
       <div class="mkov-detail">
         <div class="mkov-toolbar">
           <div class="mkov-daynav">
-            <button onclick="mkovStepDay(-1)" id="mkovPrev" title="上一個交易日（←）">‹</button>
+            <button onclick="mkovStepDay(-1)" id="mkovPrev" title="上一個交易日（－ 或 ←）">‹</button>
             <div class="treplay-detail-hdr" id="mkovHdr">—</div>
-            <button onclick="mkovStepDay(1)" id="mkovNext" title="下一個交易日（→）">›</button>
-            <span class="mkov-hint">滾輪縮放・拖曳平移・點標記跳到進場回顧</span>
+            <button onclick="mkovStepDay(1)" id="mkovNext" title="下一個交易日（＋ 或 →）">›</button>
+            <span class="mkov-hint">＋明天 －昨天・滾輪縮放・拖曳平移・點標記跳到進場回顧</span>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
             <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
@@ -3910,9 +3912,9 @@ function buildCmpPage(){
       <div class="mkov-detail">
         <div class="mkov-toolbar">
           <div class="mkov-daynav">
-            <button onclick="cmpStepDay(-1)" id="cmpPrev" title="上一個有交易的日子（←）">‹</button>
+            <button onclick="cmpStepDay(-1)" id="cmpPrev" title="上一個有交易的日子（－ 或 ←）">‹</button>
             <div class="treplay-detail-hdr" id="cmpHdr">—</div>
-            <button onclick="cmpStepDay(1)" id="cmpNext" title="下一個有交易的日子（→）">›</button>
+            <button onclick="cmpStepDay(1)" id="cmpNext" title="下一個有交易的日子（＋ 或 →）">›</button>
             <label class="mkov-hint" style="display:flex;align-items:center;gap:4px;">同訊號容許
               <input type="number" min="1" max="240" value="${cmpTolMin}" onchange="cmpTolMin=Math.max(1,+this.value||15);cmpRefresh()" class="cmp-tol"> 分鐘</label>
           </div>
@@ -4043,6 +4045,36 @@ function toggleCmpTF(tf){
   cmpChart.buildCanvases(); cmpChart.renderAll();
 }
 
+// ＋＝明天、－＝昨天（主畫面、進場回顧、總體行情回顧、版本對比都通用；數字鍵盤的 ＋／－ 也可以）
+function isNextDayKey(e){ return !e.ctrlKey && !e.metaKey && !e.altKey && (e.key==='+' || e.key==='=' || e.code==='NumpadAdd'); }
+function isPrevDayKey(e){ return !e.ctrlKey && !e.metaKey && !e.altKey && (e.key==='-' || e.key==='_' || e.code==='NumpadSubtract'); }
+// 進場回顧：跳到下一個／上一個有交易的日子（選那天的第一筆）
+function replayStepDay(dir){
+  const trades=_allClosedTradesCache; if(!trades.length) return;
+  const sel=document.querySelector('.treplay-item.sel');
+  const cur=sel ? trades[parseInt(sel.id.replace('treplayItem',''))].date : null;
+  const dates=[...new Set(trades.map(t=>t.date))].sort();
+  let j = cur ? dates.indexOf(cur)+dir : 0;
+  if(j<0 || j>=dates.length) return;
+  let first=-1;
+  trades.forEach((t,i)=>{ if(t.date===dates[j] && (first<0 || t.entryIdx<trades[first].entryIdx)) first=i; });
+  if(first<0) return;
+  const grp=document.getElementById('treplayDay-'+dates[j]); if(grp) grp.classList.remove('collapsed');
+  selectReplayTrade(first);
+  const hdr=document.getElementById('treplayDayHdr-'+dates[j]); if(hdr) hdr.scrollIntoView({block:'nearest'});
+}
+window.addEventListener('keydown', e=>{
+  const ov=document.getElementById('tresultOverlay');
+  if(!ov || !ov.classList.contains('show')) return;
+  if(/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))) return;
+  const dir = isNextDayKey(e) ? 1 : (isPrevDayKey(e) ? -1 : 0);
+  if(!dir) return;
+  if(_curTResultTab==='mkov') mkovStepDay(dir);
+  else if(_curTResultTab==='cmp') cmpStepDay(dir);
+  else if(_curTResultTab==='replay') replayStepDay(dir);
+  else return;
+  e.preventDefault();
+});
 // 鍵盤 ← →：總體行情回顧／版本對比 換日
 window.addEventListener('keydown', e=>{
   if(/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))) return;
