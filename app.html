@@ -317,7 +317,7 @@ canvas.cross{pointer-events:none;}
 /* ===== 總體行情回顧 ===== */
 .notrade-day-chip{cursor:pointer;transition:all .12s;}
 .notrade-day-chip:hover{border-color:var(--blue);color:#fff;background:rgba(37,99,235,.18);}
-.mkov-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;align-items:stretch;height:72vh;min-height:420px;}
+.mkov-layout{display:grid;grid-template-columns:240px 1fr;gap:8px;align-items:stretch;height:72vh;min-height:420px;}
 .mkov-left{display:flex;flex-direction:column;gap:10px;min-height:0;}
 .mkov-cal{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:10px;flex-shrink:0;}
 .mkov-cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px;}
@@ -416,7 +416,7 @@ canvas.cross{pointer-events:none;}
 .tver-mini select{flex:1;min-width:0;height:28px;border-radius:7px;border:1px solid var(--vc,var(--b2));background:var(--bg3);color:#fff;font-size:11.5px;font-weight:700;font-family:inherit;padding:0 4px;}
 .tver-mini button{height:28px;width:30px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:#fff;cursor:pointer;font-size:12px;flex-shrink:0;}
 /* 版本對比：版本清單移到左欄 */
-.cmp-layout{grid-template-columns:300px 1fr;}
+.cmp-layout{grid-template-columns:260px 1fr;}
 .cmp-left{overflow-y:auto;padding-right:2px;}
 .cmp-left > *{flex-shrink:0;}
 .cmp-left .mkov-info{flex:none;overflow:visible;}
@@ -433,8 +433,8 @@ canvas.cross{pointer-events:none;}
 .tresult-page{display:none;}
 .tresult-page.show{display:block;}
 /* Trade replay list+detail */
-.treplay-layout{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:stretch;height:70vh;min-height:400px;max-height:900px;}
-.treplay-left{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-height:0;height:100%;}
+.treplay-layout{display:grid;grid-template-columns:190px 1fr;gap:8px;align-items:stretch;height:70vh;min-height:400px;}
+.treplay-left{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-height:0;height:100%;}
 .treplay-list{flex:1 1 auto;min-height:80px;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:6px;}
 .treplay-item{padding:8px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;font-size:10px;}
 .treplay-item:hover{background:var(--bg3);}
@@ -902,6 +902,65 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
 .sns-bad{color:#fca5a5;}
 .sns-good{color:#86efac;}
 .sns-warn{color:#fbbf24;margin-top:4px;}
+
+/* ===== K線圖分頁：圖撐滿整個畫面（版面縮小） ===== */
+.tresult-overlay.chart-tab{padding:6px 6px 0;}
+.tresult-overlay.chart-tab .tresult-card{max-width:100%;}
+.tresult-overlay.chart-tab #tresultTabs{margin-bottom:6px;gap:5px;padding-right:90px;}
+.tresult-overlay.chart-tab #tresultTabs .tresult-tab{padding:5px 14px;font-size:12px;border-radius:8px;box-shadow:none;}
+.tresult-overlay.chart-tab .tresult-close-btn{position:fixed;top:6px;right:8px;width:auto;padding:6px 16px;font-size:12px;border-radius:8px;z-index:20;box-shadow:none;}
+.tresult-overlay.chart-tab .mkov-left,.tresult-overlay.chart-tab .treplay-left{gap:6px;}
+.tresult-overlay.chart-tab .mkov-cal,.tresult-overlay.chart-tab .mkov-info,.tresult-overlay.chart-tab .treplay-day-summary,.tresult-overlay.chart-tab .cmp-vlist{padding:8px;}
+.tresult-overlay.chart-tab .mkov-detail,.tresult-overlay.chart-tab .treplay-detail{padding:6px;}
+.tresult-overlay.chart-tab .treplay-detail > .tresult-tabs{margin-bottom:4px!important;}
+/* ===== 多格局排列：上下／左右 ===== */
+body.tf-lr .charts-col{flex-direction:row;}
+body.tf-lr .charts-col > .ccol{border-bottom:none;border-right:1px solid var(--b1);min-width:0;}
+body.tf-lr .charts-col > .ccol:last-child{border-right:none;}
+body.tf-lr .treplay-canvas-multi{flex-direction:row;}
+body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
+
+/* ===== 📊 績效統計：版本之間比較 ===== */
+.scmp-sec{border-color:rgba(250,204,21,.35);}
+.scmp-hdr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.scmp-hdr .tresult-section-title{margin-bottom:0;}
+.scmp-toggle{margin-left:auto;height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.scmp-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.scmp-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t3);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.scmp-chip i{width:9px;height:9px;border-radius:50%;background:var(--vc);display:inline-block;opacity:.5;}
+.scmp-chip.on{color:#fff;border-color:var(--vc);background:color-mix(in srgb, var(--vc) 16%, var(--bg3));}
+.scmp-chip.on i{opacity:1;}
+.scmp-chip .b{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--vc);color:#000;}
+.scmp-note{font-size:10.5px;color:var(--t3);margin-bottom:10px;}
+.scmp-tbl-wrap{overflow-x:auto;margin-bottom:14px;}
+.scmp-tbl{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;}
+.scmp-tbl th,.scmp-tbl td{padding:7px 10px;border-bottom:1px solid var(--b1);text-align:right;white-space:nowrap;}
+.scmp-tbl th:first-child,.scmp-tbl td:first-child{text-align:left;color:var(--t2);font-weight:600;position:sticky;left:0;background:var(--bg2);}
+.scmp-tbl thead th{color:#fff;font-weight:800;border-bottom:2px solid var(--b2);}
+.scmp-tbl thead th span{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0;}
+.scmp-tbl tr.grp td{background:rgba(255,255,255,.03);color:var(--t3);font-size:10.5px;font-weight:800;letter-spacing:.5px;text-align:left;}
+.scmp-tbl td b{color:#fff;font-weight:800;}
+.scmp-tbl td.best b{color:#facc15;}
+.scmp-tbl td.best::after{content:' ★';color:#facc15;font-size:10px;}
+.scmp-d{display:block;font-size:10px;font-weight:700;margin-top:1px;}
+.scmp-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--t2);margin-bottom:6px;}
+.scmp-legend span{display:inline-flex;align-items:center;gap:5px;}
+.scmp-legend i{width:16px;height:3px;border-radius:2px;display:inline-block;}
+
+/* ===== 📊 績效統計：兩個版本左右並排 ===== */
+.tver-split{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;color:#fff;}
+.tver-split select{height:30px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:#fff;font-size:11.5px;font-weight:700;font-family:inherit;padding:0 6px;max-width:220px;}
+.tver-split select.on{border-color:#facc15;box-shadow:0 0 0 1px #facc15 inset;}
+.stats-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+.stats-col{min-width:0;}
+.stats-col-hdr{position:sticky;top:0;z-index:4;display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:10px;border-radius:10px;background:var(--bg2);border:1px solid var(--vc);box-shadow:0 6px 16px rgba(0,0,0,.45);font-size:14px;font-weight:800;color:#fff;}
+.stats-col-hdr i{width:10px;height:10px;border-radius:50%;background:var(--vc);}
+.stats-col-hdr span{margin-left:auto;font-size:11px;color:var(--t3);font-weight:600;}
+.stats-col .tresult-hero{gap:8px;}
+.stats-col .tresult-hero-card{padding:14px 8px;}
+.stats-col .tresult-hero-val{font-size:26px;}
+.stats-col .tresult-title{font-size:20px;}
+.stats-col .tresult-section{padding:14px;}
 </style>
 </head>
 <body>
@@ -916,6 +975,7 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在K線圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
     <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
+    <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="多個格局（例如 5K＋60K）要上下排還是左右排" style="font-size:12px;padding:0 8px;width:auto;">⬍ 上下</button>
     <button class="day-btn ind-trigger" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
     <div class="day-nav">
       <button class="day-btn" id="btnPrevDay">‹</button>
@@ -1813,7 +1873,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   }
 
   // 60K：美股盤時段用很淺的黃色反白（夏令 21:00~03:00 / 冬令 22:00~04:00 台北時間），畫在K棒後面
-  if(tfKey==='60k'){
+  if(false && tfKey==='60k'){   // 60K 開盤時段黃底已取消
     const _hl=MKT.hl60(currentDay);
     const startTs=_hl.s, endTs=_hl.e;
     const full=allBars['60k']||[];
@@ -2136,6 +2196,7 @@ function attachEvents(wrap,tf){
   wrap.addEventListener('touchend',()=>{tTwo=false;wrap._panStart=null;clearAllCross();});
   wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width,e.clientY-r.top);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
+  wrap.addEventListener('wheel',e=>{ e.preventDefault(); zoomTF(tf, e.deltaY<0?1:-1); },{passive:false});
 
   // ===== 方框/水平線：畫、移動、調整、刪除（Pointer 事件 + setPointerCapture）=====
   // 左鍵空白拖曳=灰色方框(預設30根)；右鍵空白拖曳=白色水平線(預設30根,最上層)
@@ -2828,7 +2889,7 @@ function zoomTF(tf, dir){
   // dir=1: 放大(較少K棒,CW變大), dir=-1: 縮小(較多K棒,CW變小)
   let z = zoomLevel[tf] || 1;
   z = dir === 1 ? z * 1.25 : z / 1.25;
-  z = Math.max(0.3, Math.min(z, 3));
+  z = Math.max(0.15, Math.min(z, 5));
   zoomLevel[tf] = z;
   renderAll();
 }
@@ -3259,6 +3320,7 @@ function defaultFiveKTF(){ return TF_ORDER.find(tf=>tfDisp(tf)==='5K') || '5k'; 
 // 例：選 2026-01-02 → 顯示 01-02 04:00 ～ 01-03 03:30（中間 05:00～06:00 休市那段本來就沒有K棒）
 const DAY_WIN_FROM = '04:00', DAY_WIN_TO = '03:30';
 const DAY_WIN_LABEL = '04:00 → 隔天 03:30';
+const DAY60_PREV = 5;   // 60K 多帶前幾個交易日
 let _dayWinCache = {};
 // 某一天 1K 資料裡「跨過午夜之後」、時間 < 某時刻 的部分；或跨午夜前 ≥ 某時刻的部分
 function _dayPart(d, fn){
@@ -3285,8 +3347,17 @@ function dayWindowBars(d, tf){
   if(tf==='1k') return dayWindow1k(d);
   const key=d+'|'+tf;
   if(_dayWinCache[key]) return _dayWinCache[key];
-  const w=dayWindowOf(d), all=DATA[d][tf]||[];
-  const out = w.lo===null ? [] : all.filter(b=>b.idx>=w.lo && b.idx<=w.hi);
+  const w=dayWindowOf(d);
+  if(w.lo===null) return (_dayWinCache[key]=[]);
+  let lo=w.lo;
+  const ds=[d];
+  if(tf==='60k'){   // 60K：當天＋前 5 個交易日一起看
+    const i=DAYS.indexOf(d);
+    for(let j=i-1;j>=0 && j>=i-DAY60_PREV;j--){ const pw=dayWindowOf(DAYS[j]); if(pw.lo!==null){ lo=Math.min(lo,pw.lo); ds.unshift(DAYS[j]); } }
+  }
+  const map=new Map();
+  ds.forEach(x=>((DATA[x]&&DATA[x][tf])||[]).forEach(b=>{ if(b.idx>=lo && b.idx<=w.hi) map.set(b.idx,b); }));
+  const out=[...map.values()].sort((a,b)=>a.idx-b.idx);
   return (_dayWinCache[key]=out);
 }
 // 找出某個 1K idx 落在這個格局的哪一根
@@ -3296,6 +3367,8 @@ function dayFindPos(bars, idx, tf){
   for(let i=bars.length-1;i>=0;i--){ const b=bars[i]; if(b.idx<=idx && idx<=(b.idx_end||b.idx)) return i; }
   return -1;
 }
+// 圖上進出場文字：黑邊描字，深色背景也看得清楚
+function bigTxt(ctx,txt,x,y){ ctx.save(); ctx.lineWidth=3.5; ctx.strokeStyle='rgba(0,0,0,0.85)'; ctx.lineJoin='round'; ctx.strokeText(txt,x,y); ctx.restore(); ctx.fillText(txt,x,y); }
 function tradeLegs(t){
   return (t.legs&&t.legs.length)?t.legs:[
     {type:'entry',qty:t.qty,price:t.entryPrice,idx:t.entryIdx},
@@ -3387,7 +3460,8 @@ DayChart.prototype.render=function(tf){
   const cw=(W-Pd.l-Pd.r)/segment.length;
   const allP=segment.flatMap(b=>[b.h,b.l]);
   let lo=Math.min(...allP), hi=Math.max(...allP);
-  const pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad;
+  const _ph=H-Pd.t-Pd.b, _mpx=marks.length?Math.min(70,_ph*0.22):0;
+  const pad=Math.max((hi-lo)*0.1, _mpx?(hi-lo)*_mpx/Math.max(40,_ph-2*_mpx):0)||1; lo-=pad; hi+=pad;
   const rng=hi-lo||1;
   const Y2=p=>Pd.t+(H-Pd.t-Pd.b)*(1-(p-lo)/rng), X2=i=>Pd.l+i*cw+cw/2;
   const last=bars[bars.length-1];
@@ -3397,7 +3471,22 @@ DayChart.prototype.render=function(tf){
     const y=Pd.t+(H-Pd.t-Pd.b)*i/4, price=hi-rng*i/4;
     ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(Pd.l,y);ctx.lineTo(W-Pd.r,y);ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';ctx.fillText(price.toFixed(1),W-Pd.r+4,y+3);
+    ctx.fillStyle='#999';ctx.font='11px monospace';ctx.textAlign='left';ctx.fillText(price.toFixed(1),W-Pd.r+4,y+3);
+  }
+  // 60K 帶了前幾天：每一天的起點畫分隔線＋日期，當天底色稍亮
+  if(tf==='60k'){
+    const i=DAYS.indexOf(day);
+    for(let j=Math.max(0,i-DAY60_PREV);j<=i;j++){
+      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null) continue;
+      let p=-1; for(let k=0;k<segment.length;k++){ if((segment[k].idx_end||segment[k].idx)>=dw.lo){ p=k; break; } }
+      if(p<0) continue;
+      const x=X2(p)-cw/2;
+      if(j===i){ ctx.fillStyle='rgba(100,180,255,0.05)'; ctx.fillRect(x,Pd.t,W-Pd.r-x,H-Pd.t-Pd.b); }
+      ctx.strokeStyle=j===i?'rgba(100,180,255,0.6)':'rgba(255,255,255,0.18)'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(x,Pd.t); ctx.lineTo(x,H-Pd.b); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=j===i?'rgba(100,180,255,0.95)':'#8a8a99'; ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+      ctx.fillText(DAYS[j].slice(5).replace('-','/')+(j===i?' 今天':''), x+4, Pd.t-8);
+    }
   }
   drawIndicators(ctx, canvas._layout, tf, 'back');
   const span=(t)=>{
@@ -3440,8 +3529,10 @@ DayChart.prototype.render=function(tf){
     });
   }
 
-  // 進出場標記
+  // 進出場標記：買（多單進場／空單平倉）畫在K棒下方、箭頭朝上、字在箭頭下面；
+  //             賣（空單進場／多單平倉）畫在K棒上方、箭頭朝下、字在箭頭上面。箭頭離K棒留一段距離，不擋K棒
   const hits=[], seen={};
+  const GAP=24, AH=15, AW=9, STK=34;
   marks.forEach(m=>{
     const {t}=m, vColor=m.color;
     if(m.dim) ctx.globalAlpha=0.35;
@@ -3449,29 +3540,28 @@ DayChart.prototype.render=function(tf){
       const rel=dayFindPos(bars,l.idx,tf)-startPos;
       if(rel<0||rel>=segment.length) return;
       const b=segment[rel], x=X2(rel);
-      const key=rel+'_'+l.type+'_'+(l.type==='entry'?t.dir:''); const sn=seen[key]||0; seen[key]=sn+1;
-      const off=sn*13, onRight=t.dir==='long', lx=onRight?x+9:x-9;
+      const isEntry=l.type==='entry';
+      const below = isEntry ? t.dir==='long' : t.dir==='short';
+      const key=rel+'_'+(below?'b':'a'); const sn=seen[key]||0; seen[key]=sn+1;
+      const off=sn*STK;
       const tag=m.tag?m.tag+' ':'';
-      ctx.font='bold 9px sans-serif'; ctx.textAlign=onRight?'left':'right';
+      const txt = isEntry ? `${tag}${m.tag?'':'#'+(m.i+1)+' '}${t.dir==='long'?'多':'空'}${l.qty}` : `${tag}平${l.qty}`;
+      const fill = isEntry ? (vColor || (t.dir==='long'?UP:DN)) : (vColor || '#a855f7');
+      const ring = isEntry ? (t.dir==='long'?UP:DN) : '#a855f7';
+      ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
       let ey;
-      if(l.type==='entry'){
-        const fill = vColor || (t.dir==='long'?UP:DN);
-        if(t.dir==='long'){
-          ey=Y2(b.l)+14+off;
-          ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey+10);ctx.lineTo(x+6,ey+10);ctx.closePath();ctx.fill();
-          if(vColor){ctx.strokeStyle=UP;ctx.lineWidth=1.2;ctx.stroke();}
-          ctx.fillStyle=vColor||'#fff';ctx.fillText(`${tag}${m.tag?'':'#'+(m.i+1)+' '}多${l.qty}`,lx,ey+8); ey+=5;
-        } else {
-          ey=Y2(b.h)-14-off;
-          ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey-10);ctx.lineTo(x+6,ey-10);ctx.closePath();ctx.fill();
-          if(vColor){ctx.strokeStyle=DN;ctx.lineWidth=1.2;ctx.stroke();}
-          ctx.fillStyle=vColor||'#fff';ctx.fillText(`${tag}${m.tag?'':'#'+(m.i+1)+' '}空${l.qty}`,lx,ey-6); ey-=5;
-        }
+      if(below){
+        const tip=Y2(b.l)+GAP+off;              // 箭頭尖端（朝上指向K棒）
+        ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,tip);ctx.lineTo(x-AW,tip+AH);ctx.lineTo(x+AW,tip+AH);ctx.closePath();ctx.fill();
+        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();}
+        ctx.fillStyle=vColor||'#fff';bigTxt(ctx,txt,x,tip+AH+14);
+        ey=tip+AH/2;
       } else {
-        ey=Y2(b.c)-14-off;
-        ctx.fillStyle=vColor||'#a855f7';ctx.beginPath();ctx.moveTo(x,ey+10);ctx.lineTo(x-6,ey);ctx.lineTo(x+6,ey);ctx.closePath();ctx.fill();
-        if(vColor){ctx.strokeStyle='#a855f7';ctx.lineWidth=1.2;ctx.stroke();}
-        ctx.fillStyle=vColor||'#fff';ctx.fillText(`${tag}平${l.qty}`,lx,ey+3); ey+=5;
+        const tip=Y2(b.h)-GAP-off;              // 箭頭尖端（朝下指向K棒）
+        ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,tip);ctx.lineTo(x-AW,tip-AH);ctx.lineTo(x+AW,tip-AH);ctx.closePath();ctx.fill();
+        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();}
+        ctx.fillStyle=vColor||'#fff';bigTxt(ctx,txt,x,tip-AH-5);
+        ey=tip-AH/2;
       }
       if(l.price!=null){
         ctx.strokeStyle=vColor||(l.type==='entry'?(t.dir==='long'?UP:DN):'#a855f7');ctx.lineWidth=1.5;
@@ -3483,8 +3573,8 @@ DayChart.prototype.render=function(tf){
     ctx.globalAlpha=1;
   });
   this.hits[tf]=hits;
-  ctx.fillStyle='#999';ctx.font='8px sans-serif';ctx.textAlign='center';
-  const step=Math.max(1,Math.ceil(40/cw));
+  ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='center';
+  const step=Math.max(1,Math.ceil(52/cw));
   segment.forEach((b,i)=>{ if((startPos+i)%step===0) ctx.fillText(b.ts,X2(i),H-Pd.b+14-(stripH?0:0)); });
   this.chdr(tf, segment[segment.length-1]);
 };
@@ -3648,7 +3738,8 @@ function buildMktOverviewPage(){
             <span class="mkov-hint">＋明天 －昨天・滾輪縮放・拖曳平移・點標記跳到進場回顧</span>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
-            <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
+            <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="兩個格局上下排或左右排" style="font-size:11px;padding:0 9px;width:auto;height:26px;">${tfLayoutLabel()}</button>
+          <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
             <div style="display:flex;gap:6px;" id="mkovTFButtons">
               ${TF_ORDER.map(tf=>`<div class="tresult-tab${mkovTFs.includes(tf)?' on':''}" data-tf="${tf}" onclick="toggleMkovTF('${tf}')" style="padding:5px 12px;font-size:11px;">${tfDisp(tf)}</div>`).join('')}
             </div>
@@ -3667,7 +3758,7 @@ function syncDayLayoutHeight(sel, after){
     const layout=document.querySelector(sel);
     if(!layout || window.innerWidth<=820){ if(after) after(); return; }
     const rect=layout.getBoundingClientRect();
-    layout.style.height=Math.max(420, window.innerHeight-rect.top-16)+'px';
+    layout.style.height=Math.max(420, window.innerHeight-rect.top-8)+'px';
     if(after) after();
   });
 }
@@ -3802,6 +3893,7 @@ function renderVersionBar(){
       ${opts.map(v=>`<button class="tver-chip${v.id===tvActive?' on':''}" onclick="tvSelect('${v.id}')" style="--vc:${tvColor(v.id)}">
         <i></i>${escapeHtml(tvName(v.id))}<span class="tver-n">${tvCount(v.id)}筆</span></button>`).join('')}
     </div>
+    ${statsSplitSelectHtml()}
     <div class="tver-actions">
       <button class="tver-btn primary" onclick="tvSaveCurrentAsNew()" title="把目前進行中的模擬單存成新版本">💾 存成新版本</button>
       ${saved?`<button class="tver-btn" onclick="tvOverwrite()" title="同一輪分幾天模擬時，用目前的模擬單更新這個版本">⟳ 用目前紀錄更新</button>
@@ -3919,7 +4011,8 @@ function buildCmpPage(){
               <input type="number" min="1" max="240" value="${cmpTolMin}" onchange="cmpTolMin=Math.max(1,+this.value||15);cmpRefresh()" class="cmp-tol"> 分鐘</label>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
-            <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
+            <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="兩個格局上下排或左右排" style="font-size:11px;padding:0 9px;width:auto;height:26px;">${tfLayoutLabel()}</button>
+          <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
             <div style="display:flex;gap:6px;" id="cmpTFButtons">
               ${TF_ORDER.map(tf=>`<div class="tresult-tab${cmpTFs.includes(tf)?' on':''}" data-tf="${tf}" onclick="toggleCmpTF('${tf}')" style="padding:5px 12px;font-size:11px;">${tfDisp(tf)}</div>`).join('')}
             </div>
@@ -4113,7 +4206,7 @@ let replayZoomByTF = {'1k':1,'5k':1,'15k':1,'60k':1}; // 每個格局獨立縮�
 function zoomReplayTF(tf, dir){
   let z = replayZoomByTF[tf] || 1;
   z = dir===1 ? z*1.3 : z/1.3;
-  z = Math.max(0.25, Math.min(z, 4));
+  z = Math.max(0.1, Math.min(z, 8));
   replayZoomByTF[tf] = z;
   const sel = document.querySelector('.treplay-item.sel');
   if(sel){
@@ -4180,6 +4273,7 @@ function buildReplayPage(){
         <div class="tresult-tabs" style="margin-bottom:8px;justify-content:space-between;">
           <div class="treplay-detail-hdr" id="treplayHdr">—</div>
           <div style="display:flex;gap:6px;align-items:center;">
+          <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="兩個格局上下排或左右排" style="font-size:11px;padding:0 9px;width:auto;height:26px;">${tfLayoutLabel()}</button>
           <button class="day-btn ind-trigger" id="btnIndicatorsReplay" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
           <div style="display:flex;gap:6px;" id="replayTFButtons">
             <div class="tresult-tab" id="rtf-1k" onclick="toggleReplayTF('1k')" style="padding:5px 12px;font-size:11px;">${tfDisp('1k')}</div>
@@ -4212,7 +4306,7 @@ function syncReplayListHeight(){
     const list = document.querySelector('.treplay-list');
     if(!layout) return;
     const rect = layout.getBoundingClientRect();
-    const bottomMargin = 16; // 底部留一點空間，避免貼死邊緣
+    const bottomMargin = 8; // 底部留一點空間，避免貼死邊緣
     const availableHeight = window.innerHeight - rect.top - bottomMargin;
     layout.style.height = Math.max(400, availableHeight) + 'px';
     // 清單本身也明確設定 max-height，確保捲動只發生在清單內部，不會撐開外層
@@ -4271,6 +4365,7 @@ function attachReplayCrosshair(tf){
     handleReplayCross(tf, (e.clientX-r.left)/r.width);
   });
   bodyEl.addEventListener('mouseleave', () => clearAllReplayCross());
+  bodyEl.addEventListener('wheel', e => { e.preventDefault(); zoomReplayTF(tf, e.deltaY<0?1:-1); }, {passive:false});
   bodyEl.addEventListener('touchmove', e => {
     if(e.touches.length!==1) return;
     e.preventDefault();
@@ -4525,7 +4620,7 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
     const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
     ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillStyle='#999';ctx.font='11px monospace';ctx.textAlign='left';
     ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
   }
 
@@ -4558,7 +4653,7 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
   // 畫出每一次進場/出場（若同一根K棒有多腳，用小偏移避免完全重疊）
   // 標籤位置：多單在箭頭右邊，空單在箭頭左邊；平倉沿用該筆交易原本的多/空方向
   const seenAtRelPos = {};
-  const labelGap = 9;
+  const labelGap = 13;
   legPositions.forEach(l => {
     const relPos = l.pos - startPos;
     if(relPos < 0 || relPos >= segment.length) return;
@@ -4567,32 +4662,32 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
     const stackN = seenAtRelPos[stackKey] || 0;
     seenAtRelPos[stackKey] = stackN + 1;
     const x = X2(relPos);
-    const stackOffset = stackN * 13;
+    const stackOffset = stackN * 19;
     const onRight = t.dir === 'long';
     const labelX = onRight ? x+labelGap : x-labelGap;
 
     if(l.type === 'entry'){
       const label = `${t.dir==='long'?'多':'空'}${l.qty}`;
       if(t.dir==='long'){
-        const ey=Y2(b.l)+14+stackOffset;
-        ctx.fillStyle=UP;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey+10);ctx.lineTo(x+6,ey+10);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey+8);
+        const ey=Y2(b.l)+18+stackOffset;
+        ctx.fillStyle=UP;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-9,ey+15);ctx.lineTo(x+9,ey+15);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign=onRight?'left':'right';bigTxt(ctx,label,labelX,ey+13);
       } else {
-        const ey=Y2(b.h)-14-stackOffset;
-        ctx.fillStyle=DN;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-6,ey-10);ctx.lineTo(x+6,ey-10);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey-6);
+        const ey=Y2(b.h)-18-stackOffset;
+        ctx.fillStyle=DN;ctx.beginPath();ctx.moveTo(x,ey);ctx.lineTo(x-9,ey-15);ctx.lineTo(x+9,ey-15);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign=onRight?'left':'right';bigTxt(ctx,label,labelX,ey-9);
       }
     } else {
       const label = `平${l.qty}`;
       // 出場一律用箭頭（倒三角），從上方指向出場價位，避免跟進場的三角形混淆但同樣是箭頭而非圓點
-      const ey=Y2(b.c)-14-stackOffset;
-      ctx.fillStyle='#a855f7';ctx.beginPath();ctx.moveTo(x,ey+10);ctx.lineTo(x-6,ey);ctx.lineTo(x+6,ey);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign=onRight?'left':'right';ctx.fillText(label,labelX,ey+3);
+      const ey=Y2(b.c)-18-stackOffset;
+      ctx.fillStyle='#a855f7';ctx.beginPath();ctx.moveTo(x,ey+15);ctx.lineTo(x-9,ey);ctx.lineTo(x+9,ey);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign=onRight?'left':'right';bigTxt(ctx,label,labelX,ey+6);
     }
   });
 
-  ctx.fillStyle='#999';ctx.font='8px sans-serif';ctx.textAlign='center';
-  segment.forEach((b,i)=>{if(i%5===0) ctx.fillText(b.ts,X2(i),H-6);});
+  ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='center';
+  { const _st=Math.max(1,Math.ceil(52/cw)); segment.forEach((b,i)=>{if(i%_st===0) ctx.fillText(b.ts,X2(i),H-6);}); }
 
   // 預設顯示區段最後一根K棒的漲跌/上下影線（尚未移動滑鼠時）
   if(segment.length) updateReplayChdrPrice(tf, segment[segment.length-1]);
@@ -4772,10 +4867,12 @@ function resetDateRange(){
 
 function renderTradeResultWithTrades(trades, keepTab){
   const prevTab=_curTResultTab;
+  window._statsSplit = statsSplitOn();
   _renderTradeResultCore(trades);
   const vb=document.getElementById('tverBar');
   if(vb){ vb.dataset.has='1'; vb.style.display='flex'; renderVersionBar(); }
   const dr=document.getElementById('tresultDateRange'); if(dr) dr.dataset.has = dr.style.display==='none' ? '0' : '1';
+  statsSplitRender(trades);
   if(keepTab && prevTab!=='stats') switchTResultTab(prevTab);
 }
 function _renderTradeResultCore(trades){
@@ -5128,8 +5225,9 @@ function chartClickData(title, items){
 
 // 依目前視窗寬度決定曲線圖的實際寬度，讓圖左右撐滿區塊（不再固定 720 寬、兩側留白）
 function equityCurveTargetWidth(chartId){
-  const card = Math.min(1800, window.innerWidth*0.97);
-  const full = Math.max(600, card - 42);
+  let card = Math.min(1800, window.innerWidth*0.97);
+  if(window._statsSplit) card = (card - 12)/2;   // 左右對比時，每邊只有一半寬
+  const full = Math.max(420, card - 42);
   if(chartId==='eqOverall') return Math.round(full);
   return Math.round(Math.max(320, (full - 10)/2 - 42));
 }
@@ -5617,6 +5715,7 @@ function showDayLotsModal(dateStr){
 function closeDayLotsModal(){
   const overlay = document.getElementById('dayLotsModalOverlay');
   if(overlay) overlay.classList.remove('show');
+  if(_statsCacheBackup){ _allClosedTradesCache=_statsCacheBackup; _statsCacheBackup=null; }
 }
 
 function showTradeDetailPopover(evt, idx){
@@ -7628,7 +7727,7 @@ function renderSmktChartOnCanvas(canvasId, date, note, tf){
     const y=P.t+(H-P.t-P.b)*i/4, price=hi-rng*i/4;
     ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(W-P.r,y);ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillStyle='#999';ctx.font='11px monospace';ctx.textAlign='left';
     ctx.fillText(price.toFixed(1),W-P.r+4,y+3);
   }
 
@@ -7678,6 +7777,7 @@ function attachSmktCrosshair(tf){
     handleSmktCross(tf,(e.clientX-r.left)/r.width);
   });
   bodyEl.addEventListener('mouseleave',()=>clearAllSmktCross());
+  bodyEl.addEventListener('wheel',e=>{ e.preventDefault(); zoomSmktTF(tf, e.deltaY<0?1:-1); },{passive:false});
   bodyEl.addEventListener('touchmove',e=>{
     if(e.touches.length!==1) return;
     e.preventDefault();
@@ -9153,6 +9253,234 @@ function snrPayloadPart(){
   const cur=snrCollect(), recs={};
   Object.keys(cur).forEach(k=>{ recs[k]={u:SNS.rec[k]||1, v:cur[k]}; });
   return {recs, recDel:SNS.recDel};
+}
+
+// ============================================================
+// 多格局排列：上下／左右（主畫面、進場回顧、總體行情回顧、版本對比、行情檢視共用）
+// ============================================================
+function tfLayoutIsLR(){ return document.body.classList.contains('tf-lr'); }
+function tfLayoutLabel(){ return tfLayoutIsLR() ? '⬌ 左右' : '⬍ 上下'; }
+function toggleTfLayout(){
+  const lr=!tfLayoutIsLR();
+  document.body.classList.toggle('tf-lr', lr);
+  try{ localStorage.setItem('nqTfLayout', lr?'lr':'tb'); }catch(e){}
+  document.querySelectorAll('.tflay-btn').forEach(b=>b.textContent=tfLayoutLabel());
+  requestAnimationFrame(()=>{
+    try{ if(mode1kBars.length) renderAll(); }catch(e){}
+    try{ rerenderReplayForIndicators(); }catch(e){}
+    try{ rerenderMkovForIndicators(); }catch(e){}
+    try{ renderSmktCharts(); }catch(e){}
+  });
+}
+(function(){ let v='tb'; try{ v=localStorage.getItem('nqTfLayout')||'tb'; }catch(e){}
+  if(v==='lr') document.body.classList.add('tf-lr');
+  document.querySelectorAll('.tflay-btn').forEach(b=>b.textContent=tfLayoutLabel()); })();
+
+// ============================================================
+// 📊 績效統計：不同模擬版本並排比較（表格＋累積損益曲線疊圖）
+// 統計範圍（上方日期）也會套用到每個版本
+// ============================================================
+let statsCmpSel=null, statsCmpOpen=(function(){ try{ return localStorage.getItem('nqStatsCmpOpen')!=='0'; }catch(e){ return true; } })();
+const _statsCmpCache={};
+function statsCmpIds(){ return [...(tvCount('live')?['live']:[]), ...tvList.map(v=>v.id)]; }
+function statsCmpMetrics(id){
+  const f=_dateRangeFilter||{}, all=tvTradesOf(id);
+  const key=id+'|'+(f.from||'')+'|'+(f.to||'')+'|'+all.length+'|'+(id==='live'?Date.now()>>14:((tvGet(id)||{}).updatedAt||0));
+  if(_statsCmpCache[key]) return _statsCmpCache[key];
+  const tr=getTradesInRange(all, f.from, f.to).slice().sort((a,b)=>(a.date+a.exitTime).localeCompare(b.date+b.exitTime));
+  tr.forEach(t=>{ if(t.mfe===undefined){ const m=calcMaeMfeAccurate(t); t.mfe=m.mfe; t.mae=m.mae; t.singleMDD=m.singleMDD; } });
+  const n=tr.length, W=tr.filter(t=>t.pnl>0), Lo=tr.filter(t=>t.pnl<=0);
+  const sum=a=>a.reduce((x,t)=>x+t.pnl,0), avg=(a,f)=>a.length?a.reduce((x,t)=>x+f(t),0)/a.length:0;
+  const gp=sum(W), gl=sum(Lo), pnl=gp+gl;
+  let run=0,peak=0,mdd=0; const curve=[];
+  tr.forEach(t=>{ run+=t.pnl; if(run>peak) peak=run; mdd=Math.max(mdd,peak-run); curve.push({d:t.date,v:run}); });
+  const pts=t=>t.dir==='long'?(t.exitPrice-t.entryPrice):(t.entryPrice-t.exitPrice);
+  const side=d=>{ const a=tr.filter(t=>t.dir===d); return {n:a.length, pnl:sum(a), wr:a.length?a.filter(t=>t.pnl>0).length/a.length*100:NaN}; };
+  const gb=W.filter(t=>t.mfe>0);
+  const days={}; tr.forEach(t=>{ days[t.date]=(days[t.date]||0)+t.pnl; });
+  const dv=Object.values(days);
+  const avgL=avg(Lo,t=>t.pnl);
+  const r={n, pnl, comm:tr.reduce((x,t)=>x+(t.commission||0),0), wr:n?W.length/n*100:NaN,
+    gp, gl, pf:gl?Math.abs(gp/gl):(gp>0?Infinity:NaN), exp:n?pnl/n:NaN,
+    avgW:avg(W,t=>t.pnl), avgL, payoff:avgL?Math.abs(avg(W,t=>t.pnl)/avgL):(W.length?Infinity:NaN),
+    maxW:W.length?Math.max(...W.map(t=>t.pnl)):NaN, maxL:Lo.length?Math.min(...Lo.map(t=>t.pnl)):NaN,
+    avgWpts:avg(W,pts), avgLpts:avg(Lo,pts),
+    mdd, umdd:n?calcUnrealizedGroupMDD(tr):0,
+    mfe:avg(tr,t=>t.mfe||0), mae:avg(tr,t=>t.mae||0),
+    giveback:gb.length?avg(gb,t=>(t.mfe-t.pnl)/t.mfe*100):NaN,
+    hold:avg(tr,t=>Math.max(1,(t.exitIdx-t.entryIdx)*(MKT.id==='tx'?5:1))),
+    qty:avg(tr,t=>t.qty),
+    days:dv.length, dayWr:dv.length?dv.filter(v=>v>0).length/dv.length*100:NaN, perDay:dv.length?pnl/dv.length:NaN,
+    long:side('long'), short:side('short'), curve};
+  _statsCmpCache[key]=r; return r;
+}
+function statsCmpToggleVer(id){
+  if(statsCmpSel.includes(id)){ if(statsCmpSel.length<=1) return; statsCmpSel=statsCmpSel.filter(x=>x!==id); }
+  else { if(statsCmpSel.length>=5){ alert('最多同時比較 5 個版本'); return; } statsCmpSel.push(id); }
+  renderStatsCmp();
+}
+function statsCmpSetBase(id){ statsCmpSel=[id, ...statsCmpSel.filter(x=>x!==id)]; renderStatsCmp(); }
+function statsCmpToggleOpen(){ statsCmpOpen=!statsCmpOpen; try{ localStorage.setItem('nqStatsCmpOpen', statsCmpOpen?'1':'0'); }catch(e){} renderStatsCmp(); }
+function renderStatsCmp(){
+  const page=document.getElementById('pageStats'); if(!page) return;
+  let box=document.getElementById('statsCmpSec');
+  const ids=statsCmpIds();
+  if(ids.length<2){ if(box) box.remove(); return; }
+  if(!box){ box=document.createElement('div'); box.id='statsCmpSec'; box.className='tresult-section scmp-sec'; }
+  const hdr=page.querySelector('.tresult-header');
+  if(hdr) hdr.after(box); else page.prepend(box);
+  if(!statsCmpSel) statsCmpSel=[tvActive, ...ids.filter(x=>x!==tvActive)].filter(x=>ids.includes(x)).slice(0,3);
+  statsCmpSel=statsCmpSel.filter(x=>ids.includes(x)); if(!statsCmpSel.length) statsCmpSel=ids.slice(0,2);
+  const f=_dateRangeFilter||{};
+  const rangeTxt=(f.from||f.to)?`統計範圍 ${f.from||'最早'} ~ ${f.to||'最新'}（上方日期篩選也套用到每個版本）`:'全部日期・可用上方「統計範圍」只比某一段期間';
+  let h=`<div class="scmp-hdr"><div class="tresult-section-title">🆚 版本績效比較</div>
+    <span class="scmp-note" style="margin:0">${rangeTxt}</span>
+    <button class="scmp-toggle" onclick="statsCmpToggleOpen()">${statsCmpOpen?'收起 ▲':'展開 ▼'}</button></div>`;
+  if(!statsCmpOpen){ box.innerHTML=h; return; }
+  h+=`<div class="scmp-chips">${ids.map(id=>{ const on=statsCmpSel.includes(id), base=statsCmpSel[0]===id;
+    return `<button class="scmp-chip${on?' on':''}" style="--vc:${tvColor(id)}" onclick="statsCmpToggleVer('${id}')" ondblclick="statsCmpSetBase('${id}')" title="點一下加入／移除比較；點兩下設成基準"><i></i>${escapeHtml(tvName(id))}${base?'<span class="b">基準</span>':''}</button>`; }).join('')}</div>
+    <div class="scmp-note">點版本加入／移除比較（最多 5 個）・點兩下設成基準・★＝該項最好的版本・小字＝跟基準的差距</div>`;
+  const M=statsCmpSel.map(id=>({id, m:statsCmpMetrics(id)}));
+  const money=v=>isFinite(v)?`${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}`:'—';
+  const usd=v=>isFinite(v)?`$${Math.abs(v).toFixed(0)}`:'—';
+  const pct=v=>isFinite(v)?v.toFixed(1)+'%':'—';
+  const num=(d)=>v=>v===Infinity?'∞':(isFinite(v)?v.toFixed(d):'—');
+  const pt=v=>isFinite(v)?(v>=0?'+':'')+v.toFixed(1):'—';
+  // [名稱, 取值, 格式, 越大越好(1)/越小越好(-1)/不比(0), 差距格式]
+  const rows=[
+    ['整體'],
+    ['總損益（已扣手續費）',m=>m.pnl,money,1,money],
+    ['交易筆數',m=>m.n,num(0),0,v=>(v>=0?'+':'')+v.toFixed(0)],
+    ['交易天數',m=>m.days,num(0),0,v=>(v>=0?'+':'')+v.toFixed(0)],
+    ['勝率',m=>m.wr,pct,1,v=>(v>=0?'+':'')+v.toFixed(1)+'%'],
+    ['獲利因子',m=>m.pf,num(2),1,v=>(v>=0?'+':'')+v.toFixed(2)],
+    ['賺賠比',m=>m.payoff,num(2),1,v=>(v>=0?'+':'')+v.toFixed(2)],
+    ['單筆期望值',m=>m.exp,money,1,money],
+    ['每日平均損益',m=>m.perDay,money,1,money],
+    ['獲利日比例',m=>m.dayWr,pct,1,v=>(v>=0?'+':'')+v.toFixed(1)+'%'],
+    ['獲利／虧損'],
+    ['總獲利',m=>m.gp,money,1,money],
+    ['總虧損',m=>m.gl,money,1,money],
+    ['平均獲利',m=>m.avgW,money,1,money],
+    ['平均虧損',m=>m.avgL,money,1,money],
+    ['最大獲利',m=>m.maxW,money,1,money],
+    ['最大虧損',m=>m.maxL,money,1,money],
+    ['均獲（點）',m=>m.avgWpts,pt,1,pt],
+    ['均虧（點）',m=>m.avgLpts,pt,1,pt],
+    ['手續費',m=>-m.comm,money,1,money],
+    ['風險'],
+    ['最大回撤（已實現）',m=>m.mdd,usd,-1,money],
+    ['最大回撤（含未實現）',m=>m.umdd,usd,-1,money],
+    ['平均 MFE',m=>m.mfe,usd,1,money],
+    ['平均 MAE',m=>m.mae,money,1,money],
+    ['獲利回吐率',m=>m.giveback,pct,-1,v=>(v>=0?'+':'')+v.toFixed(1)+'%'],
+    ['習慣'],
+    ['平均持有（分鐘）',m=>m.hold,num(0),0,v=>(v>=0?'+':'')+v.toFixed(0)],
+    ['平均口數',m=>m.qty,num(1),0,v=>(v>=0?'+':'')+v.toFixed(1)],
+    ['多空'],
+    ['做多 損益',m=>m.long.pnl,money,1,money],
+    ['做多 筆數／勝率',m=>m.long.n,m2=>m2,0,null,m=>`${m.long.n} 筆・${pct(m.long.wr)}`],
+    ['做空 損益',m=>m.short.pnl,money,1,money],
+    ['做空 筆數／勝率',m=>m.short.n,m2=>m2,0,null,m=>`${m.short.n} 筆・${pct(m.short.wr)}`],
+  ];
+  const col=M.length;
+  h+=`<div class="scmp-tbl-wrap"><table class="scmp-tbl"><thead><tr><th>項目</th>${M.map(({id},i)=>`<th><span style="background:${tvColor(id)}"></span>${escapeHtml(tvName(id))}${i===0?'<span style="background:none;width:auto;color:#facc15;font-size:10px;margin-left:4px">基準</span>':''}</th>`).join('')}</tr></thead><tbody>`;
+  rows.forEach(r=>{
+    if(r.length===1){ h+=`<tr class="grp"><td colspan="${col+1}">${r[0]}</td></tr>`; return; }
+    const [name,get,fmt,dir,dfmt,custom]=r;
+    const vals=M.map(({m})=>get(m));
+    const fin=vals.filter(v=>isFinite(v)||v===Infinity);
+    let best=null; if(dir && col>1 && fin.length>1){ best = dir>0?Math.max(...fin):Math.min(...fin); if(fin.every(v=>v===best)) best=null; }
+    h+=`<tr><td>${name}</td>${M.map(({m},i)=>{
+      const v=vals[i], txt=custom?custom(m):fmt(v);
+      let d='';
+      if(i>0 && dfmt && isFinite(v) && isFinite(vals[0])){
+        const diff=v-vals[0];
+        if(Math.abs(diff)>1e-9){ const good=dir===0?null:(dir>0?diff>0:diff<0);
+          d=`<span class="scmp-d" style="color:${good===null?'var(--t3)':(good?'#22c55e':'#ef4444')}">${dfmt(diff)}</span>`; }
+      }
+      return `<td class="${best!==null&&v===best?'best':''}"><b>${txt}</b>${d}</td>`; }).join('')}</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  // 累積損益疊圖（x 軸＝日期）
+  const dates=[...new Set(M.flatMap(({m})=>m.curve.map(c=>c.d)))].sort();
+  if(dates.length){
+    const W=Math.max(600, Math.round(Math.min(1800, window.innerWidth*0.97)-60)), H=300, PL=62, PR=16, PT=16, PB=30;
+    const series=M.map(({id,m})=>{ const byD={}; m.curve.forEach(c=>byD[c.d]=c.v); let last=0; return {id, v:dates.map(d=>(last=(d in byD)?byD[d]:last))}; });
+    const allV=[0,...series.flatMap(s=>s.v)]; let lo=Math.min(...allV), hi=Math.max(...allV); const pd=(hi-lo)*0.08||100; lo-=pd; hi+=pd;
+    const X=i=>PL+(dates.length<2?(W-PL-PR)/2:(W-PL-PR)*i/(dates.length-1)), Y=v=>PT+(H-PT-PB)*(1-(v-lo)/(hi-lo));
+    const step=smartStepCmp(hi-lo);
+    let g='';
+    for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){ const y=Y(v).toFixed(1); g+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="rgba(255,255,255,${v===0?0.35:0.06})" ${v===0?'stroke-dasharray="5,3"':''}/><text x="${PL-6}" y="${(+y+3)}" fill="#888" font-size="10" text-anchor="end" font-family="monospace">$${v.toFixed(0)}</text>`; }
+    let lastM='';
+    dates.forEach((d,i)=>{ const ym=d.slice(0,7); if(ym!==lastM){ lastM=ym; const x=X(i).toFixed(1);
+      g+=`<line x1="${x}" y1="${PT}" x2="${x}" y2="${H-PB}" stroke="rgba(250,204,21,.18)" stroke-dasharray="3,3"/><text x="${(+x+3)}" y="${H-PB+16}" fill="#cbd5e1" font-size="10.5" font-weight="700">${+d.slice(5,7)}月</text>`; } });
+    const lines=series.map(s=>`<polyline fill="none" stroke="${tvColor(s.id)}" stroke-width="2.4" stroke-linejoin="round" points="${s.v.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/>`).join('');
+    h+=`<div class="tresult-section-title" style="font-size:13px;margin-bottom:6px;">📈 累積損益疊圖（依日期）</div>
+      <div class="scmp-legend">${M.map(({id,m})=>`<span><i style="background:${tvColor(id)}"></i>${escapeHtml(tvName(id))} <b style="color:${m.pnl>=0?'#22c55e':'#ef4444'}">${money(m.pnl)}</b></span>`).join('')}</div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;">${g}${lines}</svg>`;
+  }
+  box.innerHTML=h;
+}
+function smartStepCmp(range){ const raw=range/6, mag=Math.pow(10,Math.floor(Math.log10(raw||1))); return [1,2,2.5,5,10].map(k=>k*mag).find(v=>v>=raw)||raw; }
+
+// ============================================================
+// 📊 績效統計：選一個「對比版本」，整份報告左右並排（左＝目前版本、右＝對比版本，格式完全一樣）
+// ============================================================
+let statsSplitId = null, _statsCacheBackup = null;
+const STATS_SPLIT_CHARTS=['eqOverall','eqLong','eqShort','mmOverall','mmLong','mmShort'];
+function statsSplitOn(){
+  if(!statsSplitId || statsSplitId===tvActive) return false;
+  return statsSplitId==='live' ? tvCount('live')>0 : !!tvGet(statsSplitId);
+}
+function statsSplitSelectHtml(){
+  const ids=[...(tvCount('live')?['live']:[]), ...tvList.map(v=>v.id)].filter(id=>id!==tvActive);
+  if(!ids.length) return '';
+  const cur=statsSplitOn()?statsSplitId:'';
+  return `<label class="tver-split">🆚 左右對比
+    <select class="${cur?'on':''}" onchange="statsSplitSet(this.value)">
+      <option value="">（不對比）</option>
+      ${ids.map(id=>`<option value="${id}"${id===cur?' selected':''}>${escapeHtml(tvName(id))}（${tvCount(id)}筆）</option>`).join('')}
+    </select></label>`;
+}
+function statsSplitSet(id){
+  statsSplitId=id||null;
+  const ov=document.getElementById('tresultOverlay'), st=ov?ov.scrollTop:0;
+  if(_dateRangeFilter && (_dateRangeFilter.from||_dateRangeFilter.to)) renderTradeResultWithTrades(getTradesInRange(_fullTradesCache,_dateRangeFilter.from,_dateRangeFilter.to), true);
+  else renderTradeResultWithTrades(_fullTradesCache, true);
+  if(ov) ov.scrollTop=st;
+}
+function statsSplitTrades(id){
+  const all=tvTradesOf(id);
+  all.forEach(t=>{ const m=calcMaeMfeAccurate(t); t.mfe=m.mfe; t.mae=m.mae; t.singleMDD=m.singleMDD; });
+  const f=_dateRangeFilter||{};
+  return getTradesInRange(all, f.from, f.to);
+}
+// 同一頁出現兩份報告：把圖表的 id 加上前綴，點圖時才不會兩邊互相打架
+function statsSplitPrefix(html, pre, vid){
+  STATS_SPLIT_CHARTS.forEach(c=>{
+    html=html.split("'"+c+"'").join("'"+pre+c+"'").split('id="'+c+'_').join('id="'+pre+c+'_');
+  });
+  return html.replace(/showDayLotsModal\('([^']*)'\)/g, "showDayLotsModalV('"+vid+"','$1')");
+}
+function showDayLotsModalV(vid, date){
+  if(!_statsCacheBackup) _statsCacheBackup=_allClosedTradesCache;
+  _allClosedTradesCache = statsSplitTrades(vid);
+  showDayLotsModal(date);
+}
+function statsSplitRender(trades){
+  const page=document.getElementById('pageStats');
+  const on=statsSplitOn();
+  window._statsSplit=false;
+  if(!on || !page) return;
+  const left=statsSplitPrefix(page.innerHTML,'L_',tvActive);
+  window._statsSplit=true;
+  _renderTradeResultCore(statsSplitTrades(statsSplitId));
+  const right=statsSplitPrefix(page.innerHTML,'R_',statsSplitId);
+  window._statsSplit=false;
+  _allClosedTradesCache=trades;
+  const hdr=(id)=>`<div class="stats-col-hdr" style="--vc:${tvColor(id)}"><i></i>${escapeHtml(tvName(id))}<span>${id===tvActive?'目前版本':'對比版本'}</span></div>`;
+  page.innerHTML=`<div class="stats-split"><div class="stats-col">${hdr(tvActive)}${left}</div><div class="stats-col">${hdr(statsSplitId)}${right}</div></div>`;
 }
 </script>
 </body>
