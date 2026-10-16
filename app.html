@@ -961,6 +961,275 @@ body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
 .stats-col .tresult-hero-val{font-size:26px;}
 .stats-col .tresult-title{font-size:20px;}
 .stats-col .tresult-section{padding:14px;}
+svg[onmousemove^="chartXHair"]{cursor:crosshair;}
+
+/* ===== 🩺 問題診斷 ===== */
+.dg-sec{border-color:rgba(250,204,21,.35);}
+.dg-sum{background:linear-gradient(180deg,rgba(239,68,68,.10),rgba(239,68,68,.03));border:1px solid rgba(239,68,68,.35);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.dg-sum-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:8px;}
+.dg-sum-title span{font-size:10.5px;color:var(--t3);font-weight:500;margin-left:8px;}
+.dg-sum-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:7px;}
+.dg-sum-list li{font-size:13px;line-height:1.55;color:#e5e7eb;}
+.dg-sum-list li::marker{color:#f87171;font-weight:800;}
+.dg-sec b{color:#fff;font-weight:800;} .dg-sec b.dn{color:#f87171;} .dg-sec b.up{color:#4ade80;}
+.dg-good{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.12);font-size:12.5px;color:#d1d5db;line-height:1.6;}
+.dg-good-t{font-weight:800;color:#4ade80;margin-bottom:2px;}
+.dg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;}
+.dg-card{background:var(--bg3);border:1px solid var(--b1);border-radius:12px;padding:12px 14px;min-width:0;}
+.dg-card-title{font-size:13.5px;font-weight:800;color:#fff;margin-bottom:3px;}
+.dg-how{font-size:10.5px;color:var(--t3);line-height:1.5;margin-bottom:8px;}
+.dg-how b{color:#e5e7eb!important;}
+.dg-card{container-type:inline-size;}
+/* 表格：整張表共用欄寬（每欄依內容自動撐開），窄的時候欄位會自己縮、字會換行，不會跑出卡片 */
+.dg-tbl{display:grid;grid-template-columns:minmax(0,1.6fr) auto auto minmax(28px,1.2fr) auto auto;column-gap:8px;}
+.dg-row{display:contents;}
+.dg-row > div{padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-size:11.5px;font-variant-numeric:tabular-nums;align-self:stretch;display:flex;align-items:center;min-width:0;}
+.dg-row.dg-head > div{font-size:9.5px;color:var(--t3);font-weight:700;border-bottom:1px solid rgba(255,255,255,.12);padding-top:0;}
+.dg-row.hl > div{background:rgba(239,68,68,.10);}
+.dg-row.hl > div:first-child{border-radius:6px 0 0 6px;} .dg-row.hl > div:last-child{border-radius:0 6px 6px 0;}
+.dg-row.empty > div{opacity:.45;}
+.dg-lbl{color:#e5e7eb;font-weight:600;line-height:1.3;word-break:break-word;}
+.dg-n,.dg-wr,.dg-pnl,.dg-avg{justify-content:flex-end;white-space:nowrap;}
+.dg-n,.dg-wr{font-weight:700;color:#fff;} .dg-n span,.dg-avg span{font-size:9px;color:var(--t3);margin-left:1px;font-weight:500;}
+.dg-pnl{font-weight:800;} .dg-avg{color:var(--t2);font-size:10.5px!important;}
+.dg-bar{position:relative;}
+.dg-row:not(.dg-head) .dg-bar::before{content:'';position:absolute;left:50%;top:3px;bottom:3px;width:1px;background:rgba(255,255,255,.25);}
+.dg-bar-mid{display:none;}
+.dg-bar i{position:absolute;top:calc(50% - 6px);height:12px;border-radius:2px;min-width:2px;}
+.dg-row.dg-head .dg-bar{justify-content:center;}
+@container (max-width:400px){
+  .dg-tbl{grid-template-columns:minmax(0,1.6fr) auto auto minmax(24px,1fr) auto;column-gap:6px;}
+  .dg-avg{display:none!important;}
+  .dg-row > div{font-size:11px;}
+}
+.dg-note{font-size:11px;color:var(--t2);margin-top:6px;}
+.dg-hist{display:flex;align-items:flex-end;gap:3px;height:110px;padding:4px 0 0;border-bottom:1px solid rgba(255,255,255,.15);}
+.dg-hcol{flex:1;display:flex;flex-direction:column;height:100%;min-width:0;}
+.dg-hbars{flex:1;display:flex;align-items:flex-end;gap:1px;}
+.dg-hbars i{flex:1;border-radius:2px 2px 0 0;min-height:0;opacity:.85;}
+.dg-hx.last{width:auto;text-align:right;font-size:8.5px;}
+.dg-hx{font-size:9px;color:var(--t3);text-align:left;height:13px;line-height:13px;white-space:nowrap;overflow:visible;width:0;}
+.dg-legend{display:flex;gap:12px;font-size:10px;color:var(--t2);margin:6px 0 8px;flex-wrap:wrap;}
+.dg-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
+.dg-kv{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--t2);margin-bottom:8px;}
+.dg-sim{background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px;}
+.dg-sim-h{font-size:11px;color:var(--t2);font-weight:700;margin-bottom:4px;}
+.dg-sim-r{display:flex;flex-wrap:wrap;column-gap:14px;row-gap:2px;font-size:11.5px;padding:4px 4px;border-radius:5px;font-variant-numeric:tabular-nums;}
+.dg-sim-r.best{background:rgba(34,197,94,.12);}
+.dg-t3{color:var(--t3);font-size:10.5px;}
+.stats-col .dg-grid{grid-template-columns:1fr;}
+.stats-col .tresult-ls-grid{grid-template-columns:1fr!important;}
+@media (max-width:760px){ .tresult-ls-grid,.tresult-eff-grid{grid-template-columns:1fr!important;} }
+
+.dg-card.wide{grid-column:1/-1;}
+.dg-sub{font-size:11.5px;font-weight:800;color:#e5e7eb;margin:10px 0 4px;}
+.dg-stop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px;}
+@container (max-width:900px){ .dg-stop{grid-template-columns:minmax(0,1fr);} }
+.dg-mini{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums;margin-top:4px;}
+.dg-mini th{font-size:9.5px;color:var(--t3);font-weight:700;text-align:right;padding:4px 5px;border-bottom:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+.dg-mini td{text-align:right;padding:5px 5px;border-bottom:1px solid rgba(255,255,255,.05);color:#e5e7eb;white-space:nowrap;}
+.dg-mini th:first-child,.dg-mini td:first-child{text-align:left;}
+.dg-mini td.up{color:#4ade80;font-weight:700;} .dg-mini td.dn{color:#f87171;font-weight:700;}
+.dg-mini .sep{border-left:1px solid rgba(255,255,255,.12);}
+.dg-mini tr.best td{background:rgba(34,197,94,.13);} .dg-mini tr.cur td{color:var(--t2);font-style:italic;}
+.dg-sweep td:nth-child(4){white-space:normal;}
+.dg-scroll{overflow-x:auto;max-width:100%;}
+.dg-stop > div{min-width:0;}
+.dg-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:6px 0 4px;}
+.dg-kpis > div{background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.dg-kpis span{font-size:10px;color:var(--t3);font-weight:700;} .dg-kpis b{font-size:17px;color:#fff;} .dg-kpis em{font-size:10px;color:var(--t2);font-style:normal;}
+.dg-mtbl-wrap{max-height:360px;overflow:auto;}
+.dg-miss tr{cursor:pointer;} .dg-miss tr:hover td{background:rgba(250,204,21,.08);}
+.dg-miss tr.big td:first-child{color:#facc15;font-weight:800;}
+.dg-rbar{position:relative;min-width:90px;height:14px;background:rgba(255,255,255,.04);border-radius:3px;}
+.dg-rbar i{position:absolute;left:0;top:0;bottom:0;background:rgba(96,165,250,.45);border-radius:3px;}
+.dg-rbar span{position:relative;font-weight:700;font-size:10.5px;padding-right:4px;line-height:14px;}
+.dg-tag{display:inline-block;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:4px;margin-left:4px;}
+.dg-tag.t{background:rgba(167,139,250,.2);color:#c4b5fd;} .dg-tag.b{background:rgba(250,204,21,.18);color:#facc15;}
+
+/* ===== 🩺 問題診斷分頁（整頁、大字）===== */
+#pageDiag{font-size:14px;}
+#pageDiag .dg-sec{border:none;}
+.dg-page-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:4px 2px 12px;}
+.dg-page-t{font-size:22px;font-weight:900;color:#fff;}
+#pageDiag .dg-t3{font-size:12px;}
+#pageDiag .dg-sum{padding:18px 22px;margin-bottom:16px;}
+#pageDiag .dg-sum-title{font-size:18px;}
+#pageDiag .dg-sum-list li{font-size:15px;line-height:1.6;}
+#pageDiag .dg-good{font-size:14px;}
+#pageDiag .dg-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+@media (max-width:1250px){ #pageDiag .dg-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media (max-width:820px){ #pageDiag .dg-grid{grid-template-columns:minmax(0,1fr);} }
+#pageDiag .dg-card{padding:16px 18px;border-radius:14px;}
+#pageDiag .dg-card-title{font-size:17px;margin-bottom:5px;}
+#pageDiag .dg-card-title.big{font-size:20px;}
+#pageDiag .dg-how{font-size:12.5px;margin-bottom:12px;}
+#pageDiag .dg-row > div{font-size:13.5px;padding:7px 3px;}
+#pageDiag .dg-row.dg-head > div{font-size:11px;}
+#pageDiag .dg-avg{font-size:12px!important;}
+#pageDiag .dg-bar i{height:14px;top:calc(50% - 7px);}
+#pageDiag .dg-mini{font-size:13px;}
+#pageDiag .dg-mini th{font-size:11px;}
+#pageDiag .dg-mini td{padding:7px 6px;}
+#pageDiag .dg-sub{font-size:13.5px;margin:14px 0 6px;}
+#pageDiag .dg-kv{font-size:13px;}
+#pageDiag .dg-note{font-size:13px;}
+#pageDiag .dg-hist{height:150px;}
+#pageDiag .dg-hx{font-size:10.5px;}
+#pageDiag .dg-legend{font-size:11.5px;}
+#pageDiag .dg-kpis b{font-size:21px;} #pageDiag .dg-kpis span{font-size:11.5px;} #pageDiag .dg-kpis em{font-size:11.5px;}
+#pageDiag .dg-kpis > div{padding:10px 12px;}
+.dg-mini tr.hl td{background:rgba(239,68,68,.08);}
+.dg-ee{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;margin-top:8px;}
+@container (max-width:950px){ .dg-ee{grid-template-columns:minmax(0,1fr);} }
+.dg-ee > div{min-width:0;}
+/* 錯過了什麼 */
+.dg-miss-card{border-color:rgba(250,204,21,.45)!important;background:linear-gradient(180deg,rgba(250,204,21,.07),var(--bg3) 140px)!important;margin-bottom:16px;}
+.dg-verdict{margin:4px 0 14px;padding-left:22px;display:flex;flex-direction:column;gap:6px;}
+.dg-verdict li{font-size:15px;line-height:1.6;color:#e5e7eb;} .dg-verdict li::marker{color:#facc15;}
+.dg-cmps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.dg-cmp{border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);min-width:0;}
+.dg-cmp.hot{border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.08);}
+.dg-cmp-k{font-size:12.5px;color:#cbd5e1;font-weight:800;margin-bottom:6px;}
+.dg-cmp-v{display:flex;align-items:flex-end;gap:10px;}
+.dg-cmp-v > div{display:flex;flex-direction:column;} .dg-cmp-v span{font-size:10.5px;color:var(--t3);font-weight:700;}
+.dg-cmp-v b{font-size:24px;font-weight:900;color:#fff;line-height:1.1;} .dg-cmp-v b.dim{font-size:18px;color:#9ca3af;}
+.dg-cmp-v b i{font-size:11px;font-style:normal;margin-left:2px;color:var(--t3);font-weight:700;}
+.dg-cmp-v .vs{font-size:11px;color:var(--t3);padding-bottom:4px;}
+.dg-cmp-d{font-size:12px;font-weight:800;margin-top:6px;color:#9ca3af;} .dg-cmp.hot .dg-cmp-d{color:#fb923c;}
+.dg-miss-2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;}
+@container (max-width:950px){ .dg-miss-2{grid-template-columns:minmax(0,1fr);} }
+#pageDiag .dg-mtbl-wrap{max-height:460px;}
+/* 進場位置方格 */
+.dg-mx{display:grid;grid-template-columns:minmax(92px,auto) minmax(0,1fr) minmax(0,1fr) minmax(0,.8fr);gap:6px;align-items:stretch;}
+.dg-mx-ch{font-size:13px;font-weight:800;color:#fff;text-align:center;padding:2px 0 4px;} .dg-mx-ch.t3{color:var(--t3);font-size:12px;}
+.dg-mx-rh{display:flex;align-items:center;gap:8px;padding:4px 2px;}
+.dg-mx-rh b{display:block;font-size:13px;color:#fff;} .dg-mx-rh em{display:block;font-size:10.5px;color:var(--t3);font-style:normal;}
+.dg-mx-ic{font-size:22px;font-weight:900;color:#facc15;width:24px;text-align:center;}
+.dg-mx-cell{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;border:1px solid rgba(255,255,255,.06);min-width:0;}
+.dg-mx-cell b{font-size:18px;font-weight:900;color:#9ca3af;} .dg-mx-cell b.up{color:#4ade80;} .dg-mx-cell b.dn{color:#f87171;}
+.dg-mx-cell em{font-size:11px;color:#d1d5db;font-style:normal;}
+.dg-mx-cell.tot{background:rgba(255,255,255,.03);} .dg-mx-cell.tot b{font-size:15px;}
+.dg-mx-tag{align-self:flex-start;font-size:10.5px;font-weight:900;padding:1px 7px;border-radius:5px;margin-bottom:2px;}
+.dg-mx-tag.w{background:rgba(34,197,94,.22);color:#86efac;} .dg-mx-tag.a{background:rgba(239,68,68,.22);color:#fca5a5;} .dg-mx-tag.f{background:rgba(148,163,184,.2);color:#cbd5e1;}
+.dg-mx-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;}
+.dg-mx-sum > div{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;background:rgba(255,255,255,.03);border-left:3px solid #94a3b8;min-width:0;}
+.dg-mx-sum > div.w{border-left-color:#22c55e;} .dg-mx-sum > div.a{border-left-color:#ef4444;}
+.dg-mx-sum span{font-size:11px;color:var(--t3);font-weight:700;} .dg-mx-sum b{font-size:17px;font-weight:900;} .dg-mx-sum b.up{color:#4ade80;} .dg-mx-sum b.dn{color:#f87171;}
+.dg-mx-sum em{font-size:11px;color:#d1d5db;font-style:normal;}
+.dg-sec b.up,.dg-mx-sum b.up{color:#4ade80;}
+
+#pageDiag .dg-card.span2{grid-column:span 2;}
+@media (max-width:820px){ #pageDiag .dg-card.span2{grid-column:auto;} }
+.dg-mx-st{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px;}
+.dg-mx-st span{display:flex;flex-direction:column;font-size:13px;font-weight:800;color:#fff;}
+.dg-mx-st i{font-style:normal;font-size:10px;color:var(--t3);font-weight:700;}
+#pageDiag .dg-mx-cell b{font-size:21px;}
+#pageDiag .dg-mx{grid-template-columns:minmax(120px,auto) minmax(0,1fr) minmax(0,1fr) minmax(0,.75fr);gap:8px;}
+#pageDiag .dg-mx-cell{padding:10px 12px;}
+#pageDiag .dg-cmps{grid-template-columns:repeat(4,minmax(0,1fr));}
+@media (max-width:1100px){ #pageDiag .dg-cmps{grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+.dg-3col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;}
+.dg-2col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;}
+@container (max-width:1100px){ .dg-3col{grid-template-columns:minmax(0,1fr);} }
+@container (max-width:900px){ .dg-2col{grid-template-columns:minmax(0,1fr);} }
+.dg-3col > div,.dg-2col > div{min-width:0;}
+.dg-mini th.ga{color:#fca5a5;} .dg-mini th.gb{color:#86efac;}
+.dg-grp th.ga{color:#93c5fd;} .dg-grp th.gb{color:#fde68a;}
+.dg-dual td:first-child{white-space:nowrap;}
+.dg-pbar{position:relative;min-width:64px;height:16px;background:rgba(255,255,255,.05);border-radius:3px;}
+.dg-pbar i{position:absolute;left:0;top:0;bottom:0;background:rgba(96,165,250,.45);border-radius:3px;}
+.dg-pbar.n i{background:rgba(250,204,21,.4);}
+.dg-pbar span{position:relative;display:block;text-align:right;padding-right:4px;font-weight:700;line-height:16px;}
+.dg-kpis b.up{color:#4ade80;} .dg-kpis b.dn{color:#f87171;}
+
+.dg-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:6px 22px;}
+.dg-auto > div{min-width:0;}
+.dg-mini thead th[colspan]{text-align:center;border-bottom:1px solid rgba(255,255,255,.08);}
+.dg-mini thead th[rowspan]{vertical-align:bottom;}
+
+/* ===== 問題診斷：互動圖表 ===== */
+.dg-stack{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.dg-stack > .dg-card{flex:0 0 auto;}
+.dg-mxwrap{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(220px,1fr);gap:18px;align-items:start;}
+.dg-mx-sum.side{grid-template-columns:1fr;margin-top:28px;}
+@container (max-width:900px){ .dg-mxwrap{grid-template-columns:minmax(0,1fr);} .dg-mx-sum.side{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:0;} }
+#pageDiag .dg-mx-sum.side > div{padding:12px 14px;} #pageDiag .dg-mx-sum.side b{font-size:22px;}
+.dg-svg{width:100%;height:auto;display:block;}
+.dg-svg [data-tip]{cursor:crosshair;} .dg-svg circle[data-tip]:hover,.dg-svg rect[data-tip]:hover{stroke:#fff;stroke-width:2.5;}
+.dg-path:hover{opacity:1!important;stroke-width:4!important;stroke:#facc15!important;}
+.dg-tip{position:fixed;z-index:99999;pointer-events:none;background:rgba(15,15,20,.96);border:1px solid rgba(250,204,21,.6);border-radius:8px;padding:8px 11px;font-size:12.5px;line-height:1.55;color:#f3f4f6;box-shadow:0 8px 24px rgba(0,0,0,.6);max-width:340px;display:none;}
+.dg-viz2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin:10px 0 14px;padding:14px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);}
+.dg-viz2.r{grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);}
+.dg-viz2 > div{min-width:0;}
+@container (max-width:1000px){ .dg-viz2,.dg-viz2.r{grid-template-columns:minmax(0,1fr);} }
+.dg-cal{display:flex;flex-direction:column;gap:4px;}
+.dg-cal-h,.dg-cal-w{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}
+.dg-cal-h div{text-align:center;font-size:11px;color:var(--t3);font-weight:800;}
+.dg-cal-c{position:relative;height:46px;border-radius:7px;padding:4px 6px;display:flex;flex-direction:column;justify-content:space-between;border:1.5px solid transparent;cursor:pointer;overflow:hidden;min-width:0;}
+.dg-cal-c.off{background:rgba(255,255,255,.02);cursor:default;opacity:.45;}
+.dg-cal-c span{font-size:10.5px;color:#d1d5db;font-weight:700;}
+.dg-cal-c b{font-size:12.5px;font-weight:900;color:#fff;white-space:nowrap;}
+.dg-cal-c.ms b{color:#fde68a;}
+.dg-cal-c i{position:absolute;left:0;bottom:0;height:3px;background:#60a5fa;opacity:.9;}
+.dg-cal-c:hover{outline:2px solid #fff;}
+.dg-sim-box{background:rgba(255,255,255,.03);border:1px solid rgba(250,204,21,.25);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;align-self:start;}
+.dg-sim-box label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#e5e7eb;font-weight:700;}
+.dg-sim-box label b{color:#facc15;}
+.dg-sim-box input[type=range]{width:100%;accent-color:#facc15;height:22px;}
+.dg-simres{border-top:1px dashed rgba(255,255,255,.12);padding-top:8px;}
+.dg-simbig{font-size:30px;font-weight:900;line-height:1.1;} .dg-simbig.up{color:#4ade80;} .dg-simbig.dn{color:#f87171;}
+.dg-simgrid{display:grid;grid-template-columns:auto auto;gap:5px 14px;margin-top:8px;font-size:12.5px;}
+.dg-simgrid span{color:var(--t3);} .dg-simgrid b{color:#fff;text-align:right;} .dg-simgrid b.up{color:#4ade80;} .dg-simgrid b.dn{color:#f87171;}
+.dg-tog{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
+.dg-tog button{font:inherit;font-size:11.5px;padding:3px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;}
+.dg-tog button.on{background:#facc15;color:#000;border-color:#facc15;font-weight:800;}
+.dg-nbar{display:flex;align-items:flex-end;gap:10px;height:120px;margin-top:10px;padding:0 10px;}
+.dg-nbar > div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;}
+.dg-nbar i{width:60%;background:rgba(250,204,21,.55);border-radius:4px 4px 0 0;min-height:2px;}
+.dg-nbar b{font-size:13px;color:#fff;} .dg-nbar span{font-size:11px;color:var(--t3);}
+
+.dg-inl{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#e5e7eb;margin:6px 0;}
+.dg-inl b{color:#facc15;min-width:64px;} .dg-inl input{flex:1;accent-color:#facc15;}
+.dg-tpres{margin-top:4px;}
+.dg-viz-prev{margin:10px 0 14px;padding:14px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);}
+.dg-viz-prev .dg-viz2{background:none;border:none;padding:0;margin:6px 0;}
+.dg-prev-ana{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;margin-top:6px;}
+.dg-prev-lists{display:flex;flex-direction:column;gap:6px;}
+@container (max-width:1000px){ .dg-prev-ana{grid-template-columns:minmax(0,1fr);} }
+.dg-quad{display:grid;grid-template-columns:minmax(110px,auto) repeat(4,minmax(0,1fr));gap:6px;}
+.dg-qh{font-size:12px;font-weight:800;color:var(--t3);text-align:center;}
+.dg-qr{display:flex;flex-direction:column;justify-content:center;} .dg-qr b{font-size:13px;color:#fff;} .dg-qr em{font-size:10.5px;color:var(--t3);font-style:normal;}
+.dg-q{border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px;position:relative;}
+.dg-q b{font-size:18px;font-weight:900;color:#fff;} .dg-q span{font-size:11.5px;color:#e5e7eb;} .dg-q em{position:absolute;right:8px;top:6px;font-size:11px;font-style:normal;color:#d1d5db;font-weight:800;}
+.dg-q.w{background:rgba(34,197,94,calc(.08 + var(--a)*.55));} .dg-q.l{background:rgba(239,68,68,calc(.08 + var(--a)*.55));} .dg-q.z{background:rgba(250,204,21,calc(.06 + var(--a)*.4));} .dg-q.n{background:rgba(96,165,250,.12);}
+
+.dg-stack > .dg-card:last-child{flex:1 1 auto;}
+.dg-ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:4px 0 6px;}
+.dg-ctl .dg-tog{margin-left:0;}
+
+.dg-px{margin:10px 0 14px;padding:14px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);}
+.dg-px-top{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:20px;margin-top:6px;}
+.dg-px-bot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:12px;}
+.dg-px-top > div,.dg-px-bot > div{min-width:0;}
+@container (max-width:1000px){ .dg-px-top,.dg-px-bot{grid-template-columns:minmax(0,1fr);} }
+.dg-sub2{font-size:12.5px;font-weight:700;color:#cbd5e1;margin:2px 0 6px;}
+.dg-hl{color:#facc15;font-size:16px;}
+
+.dg-pxb{margin-top:8px;} .dg-pxb td,.dg-pxb th{padding:4px 6px!important;}
+
+.dg-px-ctl{display:grid;grid-template-columns:1fr 1fr;gap:20px;background:rgba(255,255,255,.03);border:1px solid rgba(250,204,21,.3);border-radius:10px;padding:10px 14px;margin:6px 0 12px;}
+.dg-px-ctl label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700;color:#e5e7eb;} .dg-px-ctl b{color:#facc15;} .dg-px-ctl input{accent-color:#facc15;width:100%;}
+.dg-px-res{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;}
+.dg-pxc{border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);border-left:4px solid var(--c);}
+.dg-pxc-h{font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;}
+.dg-pxc-big{font-size:28px;font-weight:900;} .dg-pxc-big.up{color:#4ade80;} .dg-pxc-big.dn{color:#f87171;}
+@container (max-width:900px){ .dg-px-ctl,.dg-px-res{grid-template-columns:1fr;} }
+.dg-heat{display:grid;gap:3px;}
+.dg-heat-h{font-size:11px;color:var(--t3);font-weight:800;text-align:center;align-self:center;}
+.dg-heat-c{border-radius:5px;padding:8px 2px;text-align:center;font-size:12px;font-weight:800;color:#fff;cursor:pointer;}
+.dg-heat-c:hover{outline:2px solid #fff;} .dg-heat-c.on{outline:2.5px solid #facc15;}
 </style>
 </head>
 <body>
@@ -968,13 +1237,10 @@ body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
 <div class="app" style="display:none" id="appRoot">
   <div class="topbar">
     <span class="app-title"><span class="mkt-switch" title="切換商品：NQ／台指（兩邊各自保留進度、筆記、交易紀錄）"><button data-m="nq" onclick="switchMarket('nq')">NQ</button><button data-m="tx" onclick="switchMarket('tx')">台指</button></span><span id="appTitleTxt">複盤</span></span>
-    <button class="day-btn" id="btnToggleJournal" onclick="openJournal()" title="開啟學習日誌分頁" style="font-size:12px;padding:0 8px;width:auto;">📔 學習日誌</button>
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側截圖面板" style="font-size:12px;padding:0 8px;width:auto;">📷 截圖</button>
     <button class="day-btn" onclick="snOpenLib()" title="依分類／資料夾整理截下來的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類或資料夾：選好後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
-    <button class="day-btn" id="btnZoneMode" onclick="toggleZoneMode()" title="開啟後：在K線圖上用左鍵拖曳畫灰色方框（時間+價格區間，會顯示在所有NQ週期、換日保留）；單擊方框內可刪除。純暫存，重新整理就消失" style="font-size:12px;padding:0 8px;width:auto;">方框：關</button>
-    <button class="day-btn" id="btnZoneClear" onclick="clearZones()" title="清除所有已畫的方框" style="font-size:12px;padding:0 8px;width:auto;">清除方框</button>
     <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="多個格局（例如 5K＋60K）要上下排還是左右排" style="font-size:12px;padding:0 8px;width:auto;">⬍ 上下</button>
     <button class="day-btn ind-trigger" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
     <div class="day-nav">
@@ -1126,6 +1392,7 @@ body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
   <div class="tresult-card">
     <div class="tresult-tabs" id="tresultTabs" style="display:none;">
       <div class="tresult-tab on" id="tabStats" onclick="switchTResultTab('stats')">📊 績效統計</div>
+      <div class="tresult-tab" id="tabDiag" onclick="switchTResultTab('diag')">🩺 問題診斷</div>
       <div class="tresult-tab" id="tabRanking" onclick="switchTResultTab('ranking')">🏆 排行榜</div>
       <div class="tresult-tab" id="tabReplay" onclick="switchTResultTab('replay')">🎬 進場回顧</div>
       <div class="tresult-tab" id="tabMkov" onclick="switchTResultTab('mkov')">🌐 總體行情回顧</div>
@@ -1141,6 +1408,7 @@ body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
       <button class="tresult-reset-range-btn" onclick="resetDateRange()">重置為全部</button>
     </div>
     <div class="tresult-page show" id="pageStats"></div>
+    <div class="tresult-page" id="pageDiag"></div>
     <div class="tresult-page" id="pageRanking"></div>
     <div class="tresult-page" id="pageReplay"></div>
     <div class="tresult-page" id="pageMktOverview"></div>
@@ -1482,6 +1750,7 @@ async function loadData(){
   DATA = (MKT.id==='tx') ? buildTxData(JSON.parse(jsonStr)) : JSON.parse(jsonStr);
   DAYS = Object.keys(DATA).sort();
   DAYS_SET = new Set(DAYS);
+  if(MKT.id==='nq'){ try{ const _rf=fixNqRollGaps(DATA, DAYS); if(_rf.length) console.log('[換月修正]', _rf); }catch(e){ console.error('換月修正失敗', e); } }
   if(remoteVersion) localStorage.setItem('nq_data_version', remoteVersion);
 }
 
@@ -3124,6 +3393,7 @@ let _allClosedTradesCache = [];
 let _curTResultTab = 'stats';
 function switchTResultTab(tab){
   _curTResultTab = tab;
+  if(tab==='stats') setTimeout(()=>{ try{ statsSplitAlign(); }catch(e){} }, 60);
   document.getElementById('tabCmp').classList.toggle('on', tab==='cmp');
   document.getElementById('pageCmp').classList.toggle('show', tab==='cmp');
   // 版本對比自己挑版本，不吃上方的「模擬版本／統計範圍」
@@ -3136,6 +3406,10 @@ function switchTResultTab(tab){
   if(_chartTab) document.getElementById('tresultOverlay').scrollTop = 0;
   document.getElementById('tabStats').classList.toggle('on', tab==='stats');
   document.getElementById('tabRanking').classList.toggle('on', tab==='ranking');
+  document.getElementById('tabDiag').classList.toggle('on', tab==='diag');
+  document.getElementById('pageDiag').classList.toggle('show', tab==='diag');
+  document.getElementById('tresultOverlay').classList.toggle('diag-tab', tab==='diag');
+  if(tab === 'diag') buildDiagPage();
   document.getElementById('tabReplay').classList.toggle('on', tab==='replay');
   document.getElementById('pageStats').classList.toggle('show', tab==='stats');
   document.getElementById('pageRanking').classList.toggle('show', tab==='ranking');
@@ -4940,7 +5214,7 @@ function _renderTradeResultCore(trades){
       groupMDD:0, avgSingleMDD:0, maxSingleMDD:0,
       netPnl:0, winRate:0, totalProfit:0, totalLoss:0, profitFactor:0, payoffRatio:0, expectancy:0,
       avgWinPts:0, avgLossPts:0,
-      avgMFE:0, avgMAE:0, giveBackRate:0, avgMAEpts:0, idealRR:0, actualRR:0, unrealizedMDD:0
+      avgMFE:0, avgMAE:0, giveBackRate:0, avgMAEpts:0, avgMFEpts:0, mfeMaeRatio:0, idealRR:0, actualRR:0, unrealizedMDD:0
     };
     const gWins = group.filter(t=>t.pnl>0);
     const gLosses = group.filter(t=>t.pnl<=0);
@@ -4988,6 +5262,10 @@ function _renderTradeResultCore(trades){
       const qty = t.qty||1;
       return a + Math.abs(t.mae||0)/(qty*TRADE_PT_VALUE);
     },0)/gLosses.length : 0;
+    // 獲利單的平均MFE點數（跟上面的 MAE 點數對照：獲利單平均最多跑出幾點）
+    const winMFEpts = gWins.length ? gWins.reduce((a,t)=>a + Math.max(0,t.mfe||0)/((t.qty||1)*TRADE_PT_VALUE),0)/gWins.length : 0;
+    // 平均 MFE ÷ 平均 MAE（絕對值）
+    const mfeMaeRatio = avgMAE!==0 ? avgMFE/Math.abs(avgMAE) : (avgMFE>0?Infinity:0);
     // 理想R:R = 最大獲利/最大虧損(絕對值)；實際R:R = 出場淨損益/最大虧損(絕對值)
     const idealRR = maxLoss!==0 ? maxWin/Math.abs(maxLoss) : 0;
     const actualRR = maxSingleMDD!==0 ? netPnl/maxSingleMDD : 0;
@@ -4998,7 +5276,7 @@ function _renderTradeResultCore(trades){
       avgWin, avgLoss, maxWin, maxLoss, maxQty, avgQty, groupMDD:mdd, avgSingleMDD, maxSingleMDD,
       netPnl, winRate, totalProfit, totalLoss, profitFactor, payoffRatio, expectancy,
       avgWinPts, avgLossPts,
-      avgMFE, avgMAE, giveBackRate, avgMAEpts: lossMAEpts, idealRR, actualRR,
+      avgMFE, avgMAE, giveBackRate, avgMAEpts: lossMAEpts, avgMFEpts: winMFEpts, mfeMaeRatio, idealRR, actualRR,
       unrealizedMDD
     };
   }
@@ -5122,8 +5400,8 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
         <div class="eff-row-icon">⇕</div>
         <div class="eff-row-body">
           <div class="eff-row-lbl">平均 MFE vs MAE</div>
-          <div class="eff-row-val"><span style="color:#22c55e">$${stats.avgMFE.toFixed(0)}</span> / <span style="color:#ef4444">$${Math.abs(stats.avgMAE).toFixed(0)}</span></div>
-          <div class="eff-row-sub">MFE（綠）÷ MAE（紅）</div>
+          <div class="eff-row-val"><span style="color:#22c55e">$${stats.avgMFE.toFixed(0)}</span> / <span style="color:#ef4444">$${Math.abs(stats.avgMAE).toFixed(0)}</span> <span style="color:#facc15;margin-left:6px;">＝ ${stats.mfeMaeRatio===Infinity?'∞':stats.mfeMaeRatio.toFixed(2)} 倍</span></div>
+          <div class="eff-row-sub">MFE（綠）÷ MAE（紅），大於 1 代表平均往有利方向跑得比不利方向多</div>
         </div>
       </div>
       <div class="eff-row">
@@ -5140,6 +5418,14 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
           <div class="eff-row-lbl">平均MAE點數（虧損單）</div>
           <div class="eff-row-val" style="color:${color}">${stats.avgMAEpts.toFixed(1)} pt</div>
           <div class="eff-row-sub">承受最大浮虧點數，越小越好</div>
+        </div>
+      </div>
+      <div class="eff-row">
+        <div class="eff-row-icon">🎯</div>
+        <div class="eff-row-body">
+          <div class="eff-row-lbl">平均MFE點數（獲利單）</div>
+          <div class="eff-row-val" style="color:${color}">${stats.avgMFEpts.toFixed(1)} pt</div>
+          <div class="eff-row-sub">持倉期間最多往有利方向跑了幾點，跟實際賺到的點數比可看出吐回多少</div>
         </div>
       </div>
       <div class="eff-row">
@@ -5176,8 +5462,11 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
   // ★ 區間連續：最高到最低之間每一格都要列出來，沒有交易的區間也留空列（不能 40 之後直接跳 120）
   const _bk = [...new Set([...Object.keys(longBuckets), ...Object.keys(shortBuckets)].map(Number))];
   const allBucketKeys = [];
+  // 左右對比時：兩個版本用同一組點數區間（取兩邊範圍最廣的），列數一樣，下面的區塊才會對齊
+  const _bfR = window._bfRange;
+  if(_bfR) _bk.push(_bfR.hi, _bfR.lo);
   if(_bk.length){ for(let b=Math.max(..._bk); b>=Math.min(..._bk); b-=bucketSize) allBucketKeys.push(b); }
-  const maxBucketCount = Math.max(1, ...allBucketKeys.map(k => Math.max((longBuckets[k]||[]).length, (shortBuckets[k]||[]).length)));
+  const maxBucketCount = Math.max(1, _bfR?_bfR.maxCount:1, ...allBucketKeys.map(k => Math.max((longBuckets[k]||[]).length, (shortBuckets[k]||[]).length)));
 
   const fmtMoney = v => `${v>=0?'+':''}$${Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0)}`;
   const fmtMoneyFull = v => `${v>=0?'+':''}$${v.toFixed(0)}`;
@@ -5325,12 +5614,10 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     });
   }
 
-  // ★ 整欄點擊熱區：不用再精準點在小圓點上，點這一整條欄位任何地方，
-  //   一次顯示「盤中最高、出場(累積)、盤中最低」三筆資料，平板點小圓點太密集時特別好用
-  let hitZones = '';
+  // ★ 十字線：滑鼠指到哪、十字就跟到哪，上方即時顯示最接近那一筆的資料（平板用手指點／拖也可以）
+  const xhItems = [];
   curveArr.forEach((v,i) => {
     if(i===0) return;
-    const gx = PADL+i*xStep;
     const delta = v - curveArr[i-1];
     const dLbl = (datesArr && datesArr[i-1]) ? ` ・ ${datesArr[i-1]}` : '';
     const items = [];
@@ -5338,10 +5625,10 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
     items.push({label:'累積', value:'$'+v.toFixed(0), color:'#fff'});
     if(lowArr && lowArr[i]!==undefined) items.push({label:'最低', value:'$'+lowArr[i].toFixed(0), color:LOW_COLOR});
     items.push({label:'本筆', value:(delta>=0?'+':'')+'$'+delta.toFixed(0), color: delta>=0?'#22c55e':'#ef4444'});
-    const dataStr = chartClickData(`第${i}筆${dLbl}`, items);
-    const hw = Math.max(10, xStep*0.9);
-    hitZones += `<rect x="${(gx-hw/2).toFixed(1)}" y="${PAD}" width="${hw.toFixed(1)}" height="${H-2*PAD}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${gx.toFixed(1)},'${dataStr}')"/>`;
+    xhItems.push({x:PADL+i*xStep, title:`第${i}筆${dLbl}`, items});
   });
+  xhRegister(chartId, {pts:xhItems, l:PADL, r:W-PAD, t:PAD, b:H-PAD, vmin:dispMin, vmax:dispMax});
+  const hitZones = xhOverlay(chartId);
 
   const idSuffix = Math.random().toString(36).slice(2,8);
   const legend = (highArr || lowArr) ? `
@@ -5351,7 +5638,7 @@ function buildEquityCurveSVG(curveArr, customColor, datesArr, highArr, lowArr, c
       <span><span style="display:inline-block;width:14px;height:2px;background:${LOW_COLOR};margin-right:4px;vertical-align:middle;border-top:2px dashed ${LOW_COLOR};height:0;"></span>盤中最低浮動損益</span>
     </div>` : '';
 
-  return `<div class="chart-info-panel" id="${chartId}_info">👆 點擊圖上的點查看該筆交易詳細資料</div>${legend}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;">
+  return `<div class="chart-info-panel" id="${chartId}_info">👆 滑鼠移到圖上，十字線跟著走、這裡即時顯示那一筆的資料</div>${legend}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;" ${xhAttrs(chartId)}>
     <defs>
       <linearGradient id="grad-${idSuffix}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="${curveColor}" stop-opacity="0.35"/>
@@ -5399,55 +5686,94 @@ shortTradesSorted.forEach(t=>{
 const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.map(t=>t.date), shortCurveHigh, shortCurveLow, 'eqShort');
 
   // MAE/MFE 柱狀圖（共用函數，可供整體/多單/空單分別呼叫）
+  // MAE/MFE 單筆K棒圖（共用函數，整體／多單／空單都用這個）
+  // 每筆交易一根：細的半透明「影線」＝盤中波動範圍（上綠＝MFE、下紅＝MAE），
+  // 粗的實心「實體」＝從 0 到出場損益（賺＝綠、賠＝紅），實體頂端一條白色橫線標出場位置。
+  // 一眼看出：影線比實體長很多＝吐回很多／扛很深；實體貼著影線頂＝出在高點附近
   function buildMaeMfeChart(tradesArr, chartId){
     if(!tradesArr.length) return '<div class="treplay-empty" style="padding:30px;">無資料</div>';
-    const mmW = Math.max(500, tradesArr.length*26+40), mmH = 240, mmPad = {l:50, r:14, t:14, b:30};
-    const allVals = tradesArr.flatMap(t => [t.mfe, t.mae, t.pnl]);
-    let mmMax = Math.max(0, ...allVals), mmMin = Math.min(0, ...allVals);
-    const mmPd = (mmMax-mmMin)*0.08 || 50; mmMax += mmPd; mmMin -= mmPd;
-    const mmRng = (mmMax-mmMin) || 1;
-    const mmY = v => mmPad.t + (mmH-mmPad.t-mmPad.b)*(1-(v-mmMin)/mmRng);
-    const mmBarW = (mmW-mmPad.l-mmPad.r)/tradesArr.length;
-    const mmX = i => mmPad.l + i*mmBarW + mmBarW/2;
-    const mmZeroY = mmY(0);
-
-    const MM_GRID_STEP = smartGridStep(mmMax-mmMin, 6);
-    let mmGrid = '';
-    const mmGridStart = Math.ceil(mmMax/MM_GRID_STEP)*MM_GRID_STEP;
-    const mmGridEnd = Math.floor(mmMin/MM_GRID_STEP)*MM_GRID_STEP;
-    for(let gv=mmGridStart; gv>=mmGridEnd; gv-=MM_GRID_STEP){
-      const gy = mmY(gv);
-      if(gy < mmPad.t-5 || gy > mmH-mmPad.b+5) continue;
-      mmGrid += `<line x1="${mmPad.l}" y1="${gy.toFixed(1)}" x2="${mmW-mmPad.r}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
-      mmGrid += `<text x="2" y="${(gy+3).toFixed(1)}" fill="#777" font-size="9" font-family="monospace">$${gv.toFixed(0)}</text>`;
+    const W = chartId==='mmOverall' ? equityCurveTargetWidth('eqOverall') : equityCurveTargetWidth('eqLong');
+    const H = 290, PAD = {l:58, r:24, t:22, b:32};
+    const N = tradesArr.length;
+    const mfe = tradesArr.map(t=>Math.max(0, t.mfe||0));
+    const mae = tradesArr.map(t=>Math.min(0, t.mae||0));
+    const pnl = tradesArr.map(t=>t.pnl);
+    let maxV = Math.max(0, ...mfe, ...pnl), minV = Math.min(0, ...mae, ...pnl);
+    const pd = (maxV-minV)*0.08 || 50; maxV += pd; minV -= pd;
+    const rng = (maxV-minV) || 1;
+    const Y = v => PAD.t + (H-PAD.t-PAD.b)*(1-(v-minV)/rng);
+    const slot = (W-PAD.l-PAD.r)/N;
+    const X = i => PAD.l + slot*(i+0.5);
+    const zeroY = Y(0);
+    const wickW = Math.max(2, Math.min(slot*0.62, 22));   // 波動範圍（MFE／MAE）
+    const bodyW = Math.max(1.5, Math.min(slot*0.32, 10)); // 出場損益
+    // 橫向格線
+    const GS = smartGridStep(maxV-minV, 6);
+    let grid = '';
+    for(let gv=Math.ceil(maxV/GS)*GS; gv>=Math.floor(minV/GS)*GS; gv-=GS){
+      const gy = Y(gv); if(gy<PAD.t-5||gy>H-PAD.b+5) continue;
+      grid += `<line x1="${PAD.l}" y1="${gy.toFixed(1)}" x2="${W-PAD.r}" y2="${gy.toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+      grid += `<text x="${PAD.l-6}" text-anchor="end" y="${(gy+3).toFixed(1)}" fill="#777" font-size="9" font-family="monospace" font-weight="600">$${gv.toFixed(0)}</text>`;
     }
-
-    let mmBars = '';
-    const MM_LABEL_THRESHOLD = 150; // 筆數太多時，省略每根bar下面的編號文字，減少節點數（點擊還是能看到完整資訊）
-    tradesArr.forEach((t,i) => {
-      const x = mmX(i);
-      const mfeY = mmY(t.mfe), maeY = mmY(t.mae);
-      const dataStr = chartClickData(`#${i+1} ${t.dir==='long'?'多':'空'} ・ ${t.date}`, [
-        {label:'MFE', value:'$'+t.mfe.toFixed(0), color:'#22c55e'},
-        {label:'出場', value:(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(0), color: t.pnl>=0?'#22c55e':'#ef4444'},
-        {label:'MAE', value:'$'+t.mae.toFixed(0), color:'#ef4444'},
-      ]);
-      mmBars += `<rect x="${(x-10).toFixed(1)}" y="${mmPad.t}" width="20" height="${mmH-mmPad.t-mmPad.b}" fill="transparent" style="cursor:pointer;" onclick="showChartPoint(event,'${chartId}',${x.toFixed(1)},'${dataStr}')"/>`;
-      mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(mfeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(mfeY-mmZeroY).toFixed(1)}" fill="#22c55e" rx="1.5" style="pointer-events:none;"/>`;
-      mmBars += `<rect x="${(x-3).toFixed(1)}" y="${Math.min(maeY,mmZeroY).toFixed(1)}" width="6" height="${Math.abs(maeY-mmZeroY).toFixed(1)}" fill="#ef4444" rx="1.5" style="pointer-events:none;"/>`;
-      const pnlY = mmY(t.pnl);
-      mmBars += `<rect x="${(x-5).toFixed(1)}" y="${(pnlY-5).toFixed(1)}" width="10" height="10" fill="#fff" stroke="${t.pnl>=0?'#22c55e':'#ef4444'}" stroke-width="2" transform="rotate(45 ${x.toFixed(1)} ${pnlY.toFixed(1)})" style="pointer-events:none;"/>`;
-      if(tradesArr.length <= MM_LABEL_THRESHOLD){
-        mmBars += `<text x="${x.toFixed(1)}" y="${mmH-mmPad.b+14}" fill="#888" font-size="9" text-anchor="middle">#${i+1}</text>`;
-      }
+    // 月份分隔
+    let months = '';
+    const segs = [];
+    tradesArr.forEach((t,i)=>{ const ym=String(t.date||'').slice(0,7); if(!ym) return;
+      if(!segs.length || segs[segs.length-1].ym!==ym) segs.push({ym,from:i,to:i}); else segs[segs.length-1].to=i; });
+    segs.forEach((g,si)=>{
+      const x1 = PAD.l + slot*g.from, x2 = PAD.l + slot*(g.to+1);
+      const [yy,mm] = g.ym.split('-');
+      if(si>0) months += `<line x1="${x1.toFixed(1)}" y1="${PAD.t}" x2="${x1.toFixed(1)}" y2="${H-PAD.b+4}" stroke="rgba(250,204,21,0.28)" stroke-width="1" stroke-dasharray="3,3"/>`;
+      if(si%2===1) months += `<rect x="${x1.toFixed(1)}" y="${PAD.t}" width="${Math.max(0,x2-x1).toFixed(1)}" height="${H-PAD.t-PAD.b}" fill="rgba(255,255,255,0.018)"/>`;
+      const w=x2-x1, full=(si===0||segs[si-1].ym.slice(0,4)!==yy)?`${yy}年${+mm}月`:`${+mm}月`;
+      const lbl = w>=58?full:(w>=22?`${+mm}月`:'');
+      if(lbl) months += `<text x="${((x1+x2)/2).toFixed(1)}" y="${H-PAD.b+18}" fill="#cbd5e1" font-size="11" font-weight="700" text-anchor="middle">${lbl}</text>`;
     });
-
-    return `<div class="chart-info-panel" id="${chartId}_info">👆 點擊圖上的長條查看該筆交易詳細資料</div><div style="width:100%;overflow-x:auto;"><svg viewBox="0 0 ${mmW} ${mmH}" style="width:${mmW}px;height:${mmH}px;display:block;min-width:100%;">
-      ${mmGrid}
-      <line x1="${mmPad.l}" y1="${mmZeroY.toFixed(1)}" x2="${mmW-mmPad.r}" y2="${mmZeroY.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
-      ${mmBars}
-      <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${mmPad.t}" x2="0" y2="${mmH-mmPad.b}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
-    </svg></div>`;
+    const gid = Math.random().toString(36).slice(2,8);
+    let bars = '';
+    const xhItems = [];
+    const rr = Math.min(3, wickW/2), rb = Math.min(2, bodyW/2);
+    tradesArr.forEach((t,i)=>{
+      const x = X(i), up = Y(mfe[i]), dn = Y(mae[i]), py = Y(pnl[i]);
+      // 影線（波動範圍）：上綠、下紅，半透明＋細邊
+      if(mfe[i]>0) bars += `<rect x="${(x-wickW/2).toFixed(1)}" y="${up.toFixed(1)}" width="${wickW.toFixed(1)}" height="${Math.max(0.5,zeroY-up).toFixed(1)}" rx="${rr}" fill="url(#mmU-${gid})" stroke="rgba(34,197,94,.55)" stroke-width="0.8"/>`;
+      if(mae[i]<0) bars += `<rect x="${(x-wickW/2).toFixed(1)}" y="${zeroY.toFixed(1)}" width="${wickW.toFixed(1)}" height="${Math.max(0.5,dn-zeroY).toFixed(1)}" rx="${rr}" fill="url(#mmD-${gid})" stroke="rgba(239,68,68,.55)" stroke-width="0.8"/>`;
+      // 實體（出場損益）：0 → 出場，實心
+      const win = pnl[i]>=0, c = win?'#22c55e':'#ef4444';
+      bars += `<rect x="${(x-bodyW/2).toFixed(1)}" y="${Math.min(py,zeroY).toFixed(1)}" width="${bodyW.toFixed(1)}" height="${Math.max(1.5,Math.abs(py-zeroY)).toFixed(1)}" rx="${rb}" fill="${c}"/>`;
+      // 出場位置：白色橫線
+      bars += `<line x1="${(x-wickW/2-1).toFixed(1)}" y1="${py.toFixed(1)}" x2="${(x+wickW/2+1).toFixed(1)}" y2="${py.toFixed(1)}" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`;
+      const giveback = t.mfe>0 ? ((t.mfe-t.pnl)/t.mfe*100) : null;
+      const items = [
+        {label:'MFE', value:'$'+mfe[i].toFixed(0), color:'#22c55e'},
+        {label:'出場', value:(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(0), color:c},
+        {label:'MAE', value:'-$'+Math.abs(mae[i]).toFixed(0), color:'#ef4444'},
+        {label:'口數', value:t.qty+'口', color:'#fff'},
+      ];
+      if(giveback!==null) items.push({label:'回吐', value:giveback.toFixed(0)+'%', color:'#f59e0b'});
+      xhItems.push({x, title:`#${i+1} ${t.dir==='long'?'多':'空'} ・ ${t.date}`, items});
+    });
+    xhRegister(chartId, {pts:xhItems, l:PAD.l, r:W-PAD.r, t:PAD.t, b:H-PAD.b, vmin:minV, vmax:maxV, band:slot});
+    return `<div class="chart-info-panel" id="${chartId}_info">👆 滑鼠移到圖上，十字線跟著走、這裡即時顯示那一筆的 MFE／出場／MAE</div>
+      <div style="display:flex;gap:16px;font-size:10px;color:var(--t2);margin-bottom:6px;flex-wrap:wrap;align-items:center;">
+        <span><span style="display:inline-block;width:12px;height:10px;border-radius:2px;background:rgba(34,197,94,.35);border:1px solid rgba(34,197,94,.6);margin-right:4px;vertical-align:middle;"></span>寬淡色上方＝MFE 最大浮盈</span>
+        <span><span style="display:inline-block;width:12px;height:10px;border-radius:2px;background:rgba(239,68,68,.35);border:1px solid rgba(239,68,68,.6);margin-right:4px;vertical-align:middle;"></span>寬淡色下方＝MAE 最大浮虧</span>
+        <span><span style="display:inline-block;width:5px;height:12px;border-radius:1px;background:#22c55e;margin-right:1px;vertical-align:middle;"></span><span style="display:inline-block;width:5px;height:12px;border-radius:1px;background:#ef4444;margin-right:4px;vertical-align:middle;"></span>窄實心＝出場損益</span>
+        <span><span style="display:inline-block;width:14px;height:0;border-top:2px solid #fff;margin-right:4px;vertical-align:middle;"></span>出場位置</span>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block;" ${xhAttrs(chartId)}>
+      <defs>
+        <linearGradient id="mmU-${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.45"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0.12"/></linearGradient>
+        <linearGradient id="mmD-${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.12"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0.45"/></linearGradient>
+      </defs>
+      ${months}
+      ${grid}
+      <line x1="${PAD.l}" y1="${zeroY.toFixed(1)}" x2="${W-PAD.r}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
+      ${bars}
+      <line id="${chartId}_vline" class="chart-vline" x1="0" y1="${PAD.t}" x2="0" y2="${H-PAD.b}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,4" visibility="hidden" style="pointer-events:none;"/>
+      ${xhOverlay(chartId)}
+      <text x="${PAD.l+4}" y="${(zeroY-6).toFixed(1)}" fill="rgba(255,255,255,0.6)" font-size="10" font-family="monospace" font-weight="700">$0</text>
+    </svg>`;
   }
 
   const maeMfeChart = buildMaeMfeChart(trades, 'mmOverall');
@@ -5508,11 +5834,6 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
     <div class="tresult-section">
       <div class="tresult-section-title" style="justify-content:space-between;display:flex;">
         <span>📊 MAE/MFE 分析（每筆交易盤中波動）<span style="font-size:9px;color:#f59e0b;font-weight:600;margin-left:6px;">⚠ 含影線、未實現</span></span>
-      </div>
-      <div style="display:flex;gap:14px;font-size:10px;color:var(--t2);margin-bottom:8px;">
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;margin-right:3px;"></span>MFE 最大獲利</span>
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ef4444;margin-right:3px;"></span>MAE 最大虧損</span>
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid #888;margin-right:3px;"></span>出場損益</span>
       </div>
       ${maeMfeChart}
     </div>
@@ -9458,6 +9779,7 @@ function statsSplitTrades(id){
 }
 // 同一頁出現兩份報告：把圖表的 id 加上前綴，點圖時才不會兩邊互相打架
 function statsSplitPrefix(html, pre, vid){
+  STATS_SPLIT_CHARTS.forEach(c=>{ if(_xhReg[c]) _xhReg[pre+c]=_xhReg[c]; });
   STATS_SPLIT_CHARTS.forEach(c=>{
     html=html.split("'"+c+"'").join("'"+pre+c+"'").split('id="'+c+'_').join('id="'+pre+c+'_');
   });
@@ -9468,19 +9790,1361 @@ function showDayLotsModalV(vid, date){
   _allClosedTradesCache = statsSplitTrades(vid);
   showDayLotsModal(date);
 }
+// 算出一組交易的蝴蝶圖點數區間（跟績效報告裡同一個算法：每 40 點一格）
+function bfRangeOf(trades){
+  const B=40, c={}; let hi=-Infinity, lo=Infinity, mc=0;
+  trades.forEach(t=>{ const pts=t.dir==='long'?(t.exitPrice-t.entryPrice):(t.entryPrice-t.exitPrice);
+    const b=Math.floor(pts/B)*B, k=b+'_'+t.dir; c[k]=(c[k]||0)+1; mc=Math.max(mc,c[k]); hi=Math.max(hi,b); lo=Math.min(lo,b); });
+  return {hi, lo, maxCount:mc};
+}
 function statsSplitRender(trades){
   const page=document.getElementById('pageStats');
   const on=statsSplitOn();
   window._statsSplit=false;
   if(!on || !page) return;
-  const left=statsSplitPrefix(page.innerHTML,'L_',tvActive);
+  const rightTrades=statsSplitTrades(statsSplitId);
+  const rA=bfRangeOf(trades), rB=bfRangeOf(rightTrades);
+  window._bfRange={hi:Math.max(rA.hi,rB.hi), lo:Math.min(rA.lo,rB.lo), maxCount:Math.max(rA.maxCount,rB.maxCount)};
+  if(!isFinite(window._bfRange.hi)) window._bfRange=null;
   window._statsSplit=true;
-  _renderTradeResultCore(statsSplitTrades(statsSplitId));
+  _renderTradeResultCore(trades);           // 左邊用共同區間重畫一次
+  const left=statsSplitPrefix(page.innerHTML,'L_',tvActive);
+  _renderTradeResultCore(rightTrades);
   const right=statsSplitPrefix(page.innerHTML,'R_',statsSplitId);
-  window._statsSplit=false;
+  window._statsSplit=false; window._bfRange=null;
   _allClosedTradesCache=trades;
   const hdr=(id)=>`<div class="stats-col-hdr" style="--vc:${tvColor(id)}"><i></i>${escapeHtml(tvName(id))}<span>${id===tvActive?'目前版本':'對比版本'}</span></div>`;
   page.innerHTML=`<div class="stats-split"><div class="stats-col">${hdr(tvActive)}${left}</div><div class="stats-col">${hdr(statsSplitId)}${right}</div></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(statsSplitAlign));
+}
+// 左右兩欄的每一個區塊高度拉成一樣（取比較高的那邊），下面的區塊才會一路對齊
+function statsSplitAlign(){
+  const cols=document.querySelectorAll('#pageStats .stats-split > .stats-col'); if(cols.length!==2) return;
+  // 先對齊區塊裡面的小卡（問題摘要、各診斷卡），再對齊整個區塊
+  ['.dg-sum','.dg-card'].forEach(sel=>{
+    const a=[...cols[0].querySelectorAll(sel)], b=[...cols[1].querySelectorAll(sel)];
+    [...a,...b].forEach(el=>el.style.minHeight='');
+    for(let i=0;i<Math.min(a.length,b.length);i++){ const h=Math.max(a[i].offsetHeight,b[i].offsetHeight); if(h) a[i].style.minHeight=b[i].style.minHeight=h+'px'; }
+  });
+  const A=[...cols[0].children], B=[...cols[1].children];
+  [...A,...B].forEach(el=>el.style.minHeight='');
+  for(let i=0;i<Math.min(A.length,B.length);i++){
+    const h=Math.max(A[i].offsetHeight,B[i].offsetHeight); if(!h) continue;
+    A[i].style.minHeight=B[i].style.minHeight=h+'px';
+  }
+}
+window.addEventListener('resize',()=>{ clearTimeout(window._ssaT); window._ssaT=setTimeout(statsSplitAlign,150); });
+// ============================================================
+// 🔧 NQ 換月資料修正：
+// 資料來源在換月週的週一早盤（06:00/07:00 開始）會先用「下一個月份合約」的成交（量極少、價格差一個價差），
+// 到 13:00/14:00 才切回主力月份，造成圖上一個假的大跳空。
+// 這裡在載入時自動找出這種「整段量極少 → 接著價格跳一大段、量突然放大」的區段，
+// 把那段K棒整段平移掉價差，讓它接上之後的主力月份，並重算 5K/15K/60K 與均線。
+// ============================================================
+function fixNqRollGaps(DATA, DAYS){
+  const fixes=[];
+  DAYS.forEach(day=>{
+    const o=(DATA[day]||{})['1k']||[]; if(o.length<120) return;
+    const lim=Math.min(o.length-60, 600);
+    for(let j=30;j<lim;j++){
+      if(o[j].idx!==o[j-1].idx+1) continue;
+      const gap=o[j].o-o[j-1].c;
+      if(Math.abs(gap)<100) continue;
+      let vb=0; for(let k=0;k<j;k++) vb+=(o[k].v||0);
+      let va=0; for(let k=j;k<j+60;k++) va+=(o[k].v||0);
+      if(vb/j>10 || va/60<Math.max(15, 5*vb/j)) continue;      // 前面那段要「幾乎沒量」、後面要「明顯放量」
+      fixes.push({day, lo:o[0].idx, hi:o[j-1].idx, delta:gap});
+      break;
+    }
+  });
+  if(!fixes.length) return fixes;
+  const inFix=idx=>{ for(const f of fixes) if(idx>=f.lo&&idx<=f.hi) return f; return null; };
+  const minLo=Math.min(...fixes.map(f=>f.lo));
+  const r=v=>Math.round(v*100)/100;
+  // 1) 1K 平移
+  const k1=new Map();
+  DAYS.forEach(day=>((DATA[day]||{})['1k']||[]).forEach(b=>{
+    const f=inFix(b.idx); if(f && !b._rf){ b.o=r(b.o+f.delta); b.h=r(b.h+f.delta); b.l=r(b.l+f.delta); b.c=r(b.c+f.delta); b._rf=1; }
+    k1.set(b.idx,b);
+  }));
+  // 2) 大格局：跟修正區段重疊的K棒，用修正後的 1K 重新組
+  const tfs=['5k','15k','60k'];
+  tfs.forEach(tf=>DAYS.forEach(day=>((DATA[day]||{})[tf]||[]).forEach(b=>{
+    const e=b.idx_end!=null?b.idx_end:b.idx;
+    if(e<minLo) return;
+    if(!fixes.some(f=>b.idx<=f.hi && e>=f.lo)) return;
+    let O=null,H=-Infinity,L=Infinity,C=null;
+    for(let i=b.idx;i<=e;i++){ const x=k1.get(i); if(!x) continue; if(O===null) O=x.o; H=Math.max(H,x.h); L=Math.min(L,x.l); C=x.c; }
+    if(O!==null){ b.o=O; b.h=H; b.l=L; b.c=C; }
+  })));
+  // 3) 重算受影響的均線（簡單移動平均，跟原始資料同一個算法）
+  const P={m5:5,m10:10,m20:20,m60:60,m240:240};
+  ['1k',...tfs].forEach(tf=>{
+    const g=new Map();
+    DAYS.forEach(day=>((DATA[day]||{})[tf]||[]).forEach(b=>{ if(!g.has(b.idx)) g.set(b.idx,b.c); }));
+    const keys=[...g.keys()].sort((a,b)=>a-b), closes=keys.map(k=>g.get(k)), pos=new Map(keys.map((k,i)=>[k,i]));
+    // 每個修正區段：從區段開頭，到區段結束後再 240 根（最長的均線）都要重算
+    const R=fixes.map(f=>{ const a=keys.findIndex(k=>k>=f.lo); let b=-1; for(let i=keys.length-1;i>=0;i--) if(keys[i]<=f.hi){ b=i; break; } return a<0||b<0?null:[a,b+240]; }).filter(Boolean);
+    if(!R.length) return;
+    DAYS.forEach(day=>((DATA[day]||{})[tf]||[]).forEach(b=>{
+      const p=pos.get(b.idx); if(p==null || !R.some(([a,e])=>p>=a&&p<=e)) return;
+      Object.keys(P).forEach(mk=>{ const n=P[mk]; if(b[mk]===undefined || p+1<n) return;
+        let s=0; for(let i=p-n+1;i<=p;i++) s+=closes[i]; b[mk]=Math.round(s/n*1000)/1000; });
+    }));
+  });
+  return fixes;
+}
+
+// ============================================================
+// ✛ 統計圖十字線：滑鼠指到哪、十字跟到哪（垂直線吸附到最近一筆、水平線跟著游標並標出金額），
+//   上方資訊列即時顯示那一筆的資料。累積損益曲線、MAE/MFE 圖共用。
+// ============================================================
+const _xhReg = {};
+function xhRegister(id, cfg){ _xhReg[id]=cfg; }
+function xhAttrs(id){ return `onmousemove="chartXHair(event,'${id}')" onclick="chartXHair(event,'${id}')" ontouchstart="chartXHair(event,'${id}')" ontouchmove="chartXHair(event,'${id}')" onmouseleave="chartXHairOut('${id}')"`; }
+function xhOverlay(id){
+  return `<rect id="${id}_band" x="0" y="0" width="0" height="0" fill="rgba(250,204,21,0.07)" visibility="hidden" pointer-events="none"/>
+    <line id="${id}_hline" x1="0" y1="0" x2="0" y2="0" stroke="rgba(250,204,21,0.75)" stroke-width="1" stroke-dasharray="3,3" visibility="hidden" pointer-events="none"/>
+    <g id="${id}_ylab" visibility="hidden" pointer-events="none"><rect x="0" y="-8" width="56" height="16" rx="3" fill="#facc15"/><text x="28" y="4" fill="#000" font-size="10" font-weight="800" font-family="monospace" text-anchor="middle"></text></g>`;
+}
+function chartXHair(e, id){
+  const cfg=_xhReg[id]; if(!cfg || !cfg.pts.length) return;
+  const svg=e.currentTarget, src=(e.touches&&e.touches[0])||e;
+  const m=svg.getScreenCTM(); if(!m) return;
+  const pt=svg.createSVGPoint(); pt.x=src.clientX; pt.y=src.clientY;
+  const p=pt.matrixTransform(m.inverse());
+  // 最近的一筆
+  let lo=0, hi=cfg.pts.length-1;
+  while(hi-lo>1){ const mid=(lo+hi)>>1; if(cfg.pts[mid].x<p.x) lo=mid; else hi=mid; }
+  const i = Math.abs(cfg.pts[lo].x-p.x) <= Math.abs(cfg.pts[hi].x-p.x) ? lo : hi;
+  const it=cfg.pts[i];
+  const vl=document.getElementById(id+'_vline');
+  if(vl){ vl.setAttribute('x1',it.x); vl.setAttribute('x2',it.x); vl.setAttribute('visibility','visible'); }
+  const bd=document.getElementById(id+'_band');
+  if(bd && cfg.band){ bd.setAttribute('x',it.x-cfg.band/2); bd.setAttribute('y',cfg.t); bd.setAttribute('width',cfg.band); bd.setAttribute('height',cfg.b-cfg.t); bd.setAttribute('visibility','visible'); }
+  const y=Math.max(cfg.t, Math.min(cfg.b, p.y));
+  const hl=document.getElementById(id+'_hline');
+  if(hl){ hl.setAttribute('x1',cfg.l); hl.setAttribute('x2',cfg.r); hl.setAttribute('y1',y); hl.setAttribute('y2',y); hl.setAttribute('visibility','visible'); }
+  const yl=document.getElementById(id+'_ylab');
+  if(yl){ const v=cfg.vmax-(y-cfg.t)/(cfg.b-cfg.t)*(cfg.vmax-cfg.vmin);
+    yl.querySelector('text').textContent=(v<0?'-':'')+'$'+Math.abs(v).toFixed(0);
+    yl.setAttribute('transform',`translate(${cfg.l-58},${y})`); yl.setAttribute('visibility','visible'); }
+  if(cfg._last!==i){ cfg._last=i; chartInfoShow(id, it.title, it.items); }
+}
+function chartXHairOut(id){
+  ['_hline','_ylab','_band'].forEach(s=>{ const el=document.getElementById(id+s); if(el) el.setAttribute('visibility','hidden'); });
+}
+function chartInfoShow(id, title, items){
+  const infoEl=document.getElementById(id+'_info'); if(!infoEl) return;
+  infoEl.innerHTML=`<div class="chart-info-row"><span class="chart-info-stat" style="background:rgba(250,204,21,0.15);"><span class="chart-info-val" style="color:#facc15;">${title}</span></span>${items.map(it=>`<span class="chart-info-stat"><span class="chart-info-lbl" style="color:#d1d5db;">${it.label}</span><span class="chart-info-val" style="color:${it.color||'#fff'};">${it.value}</span></span>`).join('')}</div>`;
+  infoEl.classList.add('active');
+}
+
+// ============================================================
+// 🩺 問題診斷：從現有的交易紀錄自動找出「錢是在哪裡賠掉的」
+// 全部用已記錄的資料算（進出時間／價位／口數／加碼腳位／MAE、MFE／當天K棒），不用另外輸入
+// ============================================================
+function buildDiagnosis(tradesIn){
+  if(!tradesIn || tradesIn.length<3) return '';
+  const PTV = TRADE_PT_VALUE, MU = MKT.id==='tx' ? 5 : 1;            // 每根最小K棒幾分鐘
+  const T = tradesIn.slice().sort((a,b)=>a.date!==b.date ? a.date.localeCompare(b.date) : (a.entryIdx-b.entryIdx));
+  const money = v => `${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}`;
+  const pct = v => isFinite(v) ? v.toFixed(0)+'%' : '—';
+  const sum = a => a.reduce((x,t)=>x+t.pnl,0);
+  const S = a => { const n=a.length, w=a.filter(t=>t.pnl>0).length, p=sum(a); return {n, wr:n?w/n*100:NaN, pnl:p, avg:n?p/n:NaN}; };
+  const ptsOf = t => t.dir==='long' ? (t.exitPrice-t.entryPrice) : (t.entryPrice-t.exitPrice);
+  const holdOf = t => Math.max(1, (t.exitIdx-t.entryIdx)*MU);
+  const maePts = t => Math.abs(t.mae||0)/((t.qty||1)*PTV);
+  const mfePts = t => Math.max(0,t.mfe||0)/((t.qty||1)*PTV);
+  const all = S(T);
+  const totalLoss = T.filter(t=>t.pnl<0).reduce((x,t)=>x+t.pnl,0);
+  const avgWin = (()=>{ const w=T.filter(t=>t.pnl>0); return w.length?sum(w)/w.length:0; })();
+  const avgLossAbs = (()=>{ const l=T.filter(t=>t.pnl<0); return l.length?Math.abs(sum(l)/l.length):0; })();
+
+  // ---- 每筆加上「當天第幾筆、前一筆結果、間隔、當天已累積損益」
+  let curDay=null, k=0, dayRun=0, prev=null;
+  T.forEach(t=>{
+    if(t.date!==curDay){ curDay=t.date; k=0; dayRun=0; prev=null; }
+    k++; t._nth=k; t._dayBefore=dayRun; t._prev=prev;
+    t._gap = prev ? Math.max(0,(t.entryIdx-prev.exitIdx)*MU) : null;
+    const fe=((t.legs||[]).filter(l=>l.type==='entry').sort((a,b)=>a.idx-b.idx))[0];
+    t._ePx = fe ? fe.price : t.entryPrice; t._eQty = fe ? fe.qty : t.qty;
+    t._dist = prev ? Math.abs(t._ePx - prev.exitPrice) : null;            // 離上一筆出場價幾點
+    t._same = prev ? (prev.dir===t.dir) : null;                            // 同方向 or 反手
+    t._qtyChg = prev ? Math.sign(t.qty - prev.qty) : null;                 // 口數變大/一樣/變小
+    t._lStreak = prev ? (prev.pnl<=0 ? (prev._lStreak||0)+1 : 0) : 0;      // 進場前已經連賠幾筆
+    t._wStreak = prev ? (prev.pnl>0 ? (prev._wStreak||0)+1 : 0) : 0;
+    t._dayPeakBefore = prev ? Math.max(prev._dayPeakBefore||0, dayRun) : 0;
+    dayRun+=t.pnl; prev=t;
+  });
+
+  window._DG = {T};
+  // ---- 加碼分類
+  T.forEach(t=>{
+    const legs=(t.legs||[]).filter(l=>l.type==='entry').slice().sort((a,b)=>a.idx-b.idx);
+    if(legs.length<=1){ t._add='single'; return; }
+    let q=0, avg=0, avgDown=false;
+    legs.forEach((l,i)=>{
+      if(i>0){ const worse = t.dir==='long' ? l.price<avg : l.price>avg; if(worse) avgDown=true; }
+      avg=(avg*q+l.price*l.qty)/(q+l.qty); q+=l.qty;
+    });
+    t._add = avgDown ? 'down' : 'up';
+  });
+
+  // ---- 進場位置：60K 60MA 斜率
+  // 取「包含進場那根」在內的 4 根 60K（例如 12:xx 進場 → 9、10、11、12 點這 4 根）的 60MA，
+  // 4 個點一路往上＝上揚、一路往下＝下彎，其他＝沒方向。
+  // 進場那根還沒收完，它的 60MA 用「前 59 根收盤＋進場價」算，不偷看之後的價格。
+  function ma60Trend(t){
+    const arr=(DATA[t.date]||{})['60k']||[];
+    const leg=((t.legs||[]).filter(l=>l.type==='entry').sort((a,b)=>a.idx-b.idx))[0];
+    const eIdx = leg ? leg.idx : t.entryIdx, ePx = leg ? leg.price : t.entryPrice;
+    let p=-1;
+    for(let i=arr.length-1;i>=0;i--){ const e=arr[i].idx_end!=null?arr[i].idx_end:arr[i].idx; if(arr[i].idx<=eIdx && eIdx<=e){ p=i; break; } if(e<eIdx){ p=i+1<arr.length?i+1:-1; break; } }
+    if(p<62) return null;
+    const ma=(k, last)=>{ let s=0; for(let i=k-59;i<k;i++) s+=arr[i].c; return (s+(last!=null?last:arr[k].c))/60; };
+    const m=[ma(p-3), ma(p-2), ma(p-1), ma(p, ePx)];
+    const up = m[0]<m[1] && m[1]<m[2] && m[2]<m[3];
+    const dn = m[0]>m[1] && m[1]>m[2] && m[2]>m[3];
+    return {trend: up?'up':(dn?'down':'flat'), m, ts:arr[p].ts};
+  }
+  T.forEach(t=>{ const r=ma60Trend(t); t._ma60 = r ? r.trend : null; });
+
+  // ===== 表格工具 =====
+  const maxAbs = rows => Math.max(1, ...rows.map(r=>Math.abs(r.s.pnl||0)));
+  function table(rows, opt={}){
+    const m=maxAbs(rows);
+    return `<div class="dg-tbl">${head}${rows.map(r=>{
+      const s=r.s, w=s.n?Math.abs(s.pnl)/m*100:0, pos=s.pnl>=0;
+      return `<div class="dg-row${r.hl?' hl':''}${s.n?'':' empty'}" title="${r.tip||''}">
+        <div class="dg-lbl">${r.label}</div>
+        <div class="dg-n">${s.n}<span>筆</span></div>
+        <div class="dg-wr" style="color:${!s.n?'var(--t3)':(s.wr>=50?'#22c55e':'#ef4444')}">${s.n?pct(s.wr):'—'}</div>
+        <div class="dg-bar"><div class="dg-bar-mid"></div>${s.n?`<i style="${pos?'left':'right'}:50%;width:${(w/2).toFixed(1)}%;background:${pos?'#22c55e':'#ef4444'}"></i>`:''}</div>
+        <div class="dg-pnl" style="color:${!s.n?'var(--t3)':(pos?'#22c55e':'#ef4444')}">${s.n?money(s.pnl):'—'}</div>
+        <div class="dg-avg">${s.n?money(s.avg):''}<span>${s.n?'/筆':''}</span></div>
+      </div>`; }).join('')}</div>`;
+  }
+  const head = `<div class="dg-row dg-head"><div class="dg-lbl">分組</div><div class="dg-n">筆數</div><div class="dg-wr">勝率</div><div class="dg-bar" style="text-align:center">總損益</div><div class="dg-pnl"></div><div class="dg-avg">平均</div></div>`;
+  const card = (icon, title, how, body, cls='') => `<div class="dg-card ${cls}"><div class="dg-card-title">${icon} ${title}</div><div class="dg-how">${how}</div>${body}</div>`;
+  const F=[];   // 問題摘要：{impact, html}
+  const G=[];   // 做得好的
+
+  // ===== 1. 賠錢後的下一筆（詳細）=====
+  const first=T.filter(t=>!t._prev), afterW=T.filter(t=>t._prev&&t._prev.pnl>0), afterL=T.filter(t=>t._prev&&t._prev.pnl<=0);
+  const revenge=afterL.filter(t=>t._gap!==null&&t._gap<=10);
+  const sRev=S(revenge), sAL=S(afterL), sAW=S(afterW);
+  // 雙欄表：同一個分組，左邊＝上一筆賠錢後、右邊＝上一筆賺錢後
+  const cellS = s => s.n ? `<td>${s.n}</td><td class="${s.wr>=50?'up':'dn'}">${pct(s.wr)}</td><td class="${s.pnl>=0?'up':'dn'}">${money(s.pnl)}</td><td class="${s.avg>=0?'up':'dn'}">${money(s.avg)}</td>` : `<td class="dg-t3">0</td><td></td><td class="dg-t3">—</td><td></td>`;
+  function dualTbl(firstCol, groups, A=afterL, B=afterW, la='上一筆賠錢後', lb='上一筆賺錢後'){
+    return `<table class="dg-mini dg-dual"><thead><tr><th rowspan="2">${firstCol}</th><th colspan="4" class="ga">${la}</th><th colspan="4" class="gb sep">${lb}</th></tr>
+      <tr><th class="ga">筆數</th><th class="ga">勝率</th><th class="ga">總損益</th><th class="ga">平均</th><th class="gb sep">筆數</th><th class="gb">勝率</th><th class="gb">總損益</th><th class="gb">平均</th></tr></thead><tbody>
+      ${groups.map(g=>{ const a=S(A.filter(g.fn)), b=S(B.filter(g.fn)); return `<tr class="${a.n&&a.pnl<0&&a.avg<Math.min(0,b.avg)?'hl':''}"><td>${g.lbl}</td>${cellS(a)}${cellS(b).replace('<td>','<td class="sep">')}</tr>`; }).join('')}</tbody></table>`;
+  }
+  const gapG=[[0,2],[2,5],[5,10],[10,20],[20,30],[30,60],[60,90],[90,120],[120,180],[180,240],[240,Infinity]].map(([a,b])=>({lbl: b===Infinity?`${a} 分鐘以上`:`${a}～${b} 分鐘`, fn:t=>t._gap!==null&&t._gap>=a&&t._gap<b}));
+  const distG=[[0,5],[5,15],[15,30],[30,60],[60,Infinity]].map(([a,b])=>({lbl: b===Infinity?`${a} 點以上`:`${a}～${b} 點`, fn:t=>t._dist!==null&&t._dist>=a&&t._dist<b}));
+  const dirG=[{lbl:'同方向再進', fn:t=>t._same===true},{lbl:'反手（換方向）', fn:t=>t._same===false}];
+  const qtyG=[{lbl:'口數加大', fn:t=>t._qtyChg===1},{lbl:'口數一樣', fn:t=>t._qtyChg===0},{lbl:'口數減少', fn:t=>t._qtyChg===-1}];
+  const streakRows=[
+    {label:'連賠 1 筆之後', s:S(T.filter(t=>t._lStreak===1))},
+    {label:'連賠 2 筆之後', s:S(T.filter(t=>t._lStreak===2))},
+    {label:'連賠 3 筆以上之後', s:S(T.filter(t=>t._lStreak>=3))},
+    {label:'連賺 1 筆之後', s:S(T.filter(t=>t._wStreak===1))},
+    {label:'連賺 2 筆以上之後', s:S(T.filter(t=>t._wStreak>=2))},
+  ];
+  streakRows.forEach(r=>{ r.hl = r.s.n && r.s.pnl<0 && r.label.includes('賠'); });
+  const avgGapL = afterL.length ? afterL.reduce((a,t)=>a+t._gap,0)/afterL.length : NaN, avgGapW = afterW.length ? afterW.reduce((a,t)=>a+t._gap,0)/afterW.length : NaN;
+  const revRate = afterL.length ? afterL.filter(t=>t._same===false).length/afterL.length*100 : NaN;
+  const upRate = afterL.length ? afterL.filter(t=>t._qtyChg===1).length/afterL.length*100 : NaN;
+  const c1 = card('😤','賠錢後的下一筆','同一天內，看上一筆的結果會不會影響下一筆。每張表左邊是「上一筆賠錢後」、右邊是「上一筆賺錢後」，左邊特別差（紅底）的那一列就是你的壞習慣。',
+    `<div class="dg-kpis">
+      <div><span>當天第一筆</span><b class="${S(first).pnl>=0?'up':'dn'}">${money(S(first).pnl)}</b><em>${first.length} 筆・勝率 ${pct(S(first).wr)}</em></div>
+      <div><span>上一筆賠錢後</span><b class="${sAL.pnl>=0?'up':'dn'}">${money(sAL.pnl)}</b><em>${sAL.n} 筆・勝率 ${pct(sAL.wr)}・平均 ${money(sAL.avg)}</em></div>
+      <div><span>上一筆賺錢後</span><b class="${sAW.pnl>=0?'up':'dn'}">${money(sAW.pnl)}</b><em>${sAW.n} 筆・勝率 ${pct(sAW.wr)}・平均 ${money(sAW.avg)}</em></div>
+      <div><span>賠錢後平均隔多久再進場</span><b>${isFinite(avgGapL)?avgGapL.toFixed(0):'—'} 分鐘</b><em>賺錢後平均隔 ${isFinite(avgGapW)?avgGapW.toFixed(0):'—'} 分鐘</em></div>
+      <div><span>賠錢後反手的比例</span><b>${pct(revRate)}</b><em>賠錢後口數加大的比例 ${pct(upRate)}</em></div>
+    </div>
+    ${dgAfterLossViz(T)}
+    <div class="dg-auto">
+      <div><div class="dg-sub">① 隔多久再進場（從上一筆出場算起）</div><div class="dg-scroll">${dualTbl('間隔', gapG)}</div></div>
+      <div><div class="dg-sub">② 進場價離上一筆出場價多遠</div><div class="dg-scroll">${dualTbl('距離', distG)}</div>
+        <div class="dg-sub">③ 方向：同方向再進 or 反手</div><div class="dg-scroll">${dualTbl('方向', dirG)}</div></div>
+      <div><div class="dg-sub">④ 口數：比上一筆大還是小</div><div class="dg-scroll">${dualTbl('口數', qtyG)}</div></div>
+      <div><div class="dg-sub">⑤ 連續賠／賺之後的下一筆</div>${table(streakRows)}</div>
+    </div>`, 'wide');
+  if(sRev.n>=2 && sRev.pnl<0) F.push({impact:-sRev.pnl, html:`賠錢後 <b>10 分鐘內</b>就再進場的 <b>${sRev.n}</b> 筆，合計 <b class="dn">${money(sRev.pnl)}</b>，勝率 ${pct(sRev.wr)}。賠完先停一下再看。`});
+  if(sAL.n>=3 && sAW.n>=3 && sAL.avg < sAW.avg - avgLossAbs*0.3 && sAL.pnl<0) F.push({impact:-sAL.pnl*0.5, html:`上一筆賠錢後，下一筆平均 <b class="dn">${money(sAL.avg)}</b>／筆；上一筆賺錢後是 ${money(sAW.avg)}／筆。賠錢會影響你下一筆的判斷。`});
+  { const r=S(afterL.filter(t=>t._same===false)); if(r.n>=2 && r.pnl<0) F.push({impact:-r.pnl*0.8, html:`賠錢後<b>反手</b>的 ${r.n} 筆合計 <b class="dn">${money(r.pnl)}</b>，勝率 ${pct(r.wr)}。被打掉就馬上反向，通常是情緒單。`}); }
+  { const r=S(afterL.filter(t=>t._qtyChg===1)); if(r.n>=2 && r.pnl<0) F.push({impact:-r.pnl*0.9, html:`賠錢後<b>口數加大</b>的 ${r.n} 筆合計 <b class="dn">${money(r.pnl)}</b>。想一次賺回來，結果賠更多。`}); }
+  { const r=S(T.filter(t=>t._lStreak>=2)); if(r.n>=2 && r.pnl<0) F.push({impact:-r.pnl*0.8, html:`<b>連賠 2 筆以上</b>之後還繼續做的 ${r.n} 筆，又賠了 <b class="dn">${money(r.pnl)}</b>。連賠 2 筆就停手。`}); }
+
+  // ===== 2. 當天第幾筆 =====
+  const nth=[1,2,3,4,5].map(n=>({label:`第 ${n} 筆`, s:S(T.filter(t=>t._nth===n))}));
+  const sN4=S(T.filter(t=>t._nth>=6));
+  nth.push({label:'第 6 筆以後', s:sN4, hl:sN4.n&&sN4.pnl<0});
+  nth.forEach(r=>{ if(r.s.n && r.s.pnl<0 && !r.hl && r.label!=='第 1 筆') r.hl = r.s.avg < -avgLossAbs*0.3; });
+  const c2 = card('🔢','當天第幾筆','前幾筆是正的、後面越做越差，代表越做越累或越做越急，可以設「每天最多 N 筆」。', table(nth));
+  {
+    let cut=null; for(let n=2;n<=4;n++){ const after=T.filter(t=>t._nth>=n); const sa=S(after); if(sa.n>=3 && sa.pnl<0 && S(T.filter(t=>t._nth<n)).pnl>sa.pnl){ cut={n,sa}; break; } }
+    if(cut) F.push({impact:-cut.sa.pnl, html:`每天第 <b>${cut.n}</b> 筆以後的 ${cut.sa.n} 筆合計 <b class="dn">${money(cut.sa.pnl)}</b>（勝率 ${pct(cut.sa.wr)}）。可以試試每天最多做 ${cut.n-1} 筆。`});
+  }
+
+  // ===== 3. 當天已經賺／賠多少時（詳細）=====
+  const X = Math.max(avgLossAbs, 1);                     // 單位＝你的平均虧損
+  const X2 = X*2;
+  const avgQ = a => a.length ? a.reduce((x,t)=>x+t.qty,0)/a.length : NaN;
+  const avgHold = a => a.length ? a.reduce((x,t)=>x+holdOf(t),0)/a.length : NaN;
+  const stG = [
+    {lbl:'當天第一筆', fn:t=>!t._prev},
+    {lbl:`已賠 ${money(-3*X)} 以上`, fn:t=>t._prev&&t._dayBefore<=-3*X},
+    {lbl:`已賠 ${money(-2*X).slice(1)}～${money(-3*X).slice(1)}`, fn:t=>t._prev&&t._dayBefore>-3*X&&t._dayBefore<=-2*X},
+    {lbl:`已賠 ${money(-X).slice(1)}～${money(-2*X).slice(1)}`, fn:t=>t._prev&&t._dayBefore>-2*X&&t._dayBefore<=-X},
+    {lbl:`小賠（0～${money(-X).slice(1)}）`, fn:t=>t._prev&&t._dayBefore>-X&&t._dayBefore<=0},
+    {lbl:`小賺（0～${money(X).slice(1)}）`, fn:t=>t._prev&&t._dayBefore>0&&t._dayBefore<X},
+    {lbl:`已賺 ${money(X).slice(1)}～${money(2*X).slice(1)}`, fn:t=>t._prev&&t._dayBefore>=X&&t._dayBefore<2*X},
+    {lbl:`已賺 ${money(2*X).slice(1)}～${money(3*X).slice(1)}`, fn:t=>t._prev&&t._dayBefore>=2*X&&t._dayBefore<3*X},
+    {lbl:`已賺 ${money(3*X)} 以上`, fn:t=>t._prev&&t._dayBefore>=3*X},
+  ];
+  const stTbl = `<table class="dg-mini"><thead><tr><th>進場前當天已累積</th><th>筆數</th><th>勝率</th><th>總損益</th><th>平均</th><th>平均口數</th><th>平均持有</th></tr></thead><tbody>
+    ${stG.map(g=>{ const a=T.filter(g.fn), s2=S(a); return `<tr class="${s2.n&&s2.pnl<0&&g.lbl.includes('已賠')?'hl':''}"><td>${g.lbl}</td><td>${s2.n||'<span class="dg-t3">0</span>'}</td><td class="${s2.wr>=50?'up':'dn'}">${s2.n?pct(s2.wr):''}</td><td class="${s2.pnl>=0?'up':'dn'}">${s2.n?money(s2.pnl):'—'}</td><td class="${s2.avg>=0?'up':'dn'}">${s2.n?money(s2.avg):''}</td><td>${s2.n?avgQ(a).toFixed(1):''}</td><td>${s2.n?avgHold(a).toFixed(0)+' 分':''}</td></tr>`; }).join('')}</tbody></table>`;
+  // 每日停損／停利模擬：當天累積碰到線，那天之後的單都不做
+  const byDay={}; T.forEach(t=>{ (byDay[t.date]=byDay[t.date]||[]).push(t); });
+  function simDay(fnStop){
+    let tot=0, trig=0, skip=0, skipP=0;
+    Object.values(byDay).forEach(arr=>{ let run=0, stopped=false;
+      arr.forEach(t=>{ if(stopped){ skip++; skipP+=t.pnl; return; } run+=t.pnl; tot+=t.pnl; if(fnStop(run)){ stopped=true; trig++; } }); });
+    return {tot, diff:tot-all.pnl, trig, skip, skipP};
+  }
+  const dsl=[1,2,3,4].map(m=>({m, r:simDay(run=>run<=-m*X)}));
+  const dtp=[1,2,3,5].map(m=>({m, r:simDay(run=>run>=m*X)}));
+  const simTbl=(rows, word)=>`<table class="dg-mini"><thead><tr><th>${word}</th><th>觸發天數</th><th>少做幾筆</th><th>少做的單原本損益</th><th>模擬總損益</th><th>跟現在比</th></tr></thead><tbody>
+    ${rows.map(({m,r})=>`<tr class="${r.diff>0?'best':''}"><td>${word==='每日停損'?money(-m*X):money(m*X)}（${m} 倍）</td><td>${r.trig} 天</td><td>${r.skip} 筆</td><td class="${r.skipP>=0?'up':'dn'}">${money(r.skipP)}</td><td>${money(r.tot)}</td><td class="${r.diff>=0?'up':'dn'}">${money(r.diff)}</td></tr>`).join('')}</tbody></table>`;
+  // 當天高點回吐
+  const days=Object.values(byDay).map(arr=>{ let run=0, peak=0, low=0; arr.forEach(t=>{ run+=t.pnl; if(run>peak) peak=run; if(run<low) low=run; }); return {peak, low, end:run, n:arr.length}; });
+  const gb1=days.filter(d=>d.peak>=X && d.end<d.peak), gb2=days.filter(d=>d.peak>=2*X && d.end<=0), rec=days.filter(d=>d.low<=-2*X && d.end>0);
+  const gbSum=gb1.reduce((a,d)=>a+(d.peak-d.end),0);
+  const c3 = card('📉','當天已經賺／賠多少的時候',`進場前，當天已經累積的損益（單位用你的平均虧損 ${money(X).slice(1)}）。看你在「已經賠很多」或「已經賺很多」的時候還繼續做，結果怎樣；下面再模擬「設每日停損／停利」會差多少。`,
+    `<div class="dg-kpis">
+      <div><span>當天曾賺 ${money(X).slice(1)}↑ 但收工時回吐</span><b>${gb1.length} 天</b><em>總共吐回 ${money(gbSum).slice(1)}・平均 ${gb1.length?money(gbSum/gb1.length).slice(1):'—'}／天</em></div>
+      <div><span>當天曾賺 ${money(2*X).slice(1)}↑ 最後收在 0 以下</span><b class="${gb2.length?'dn':''}">${gb2.length} 天</b><em>賺變賠的日子</em></div>
+      <div><span>當天曾賠 ${money(2*X).slice(1)}↑ 最後救回來</span><b class="${rec.length?'up':''}">${rec.length} 天</b><em>大賠後繼續做有救回來的日子</em></div>
+      <div><span>有做單的日子</span><b>${days.length} 天</b><em>平均每天 ${(T.length/Math.max(1,days.length)).toFixed(1)} 筆</em></div>
+    </div>
+    ${dgDayViz(T, X)}
+    <div class="dg-2col">
+      <div><div class="dg-sub">① 進場前當天已經賺／賠多少</div><div class="dg-scroll">${stTbl}</div></div>
+      <div><div class="dg-sub">② 每日停損模擬（只看已平倉：平倉後當天累積賠到線就收工）</div><div class="dg-scroll">${simTbl(dsl,'每日停損')}</div>
+        <div class="dg-sub">③ 每日停利模擬（只看已平倉：平倉後當天累積賺到線就收工）</div><div class="dg-scroll">${simTbl(dtp,'每日停利')}</div>
+        <div class="dg-t3">＊這兩張表是「每日」停損／停利，只看已平倉損益（某一筆平倉後當天累積碰到線，後面的單當作沒做）。上面的拉桿是「單筆」停損／停利（點數）。</div></div>
+    </div>`, 'wide');
+  { const b=dsl.slice().sort((a,b)=>b.r.diff-a.r.diff)[0]; if(b && b.r.diff>Math.max(50,Math.abs(all.pnl)*0.08)) F.push({impact:b.r.diff, html:`設<b>每日停損 ${money(-b.m*X)}</b>（賠到就收工），總損益會多 <b class="up">${money(b.r.diff).slice(1)}</b>（${b.r.trig} 天會觸發，少做 ${b.r.skip} 筆）。`}); }
+  { const b=dtp.slice().sort((a,b)=>b.r.diff-a.r.diff)[0]; if(b && b.r.diff>Math.max(50,Math.abs(all.pnl)*0.08)) F.push({impact:b.r.diff*0.9, html:`設<b>每日停利 ${money(b.m*X)}</b>（賺到就收工），總損益會多 <b class="up">${money(b.r.diff).slice(1)}</b>。賺到之後還繼續做，常常吐回去。`}); }
+  if(gb2.length>=2) F.push({impact:gb2.reduce((a,d)=>a+d.peak-d.end,0)*0.5, html:`有 <b>${gb2.length} 天</b>當天曾經賺超過 ${money(2*X).slice(1)}，最後卻收在 0 以下。`});
+
+  // ===== 4. 加碼 =====
+  const sSingle=S(T.filter(t=>t._add==='single')), sUp=S(T.filter(t=>t._add==='up')), sDown=S(T.filter(t=>t._add==='down'));
+  const downLossShare = totalLoss<0 ? T.filter(t=>t._add==='down'&&t.pnl<0).reduce((x,t)=>x+t.pnl,0)/totalLoss*100 : 0;
+  const c4 = card('➕','加碼的效果','「順勢加」＝價格往有利方向走了才加；「攤平」＝虧損中往不利方向加。攤平那列如果大賠，通常就是最大虧損的來源。',
+    table([
+      {label:'一次進場（沒加碼）', s:sSingle},
+      {label:'順勢加碼', s:sUp},
+      {label:'攤平加碼', s:sDown, hl:sDown.n&&sDown.pnl<0},
+    ])+(sDown.n?`<div class="dg-note">攤平單佔全部虧損的 <b>${downLossShare.toFixed(0)}%</b></div>`:''));
+  if(sDown.n>=1 && sDown.pnl<0) F.push({impact:-sDown.pnl, html:`<b>攤平加碼</b>的 ${sDown.n} 筆合計 <b class="dn">${money(sDown.pnl)}</b>，佔全部虧損 ${downLossShare.toFixed(0)}%。虧損中不要往下攤。`});
+  if(sUp.n>=2 && sUp.pnl>0) G.push(`順勢加碼的 ${sUp.n} 筆合計 <b class="up">${money(sUp.pnl)}</b>，加對方向是有效的。`);
+
+  // ===== 5. 停損該放哪（詳細）=====
+  const W_=T.filter(t=>t.pnl>0), L_=T.filter(t=>t.pnl<=0);
+  const q = (arr,p)=>{ if(!arr.length) return NaN; const a=arr.slice().sort((x,y)=>x-y); return a[Math.min(a.length-1, Math.floor(p/100*(a.length-1)+0.5))]; };
+  const f0 = v => isFinite(v) ? v.toFixed(0) : '—';
+  const f1 = v => isFinite(v) ? v.toFixed(1) : '—';
+  const wMae=W_.map(maePts), lMae=L_.map(maePts);
+  const step = 5;
+  // (A) MAE 分布圖
+  const p95 = q([...wMae,...lMae],95);
+  const maxP = Math.max(step*4, Math.ceil((isFinite(p95)?p95:0)/step)*step);
+  const binN = Math.min(16, Math.ceil(maxP/step));
+  const binW = Math.ceil(maxP/binN/step)*step;
+  const bins=[]; for(let i=0;i<binN;i++) bins.push({lo:i*binW, hi:(i+1)*binW, w:0, l:0});
+  wMae.forEach(v=>{ bins[Math.min(binN-1,Math.floor(v/binW))].w++; });
+  lMae.forEach(v=>{ bins[Math.min(binN-1,Math.floor(v/binW))].l++; });
+  const bm=Math.max(1,...bins.map(b=>Math.max(b.w,b.l)));
+  const hist = `<div class="dg-hist">${bins.map((b,bi)=>`<div class="dg-hcol" title="MAE ${b.lo}~${b.hi} 點：獲利單 ${b.w}・虧損單 ${b.l}">
+      <div class="dg-hbars"><i style="height:${(b.w/bm*100).toFixed(0)}%;background:#22c55e"></i><i style="height:${(b.l/bm*100).toFixed(0)}%;background:#ef4444"></i></div>
+      <div class="dg-hx${b===bins[binN-1]?' last':''}">${b===bins[binN-1]?b.lo+'↑':(bi%2===0?b.lo:'')}</div></div>`).join('')}</div>
+    <div class="dg-legend"><span><i style="background:#22c55e"></i>獲利單</span><span><i style="background:#ef4444"></i>虧損單</span><span style="color:var(--t3)">橫軸＝進場後最多被套幾點（MAE 點數），滑過長條看筆數</span></div>`;
+
+  // (B) 每筆交易的逐根路徑（用實際持倉口數、均價；有分批出場的已實現損益也算進去）
+  function pathOf(t){
+    if(t._path!==undefined) return t._path;
+    const bars=(DATA[t.date]||{})['1k']||[];
+    const a=bars.findIndex(b=>b.idx===t.entryIdx), z=bars.findIndex(b=>b.idx===t.exitIdx);
+    if(a<0||z<a){ t._path=null; return null; }
+    const legs=(t.legs&&t.legs.length)?t.legs.slice().sort((x,y)=>x.idx-y.idx):[{type:'entry',qty:t.qty,price:t.entryPrice,idx:t.entryIdx},{type:'exit',qty:t.qty,price:t.exitPrice,idx:t.exitIdx}];
+    const sg=t.dir==='long'?1:-1, out=[]; let q=0, avg=0, lp=0, real=0;
+    for(let i=a;i<=z;i++){ const b=bars[i];
+      while(lp<legs.length && legs[lp].idx<=b.idx && legs[lp].type==='entry'){ const l=legs[lp++]; avg=(avg*q+l.price*l.qty)/(q+l.qty); q+=l.qty; }
+      if(q>0) out.push({h:sg>0?b.h-avg:avg-b.l, l:sg>0?b.l-avg:avg-b.h, c:sg*(b.c-avg), q, real, idx:b.idx});
+      while(lp<legs.length && legs[lp].idx<=b.idx && legs[lp].type==='exit'){ const l=legs[lp++]; const x=Math.min(q,l.qty); real+=sg*(l.price-avg)*x*PTV; q-=x; }
+    }
+    t._path=out; return out;
+  }
+  const comm = t => t.commission||0;
+  // 固定停損 X 點：第一次被套到 X 點就出場
+  function simStop(x, list){
+    let tot=0, hit=0, killW=0, saveL=0, saved=0, wins=0;
+    list.forEach(t=>{ const P=pathOf(t); let r=t.pnl;
+      if(P){ const k=P.findIndex(b=>b.l<=-x); if(k>=0){ r = P[k].real - x*P[k].q*PTV - comm(t); hit++; if(t.pnl>0) killW++; else if(r>t.pnl){ saveL++; saved+=r-t.pnl; } } }
+      tot+=r; if(r>0) wins++; });
+    const base=sum(list);
+    return {x, tot, diff:tot-base, hit, killW, saveL, saved, wr:list.length?wins/list.length*100:NaN};
+  }
+  // 保本：浮盈到 Y 點之後，停損拉到成本（之後的K棒回到成本就出場）
+  function simBE(y, list){
+    let tot=0, hit=0, fromLoss=0, cutWin=0;
+    list.forEach(t=>{ const P=pathOf(t); let r=t.pnl;
+      if(P){ const k=P.findIndex(b=>b.h>=y); if(k>=0){ const j=P.findIndex((b,i)=>i>k && b.l<=0); if(j>=0){ r=P[j].real-comm(t); hit++; if(t.pnl<=0) fromLoss++; else if(r<t.pnl) cutWin++; } } }
+      tot+=r; });
+    return {y, tot, diff:tot-sum(list), hit, fromLoss, cutWin};
+  }
+  const maxX = Math.max(step*3, Math.ceil((isFinite(p95)?p95:step*6)/step)*step);
+  const sStep = Math.max(step, Math.ceil(maxX/12/step)*step);   // 最多約 12 列
+  const xs=[]; for(let x=sStep; x<=maxX; x+=sStep) xs.push(x);
+  const sweep = xs.map(x=>simStop(x,T));
+  const best = sweep.slice().sort((a,b)=>b.diff-a.diff)[0];
+  const bestOf = list => { if(list.length<3) return null; const r=xs.map(x=>simStop(x,list)).sort((a,b)=>b.diff-a.diff)[0]; return r; };
+  const bL=bestOf(T.filter(t=>t.dir==='long')), bS=bestOf(T.filter(t=>t.dir==='short'));
+  // 分位數表
+  const qRow=(lbl, list)=>{ const w=list.filter(t=>t.pnl>0).map(maePts), l=list.filter(t=>t.pnl<=0);
+    const lm=l.map(maePts), le=l.map(t=>Math.max(0,-ptsOf(t)));
+    const avgA=a=>a.length?a.reduce((x,v)=>x+v,0)/a.length:NaN;
+    return `<tr><td>${lbl}</td><td>${f0(q(w,50))}</td><td>${f0(q(w,80))}</td><td>${f0(q(w,90))}</td><td>${f0(q(w,100))}</td><td class="sep">${f0(q(lm,50))}</td><td>${f1(avgA(lm))}</td><td>${f1(avgA(le))}</td></tr>`; };
+  const qTable=`<table class="dg-mini"><thead><tr><th></th><th colspan="4">獲利單：被套多深還能賺（點）</th><th colspan="3" class="sep">虧損單（點）</th></tr>
+      <tr><th></th><th>中位數</th><th>80%</th><th>90%</th><th>最深</th><th class="sep">被套中位數</th><th>平均被套</th><th>平均砍在</th></tr></thead>
+      <tbody>${qRow('全部',T)}${qRow('做多',T.filter(t=>t.dir==='long'))}${qRow('做空',T.filter(t=>t.dir==='short'))}</tbody></table>`;
+  // 虧損單：最深被套 vs 最後砍在哪
+  const lAvgMae = lMae.length? lMae.reduce((a,v)=>a+v,0)/lMae.length : NaN;
+  const lAvgExit = L_.length? L_.reduce((a,t)=>a+Math.max(0,-ptsOf(t)),0)/L_.length : NaN;
+  const cutAtWorst = L_.filter(t=>maePts(t)>0 && Math.max(0,-ptsOf(t))>=maePts(t)*0.85).length;
+  // 扛最深的虧損單
+  const deep = L_.slice().sort((a,b)=>maePts(b)-maePts(a)).slice(0,5);
+  const deepList = deep.length ? `<table class="dg-mini"><thead><tr><th>扛最深的虧損單</th><th>方向</th><th>口數</th><th>最深被套</th><th>最後砍在</th><th>損益</th></tr></thead><tbody>${deep.map(t=>`<tr><td>${t.date} ${t.entryTime||''}</td><td>${t.dir==='long'?'多':'空'}</td><td>${t.qty}</td><td class="dn">${f1(maePts(t))} 點</td><td>${f1(Math.max(0,-ptsOf(t)))} 點</td><td class="dn">${money(t.pnl)}</td></tr>`).join('')}</tbody></table>` : '';
+  // 保本模擬
+  const mfeAll=T.map(mfePts);
+  const ys=[...new Set([q(mfeAll,30),q(mfeAll,50),q(mfeAll,70)].filter(v=>isFinite(v)&&v>0).map(v=>Math.max(step,Math.round(v/step)*step)))].sort((a,b)=>a-b);
+  const be = ys.map(y=>simBE(y,T));
+  const sweepTbl = `<table class="dg-mini dg-sweep"><thead><tr><th>固定停損</th><th>會停到</th><th>誤殺獲利單</th><th>少賠的虧損單</th><th>模擬勝率</th><th>模擬總損益</th><th>跟現在比</th></tr></thead><tbody>
+      <tr class="cur"><td>現在（沒固定）</td><td>—</td><td>—</td><td>—</td><td>${pct(all.wr)}</td><td>${money(all.pnl)}</td><td>—</td></tr>
+      ${sweep.map(r=>`<tr class="${best&&r.x===best.x&&r.diff>0?'best':''}"><td><b>${r.x}</b> 點</td><td>${r.hit} 筆</td><td>${r.killW} 筆</td><td>${r.saveL} 筆（少賠 ${money(r.saved).slice(1)}）</td><td>${pct(r.wr)}</td><td>${money(r.tot)}</td><td class="${r.diff>=0?'up':'dn'}">${money(r.diff)}</td></tr>`).join('')}
+    </tbody></table>`;
+  const beTbl = be.length ? `<table class="dg-mini"><thead><tr><th>浮盈到幾點就把停損拉到成本</th><th>會觸發</th><th>原本賠錢→保本</th><th>原本賺更多→只保本</th><th>模擬總損益</th><th>跟現在比</th></tr></thead><tbody>
+      ${be.map(r=>`<tr><td><b>${r.y}</b> 點</td><td>${r.hit} 筆</td><td>${r.fromLoss} 筆</td><td>${r.cutWin} 筆</td><td>${money(r.tot)}</td><td class="${r.diff>=0?'up':'dn'}">${money(r.diff)}</td></tr>`).join('')}</tbody></table>` : '';
+  // 給互動拉桿用：固定停損 x 點＋保本 y 點，逐根重跑
+  _DG.pathOf = pathOf; _DG.stopMax = maxX; _DG.stopStep = sStep; _DG.stopBest = best && best.diff>0 ? best.x : 0;
+  _DG.beMax = Math.max(sStep*4, Math.ceil((q(T.map(mfePts),85)||sStep*6)/sStep)*sStep);
+  _DG.simCombo = (x, y) => {
+    let tot=0, hitS=0, killW=0, hitB=0, beSave=0, wins=0, run=0, run0=0, pk=0, pk0=0, mdd=0, mdd0=0; const curve=[0], curve0=[0];
+    T.forEach(t=>{ const P=pathOf(t); let r=t.pnl;
+      if(P && (x||y)){ let be=false;
+        for(let k=0;k<P.length;k++){ const b=P[k];
+          if(x && b.l<=-x){ r=b.real - x*b.q*PTV - comm(t); hitS++; if(t.pnl>0) killW++; break; }
+          if(be && b.l<=0){ r=b.real - comm(t); hitB++; if(t.pnl<=0) beSave++; break; }
+          if(y && b.h>=y) be=true; } }
+      tot+=r; if(r>0) wins++; run+=r; run0+=t.pnl; pk=Math.max(pk,run); pk0=Math.max(pk0,run0); mdd=Math.max(mdd,pk-run); mdd0=Math.max(mdd0,pk0-run0); curve.push(run); curve0.push(run0); });
+    return {tot, base:all.pnl, diff:tot-all.pnl, hitS, killW, hitB, beSave, wr:T.length?wins/T.length*100:0, wr0:all.wr, mdd, mdd0, curve, curve0};
+  };
+  const c5 = card('🛑','停損該放哪',`比較「最後賺錢」和「最後賠錢」的單，進場後最多被套幾點。獲利單幾乎都不會被套超過某個點數、超過的幾乎都是輸，那個點數就是你的停損。下面的模擬都是用1分K逐根重跑（用當下實際口數和均價），不是估的。`,
+    `${dgStopViz()}<div class="dg-stop">
+      <div class="dg-stop-l">${hist}
+        <div class="dg-sub">被套點數分位數</div><div class="dg-scroll">${qTable}</div>
+        <div class="dg-kv" style="margin-top:8px"><span>虧損單平均最深被套 <b>${f1(lAvgMae)}</b> 點，最後平均砍在 <b>${f1(lAvgExit)}</b> 點</span><span>${L_.length?`${cutAtWorst} 筆（${pct(cutAtWorst/L_.length*100)}）幾乎砍在最低點`:''}</span></div>
+        <div class="dg-scroll">${deepList}</div>
+      </div>
+      <div class="dg-stop-r">
+        <div class="dg-sub">如果固定停損 X 點（逐根重跑：第一次被套到 X 點就出場）</div><div class="dg-scroll">${sweepTbl}</div>
+        <div class="dg-kv" style="margin-top:6px">${bL?`<span>做多最佳：<b>${bL.x}</b> 點（${money(bL.diff)}）</span>`:''}${bS?`<span>做空最佳：<b>${bS.x}</b> 點（${money(bS.diff)}）</span>`:''}</div>
+        ${be.length?`<div class="dg-sub" style="margin-top:10px">保本停損（浮盈到 Y 點後，回到成本就出場）</div><div class="dg-scroll">${beTbl}</div>`:''}
+        <div class="dg-t3" style="margin-top:6px">＊誤殺＝原本最後會賺、但中途有被套到 X 點的單。同一根1分K裡先高還是先低無法得知，以K棒順序判斷。</div>
+      </div>
+    </div>`, 'wide');
+  if(best && best.diff>Math.max(50, Math.abs(all.pnl)*0.1)) F.push({impact:best.diff, html:`如果固定停損 <b>${best.x} 點</b>，總損益會從 ${money(all.pnl)} 變成 <b class="up">${money(best.tot)}</b>（多 ${money(best.diff).slice(1)}，會誤殺 ${best.killW} 筆獲利單）。目前虧損單扛太深。`});
+  {
+    const bb=be.slice().sort((a,b)=>b.diff-a.diff)[0];
+    if(bb && bb.diff>Math.max(50, Math.abs(all.pnl)*0.1)) F.push({impact:bb.diff, html:`浮盈到 <b>${bb.y} 點</b>就把停損拉到成本，總損益會多 <b class="up">${money(bb.diff).slice(1)}</b>（${bb.fromLoss} 筆賠錢單會變成保本）。`});
+  }
+
+  // ===== 6. 出場效率（MFE＋MAE）=====
+  const avgOf = (a,fn)=>{ const v=a.map(fn).filter(isFinite); return v.length? v.reduce((x,y)=>x+y,0)/v.length : NaN; };
+  const exitPts = t => ptsOf(t);                        // 出場點數（賺為正）
+  // (a) 散佈圖：橫＝MAE 點數、直＝MFE 點數
+  const sc = (()=>{
+    const Wd=520, Ht=330, P={l:44,r:12,t:12,b:34};
+    const xs=T.map(maePts), ys=T.map(mfePts);
+    const xm=Math.max(10, q(xs,97)||10)*1.08, ym=Math.max(10, q(ys,97)||10)*1.08;
+    const X=v=>P.l+(Wd-P.l-P.r)*Math.min(1,v/xm), Y=v=>P.t+(Ht-P.t-P.b)*(1-Math.min(1,v/ym));
+    const gs=v=>{ const r=v/5, m=Math.pow(10,Math.floor(Math.log10(r||1))); return [1,2,5,10].map(k=>k*m).find(k=>k>=r)||r; };
+    let g='';
+    for(let v=0; v<=xm; v+=gs(xm)){ const x=X(v); g+=`<line x1="${x}" y1="${P.t}" x2="${x}" y2="${Ht-P.b}" stroke="rgba(255,255,255,.06)"/><text x="${x}" y="${Ht-P.b+14}" fill="#888" font-size="10" text-anchor="middle">${v.toFixed(0)}</text>`; }
+    for(let v=0; v<=ym; v+=gs(ym)){ const y=Y(v); g+=`<line x1="${P.l}" y1="${y}" x2="${Wd-P.r}" y2="${y}" stroke="rgba(255,255,255,.06)"/><text x="${P.l-6}" y="${y+3}" fill="#888" font-size="10" text-anchor="end">${v.toFixed(0)}</text>`; }
+    const dm=Math.min(xm,ym);
+    g+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(dm)}" y2="${Y(dm)}" stroke="rgba(250,204,21,.45)" stroke-dasharray="5,4"/><text x="${X(dm)-4}" y="${Y(dm)+12}" fill="rgba(250,204,21,.7)" font-size="10" text-anchor="end">MFE＝MAE</text>`;
+    const dots=T.map((t,i)=>{ const w=t.pnl>0, r=3+Math.min(5,(t.qty||1));
+      return `<circle cx="${X(xs[i]).toFixed(1)}" cy="${Y(ys[i]).toFixed(1)}" r="${r}" fill="${w?'#22c55e':'#ef4444'}" fill-opacity=".55" stroke="${w?'#22c55e':'#ef4444'}"><title>${t.date} ${t.entryTime||''} ${t.dir==='long'?'多':'空'} ${t.qty}口\nMFE ${ys[i].toFixed(1)} 點・MAE ${xs[i].toFixed(1)} 點\n出場 ${exitPts(t)>=0?'+':''}${exitPts(t).toFixed(1)} 點・${money(t.pnl)}</title></circle>`; }).join('');
+    return `<svg viewBox="0 0 ${Wd} ${Ht}" style="width:100%;height:auto;display:block">${g}${dots}
+      <text x="${(Wd+P.l)/2}" y="${Ht-4}" fill="#aaa" font-size="11" font-weight="700" text-anchor="middle">MAE：進場後最多被套幾點 →</text>
+      <text x="12" y="${(Ht-P.b)/2}" fill="#aaa" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(-90 12 ${(Ht-P.b)/2})">MFE：最多浮盈幾點 →</text></svg>`;
+  })();
+  // (b) 獲利單吃到幾成
+  const capRowsD = [[0,30,'不到 3 成'],[30,60,'3～6 成'],[60,85,'6～8.5 成'],[85,101,'8.5 成以上']].map(([a,b,lbl])=>{
+    const arr=W_.filter(t=>t.mfe>0).filter(t=>{ const c=t.pnl/t.mfe*100; return c>=a && c<b; });
+    return {lbl, n:arr.length, mfe:avgOf(arr,mfePts), got:avgOf(arr,exitPts), give:avgOf(arr,t=>mfePts(t)-exitPts(t)), mae:avgOf(arr,maePts), pnl:sum(arr)};
+  });
+  const capTbl = `<table class="dg-mini"><thead><tr><th>獲利單吃到 MFE 的</th><th>筆數</th><th>平均最多浮盈</th><th>平均賺到</th><th>平均吐回</th><th>平均先被套</th><th>總損益</th></tr></thead><tbody>
+    ${capRowsD.map(r=>`<tr><td>${r.lbl}</td><td>${r.n}</td><td>${f1(r.mfe)} 點</td><td class="up">${f1(r.got)} 點</td><td class="${r.n?'dn':''}">${f1(r.give)} 點</td><td>${f1(r.mae)} 點</td><td class="up">${r.n?money(r.pnl):'—'}</td></tr>`).join('')}</tbody></table>`;
+  // (c) 曾浮盈 N 點以上卻賠（分好幾級，用點數）
+  const lv = (()=>{ const m=q(T.map(mfePts),50)||10; const base=m<=15?5:(m<=40?10:20); return [1,2,3,5].map(k=>k*base); })();
+  const flipRows = lv.map(n=>{ const arr=L_.filter(t=>mfePts(t)>=n); return {n, cnt:arr.length, pnl:sum(arr), mfe:avgOf(arr,mfePts), lose:avgOf(arr,t=>-exitPts(t))}; });
+  const flipTbl = `<table class="dg-mini"><thead><tr><th>曾經浮盈</th><th>最後卻賠錢</th><th>佔虧損單</th><th>平均最多浮盈</th><th>平均最後賠</th><th>合計損益</th></tr></thead><tbody>
+    ${flipRows.map(r=>`<tr class="${r.cnt?'hl':''}"><td>${r.n} 點以上</td><td>${r.cnt} 筆</td><td>${L_.length?pct(r.cnt/L_.length*100):'—'}</td><td>${f1(r.mfe)} 點</td><td class="dn">${f1(r.lose)} 點</td><td class="dn">${r.cnt?money(r.pnl):'—'}</td></tr>`).join('')}</tbody></table>`;
+  // (d) 虧損單砍在哪：最深處附近／反彈一些／大反彈
+  const cutRows = [[0.85,9,'砍在最深處附近（≥ 85%）'],[0.5,0.85,'反彈一些才砍（50～85%）'],[-9,0.5,'等到大反彈才砍（< 50%）']].map(([a,b,lbl])=>{
+    const arr=L_.filter(t=>maePts(t)>0).filter(t=>{ const r=(-exitPts(t))/maePts(t); return r>=a && r<b; });
+    return {lbl, n:arr.length, mae:avgOf(arr,maePts), cut:avgOf(arr,t=>-exitPts(t)), mfe:avgOf(arr,mfePts), pnl:sum(arr)};
+  });
+  const cutTbl = `<table class="dg-mini"><thead><tr><th>虧損單最後砍在（佔最深被套的比例）</th><th>筆數</th><th>平均最深被套</th><th>平均砍在</th><th>進場後曾浮盈</th><th>總損益</th></tr></thead><tbody>
+    ${cutRows.map(r=>`<tr><td>${r.lbl}</td><td>${r.n}</td><td class="dn">${f1(r.mae)} 點</td><td>${f1(r.cut)} 點</td><td>${f1(r.mfe)} 點</td><td class="dn">${r.n?money(r.pnl):'—'}</td></tr>`).join('')}</tbody></table>`;
+  // (e) 先被套再賺：獲利單被套多深
+  const heatLv = (()=>{ const m=q(wMae,50)||5; const b=m<=8?5:(m<=25?10:20); return [[0,b],[b,b*2],[b*2,b*4],[b*4,Infinity]]; })();
+  const heatRows = heatLv.map(([a,b])=>{ const w=W_.filter(t=>{ const v=maePts(t); return v>=a&&v<b; }), l=L_.filter(t=>{ const v=maePts(t); return v>=a&&v<b; });
+    const all2=[...w,...l]; return {lbl: b===Infinity?`${a} 點以上`:`${a}～${b} 點`, n:all2.length, wr:all2.length?w.length/all2.length*100:NaN, pnl:sum(all2), mfe:avgOf(all2,mfePts)}; });
+  const heatTbl = `<table class="dg-mini"><thead><tr><th>進場後被套</th><th>筆數</th><th>最後勝率</th><th>平均最多浮盈</th><th>總損益</th></tr></thead><tbody>
+    ${heatRows.map(r=>`<tr><td>${r.lbl}</td><td>${r.n}</td><td class="${r.wr>=50?'up':'dn'}">${pct(r.wr)}</td><td>${f1(r.mfe)} 點</td><td class="${r.pnl>=0?'up':'dn'}">${r.n?money(r.pnl):'—'}</td></tr>`).join('')}</tbody></table>`;
+  const capAvg = avgOf(W_.filter(t=>t.mfe>0), t=>t.pnl/t.mfe*100);
+  const lossHadProfit = L_.filter(t=>mfePts(t)>0).length;
+  const c6 = card('🎯','出場效率（MFE＋MAE）','MFE＝進場後最多浮盈幾點、MAE＝最多被套幾點（都換算成點數，不受口數影響）。看獲利單有沒有抱住、虧損單是在哪裡砍、被套多深之後還有沒有機會。',
+    `<div class="dg-kpis">
+      <div><span>獲利單平均吃到 MFE</span><b>${pct(capAvg)}</b><em>越高代表出在越接近最高點</em></div>
+      <div><span>獲利單平均吐回</span><b>${f1(avgOf(W_,t=>mfePts(t)-exitPts(t)))} 點</b><em>平均最多浮盈 ${f1(avgOf(W_,mfePts))} 點</em></div>
+      <div><span>虧損單曾經有浮盈</span><b>${L_.length?pct(lossHadProfit/L_.length*100):'—'}</b><em>平均曾浮盈 ${f1(avgOf(L_,mfePts))} 點</em></div>
+      <div><span>虧損單最深被套 → 砍在</span><b>${f1(avgOf(L_,maePts))} → ${f1(avgOf(L_,t=>-exitPts(t)))} 點</b><em>獲利單平均先被套 ${f1(avgOf(W_,maePts))} 點</em></div>
+    </div>
+    <div class="dg-ee">
+      <div class="dg-ee-l"><div class="dg-sub">每筆交易：MAE × MFE（綠＝最後賺、紅＝最後賠，滑過看明細）</div>${sc}
+        <div class="dg-t3">虛線以上＝往有利方向跑得比不利方向多。紅點在虛線上方很高＝明明有賺卻沒抓住；綠點在右邊很遠＝扛了很深才賺到。</div></div>
+      <div class="dg-ee-r">
+        <div class="dg-sub">① 獲利單：抱住了多少</div><div class="dg-scroll">${capTbl}</div>
+        <div class="dg-sub">② 賺變賠：曾經浮盈多少點，最後卻賠錢</div><div class="dg-scroll">${flipTbl}</div>
+        <div class="dg-sub">③ 虧損單：最後砍在哪裡</div><div class="dg-scroll">${cutTbl}</div>
+        <div class="dg-sub">④ 被套多深之後，最後還會不會賺</div><div class="dg-scroll">${heatTbl}</div>
+      </div>
+    </div>`, 'wide');
+  {
+    const fr=flipRows.find(r=>r.cnt>=1 && r.n>=lv[1]) || flipRows.find(r=>r.cnt>=1);
+    if(fr) F.push({impact:-fr.pnl + fr.cnt*fr.n*PTV*0.5, html:`有 <b>${fr.cnt}</b> 筆曾經浮盈 <b>${fr.n} 點</b>以上，最後卻賠錢出場（合計 <b class="dn">${money(fr.pnl)}</b>，平均曾浮盈 ${f1(fr.mfe)} 點）。浮盈到 ${fr.n} 點就把停損拉到成本。`});
+    const low=capRowsD[0]; if(low.n>=3 && low.n>=W_.length*0.35) F.push({impact:low.n*low.give*PTV*0.3, html:`${low.n} 筆獲利單只吃到 MFE 不到 3 成，平均吐回 <b>${f1(low.give)} 點</b>。檢查是太早跑還是吐回。`});
+    const deepCut=cutRows[0]; if(deepCut.n>=3 && L_.length && deepCut.n>=L_.length*0.4) F.push({impact:-deepCut.pnl*0.3, html:`${deepCut.n} 筆虧損單（${pct(deepCut.n/L_.length*100)}）砍在被套最深的地方附近，平均被套 ${f1(deepCut.mae)} 點才砍。常常是撐到受不了才停損。`});
+  }
+
+  // ===== 7. 賺的和賠的抱多久 =====
+  const avgH = a => a.length ? a.reduce((x,t)=>x+holdOf(t),0)/a.length : NaN;
+  const hW=avgH(W_), hL=avgH(L_);
+  const holdBins=[[0,5],[5,15],[15,30],[30,60],[60,90],[90,120],[120,150],[150,180],[180,Infinity]];
+  const c7 = card('⏱','持有時間',`獲利單平均抱 <b>${isFinite(hW)?hW.toFixed(0):'—'}</b> 分鐘，虧損單平均抱 <b>${isFinite(hL)?hL.toFixed(0):'—'}</b> 分鐘。虧損單抱得比獲利單久，就是賠錢的單砍不下手。`,
+    table(holdBins.map(([a,b])=>({label: b===Infinity?`${a} 分鐘以上`:`${a}～${b} 分鐘`, s:S(T.filter(t=>{const h=holdOf(t); return h>=a&&h<b;}))}))));
+  if(isFinite(hW)&&isFinite(hL)&&L_.length>=3&&hL>hW*1.5) F.push({impact:Math.abs(sum(L_))*0.3, html:`虧損單平均抱 <b>${hL.toFixed(0)}</b> 分鐘，比獲利單（${hW.toFixed(0)} 分鐘）久 ${(hL/hW).toFixed(1)} 倍。賠錢的單砍得太慢。`});
+
+  // ===== 8. 時段 =====
+  const hourOf = t => { const m=/^(\d{1,2}):(\d{2})/.exec(t.entryTime||''); return m?+m[1]:null; };
+  const hourMap={}; T.forEach(t=>{ const h=hourOf(t); if(h===null) return; (hourMap[h]=hourMap[h]||[]).push(t); });
+  // 依交易日的時間順序排（NQ 06:00 起、台指 15:00 夜盤起）
+  const dayStartH = MKT.id==='tx' ? 15 : 6;
+  const hours = Object.keys(hourMap).map(Number).sort((a,b)=>((a-dayStartH+24)%24)-((b-dayStartH+24)%24));
+  const hourRows = hours.map(h=>({label:`${String(h).padStart(2,'0')}:00～${String((h+1)%24).padStart(2,'0')}:00`, s:S(hourMap[h])}));
+  const c8 = card('🕐','進場時段','依進場時間（台北時間）每小時分一格。找出你最常賠錢的時段，那個時段少做或不做。', table(hourRows));
+  {
+    const bad=hourRows.filter(r=>r.s.n>=2&&r.s.pnl<0).sort((a,b)=>a.s.pnl-b.s.pnl)[0];
+    if(bad) F.push({impact:-bad.s.pnl, html:`<b>${bad.label}</b> 進場的 ${bad.s.n} 筆合計 <b class="dn">${money(bad.s.pnl)}</b>，勝率 ${pct(bad.s.wr)}，是你最差的時段。`});
+    const good=hourRows.filter(r=>r.s.n>=3&&r.s.pnl>0).sort((a,b)=>b.s.pnl-a.s.pnl)[0];
+    if(good) G.push(`<b>${good.label}</b> 是你最好的時段：${good.s.n} 筆合計 <b class="up">${money(good.s.pnl)}</b>，勝率 ${pct(good.s.wr)}。`);
+  }
+
+  // ===== 9. 星期幾 =====
+  const wdName=['日','一','二','三','四','五','六'];
+  const wdRows=[1,2,3,4,5].map(w=>({label:`星期${wdName[w]}`, s:S(T.filter(t=>new Date(t.date+'T12:00:00').getDay()===w))}));
+  const c9 = card('📅','星期幾','用交易日（日期）算。', table(wdRows));
+  {
+    const bad=wdRows.filter(r=>r.s.n>=3&&r.s.pnl<0).sort((a,b)=>a.s.pnl-b.s.pnl)[0];
+    if(bad) F.push({impact:-bad.s.pnl*0.7, html:`<b>${bad.label}</b>的 ${bad.s.n} 筆合計 <b class="dn">${money(bad.s.pnl)}</b>，勝率 ${pct(bad.s.wr)}。`});
+  }
+
+  // ===== 11. 進場位置：60K 60MA 斜率（3×2 方格）=====
+  const g = (tr,dir)=>S(T.filter(t=>t._ma60===tr && (!dir || t.dir===dir)));
+  const sWith=S(T.filter(t=>(t._ma60==='up'&&t.dir==='long')||(t._ma60==='down'&&t.dir==='short')));
+  const sAgainst=S(T.filter(t=>(t._ma60==='up'&&t.dir==='short')||(t._ma60==='down'&&t.dir==='long')));
+  const sFlat=g('flat');
+  const nNull=T.filter(t=>t._ma60===null).length;
+  const cells={}; ['up','flat','down'].forEach(tr=>['long','short'].forEach(d=>cells[tr+d]=g(tr,d)));
+  const cmax=Math.max(1,...Object.values(cells).map(c=>Math.abs(c.pnl)));
+  const tagOf=(tr,d)=> tr==='flat' ? {t:'沒方向',c:'f'} : ((tr==='up')===(d==='long') ? {t:'順勢',c:'w'} : {t:'逆勢',c:'a'});
+  const cell=(tr,d)=>{ const c=cells[tr+d], tg=tagOf(tr,d), a=c.n?Math.abs(c.pnl)/cmax:0;
+    const bg=c.n?(c.pnl>=0?`rgba(34,197,94,${(0.08+a*0.3).toFixed(2)})`:`rgba(239,68,68,${(0.08+a*0.3).toFixed(2)})`):'rgba(255,255,255,.02)';
+    return `<div class="dg-mx-cell" style="background:${bg}"><span class="dg-mx-tag ${tg.c}">${tg.t}</span>
+      <b class="${c.n?(c.pnl>=0?'up':'dn'):''}">${c.n?money(c.pnl):'—'}</b>
+      <div class="dg-mx-st"><span><i>筆數</i>${c.n}</span><span><i>勝率</i>${pct(c.wr)}</span><span><i>平均</i>${c.n?money(c.avg):'—'}</span></div></div>`; };
+  const rowTot=tr=>{ const c=g(tr); return `<div class="dg-mx-cell tot"><b class="${c.n?(c.pnl>=0?'up':'dn'):''}">${c.n?money(c.pnl):'—'}</b><em>${c.n} 筆・勝率 ${pct(c.wr)}</em></div>`; };
+  const colTot=d=>{ const c=S(T.filter(t=>t._ma60!==null&&t.dir===d)); return `<div class="dg-mx-cell tot"><b class="${c.n?(c.pnl>=0?'up':'dn'):''}">${c.n?money(c.pnl):'—'}</b><em>${c.n} 筆・勝率 ${pct(c.wr)}</em></div>`; };
+  const rh=(ic,lbl,sub)=>`<div class="dg-mx-rh"><span class="dg-mx-ic">${ic}</span><div><b>${lbl}</b><em>${sub}</em></div></div>`;
+  const matrix=`<div class="dg-mx">
+      <div></div><div class="dg-mx-ch">📈 做多</div><div class="dg-mx-ch">📉 做空</div><div class="dg-mx-ch t3">合計</div>
+      ${rh('↗','60MA 上揚','4 點一路往上')}${cell('up','long')}${cell('up','short')}${rowTot('up')}
+      ${rh('→','60MA 沒方向','有上有下')}${cell('flat','long')}${cell('flat','short')}${rowTot('flat')}
+      ${rh('↘','60MA 下彎','4 點一路往下')}${cell('down','long')}${cell('down','short')}${rowTot('down')}
+      <div class="dg-mx-ch t3" style="text-align:right">合計</div>${colTot('long')}${colTot('short')}<div></div>
+    </div>
+    <div class="dg-mx-sum side">
+      <div class="w"><span>順勢（上揚做多＋下彎做空）</span><b class="${sWith.pnl>=0?'up':'dn'}">${sWith.n?money(sWith.pnl):'—'}</b><em>${sWith.n} 筆・勝率 ${pct(sWith.wr)}</em></div>
+      <div class="a"><span>逆勢（上揚做空＋下彎做多）</span><b class="${sAgainst.pnl>=0?'up':'dn'}">${sAgainst.n?money(sAgainst.pnl):'—'}</b><em>${sAgainst.n} 筆・勝率 ${pct(sAgainst.wr)}</em></div>
+      <div class="f"><span>60MA 沒方向時</span><b class="${sFlat.pnl>=0?'up':'dn'}">${sFlat.n?money(sFlat.pnl):'—'}</b><em>${sFlat.n} 筆・勝率 ${pct(sFlat.wr)}</em></div>
+    </div>`;
+  const c11 = card('🧭','進場位置：60K 60MA 方向',`看進場當下 60K 的 60MA 是往上、往下還是沒方向，你做多／做空的結果。取包含進場那根在內的 4 根 60K（例如 12 點多進場 → 9、10、11、12 點），4 點一路往上＝上揚、一路往下＝下彎、其他＝沒方向；進場那根的 60MA 用進場價算，不偷看。格子越綠＝賺越多、越紅＝賠越多。${nNull?`（${nNull} 筆前面 60K 不夠，沒算進去）`:''}`, `<div class="dg-mxwrap">${matrix}</div>`, 'wide');
+  if(sAgainst.n>=2 && sAgainst.pnl<0) F.push({impact:-sAgainst.pnl, html:`<b>逆 60K 60MA 方向</b>進場的 ${sAgainst.n} 筆合計 <b class="dn">${money(sAgainst.pnl)}</b>，勝率 ${pct(sAgainst.wr)}；順方向的是 ${money(sWith.pnl)}（勝率 ${pct(sWith.wr)}）。`});
+  if(sFlat.n>=3 && sFlat.pnl<0) F.push({impact:-sFlat.pnl*0.8, html:`<b>60K 60MA 沒方向</b>時進場的 ${sFlat.n} 筆合計 <b class="dn">${money(sFlat.pnl)}</b>，勝率 ${pct(sFlat.wr)}。大格局沒方向時少做。`});
+  if(sWith.n>=3 && sWith.pnl>0) G.push(`順 60K 60MA 方向的 ${sWith.n} 筆合計 <b class="up">${money(sWith.pnl)}</b>，勝率 ${pct(sWith.wr)}。`);
+
+  // ===== 13. 沒交易的日子：錯過了什麼 =====
+  const c13 = buildMissedDays(T, money, pct);
+  let c14=''; try{ c14 = buildPrevNight(T, money, pct); }catch(e){ console.error(e); }
+
+  // ===== 12. 問題摘要 =====
+  const top = F.filter(f=>f.impact>0).sort((a,b)=>b.impact-a.impact).slice(0,5);
+  const summary = `<div class="dg-sum">
+    <div class="dg-sum-title">🩺 問題摘要 <span>依影響金額排序，自動從下面各項找出來</span></div>
+    ${top.length ? `<ol class="dg-sum-list">${top.map(f=>`<li>${f.html}</li>`).join('')}</ol>` : `<div class="dg-t3" style="padding:6px 0">目前沒有找到明顯的問題（交易筆數多一點會更準）。</div>`}
+    ${G.length ? `<div class="dg-good"><div class="dg-good-t">👍 做得好的</div>${G.slice(0,3).map(g=>`<div>・${g}</div>`).join('')}</div>` : ''}
+    ${T.length<30 ? `<div class="dg-t3" style="margin-top:6px">⚠ 目前只有 ${T.length} 筆交易，每一組的筆數都很少，結論僅供參考；累積到 50～100 筆會更可信。</div>` : ''}
+  </div>`;
+
+  return `<div class="dg-sec">
+    <div class="dg-page-h"><div class="dg-page-t">🩺 問題診斷</div><div class="dg-t3">${T[0].date} ~ ${T[T.length-1].date} ・ 共 ${T.length} 筆 ・ 上方可切換版本與統計範圍・滑過每一列可看說明</div></div>
+    ${summary}
+    ${c13}
+    <div class="dg-grid">
+      ${c1}
+      ${c3}
+      ${c14}
+      <div class="dg-stack">${c2}${c4}</div>
+      <div class="dg-stack">${c7}${c9}</div>
+      ${c8}
+      ${c11}
+      ${c5}
+      ${c6}
+    </div>
+  </div>`;
+}
+
+// ===== 🔍 沒交易的日子：錯過了什麼 =====
+// 範圍＝統計範圍（有設日期篩選就用篩選的起訖，沒有就用第一筆～最後一筆交易的日期）
+function diagDayStats(d){
+  const bars=(DATA[d]||{})['1k']||[]; if(!bars.length) return null;
+  const swing = arr => { let lo=Infinity, hi=-Infinity, up=0, dn=0;
+    arr.forEach(b=>{ if(b.l<lo) lo=b.l; if(b.h>hi) hi=b.h; if(b.h-lo>up) up=b.h-lo; if(hi-b.l>dn) dn=hi-b.l; });
+    return {up, dn}; };
+  const hl = arr => { let h=-Infinity,l=Infinity; arr.forEach(b=>{ if(b.h>h)h=b.h; if(b.l<l)l=b.l; }); return h-l; };
+  let main=null;
+  try{
+    const ts=MKT.rthOpenTW(d), i=bars.findIndex(b=>b.ts===ts);
+    if(i>=0){ const seg=bars.slice(i, i+MKT.rthLen); if(seg.length>=Math.min(20,MKT.rthLen)){
+      const sw=swing(seg), fh=seg.slice(0, MKT.id==='tx'?12:60);
+      main={range:hl(seg), move:seg[seg.length-1].c-seg[0].o, up:sw.up, dn:sw.dn, first:hl(fh)}; } }
+  }catch(e){}
+  const sw=swing(bars), range=hl(bars), move=bars[bars.length-1].c-bars[0].o;
+  return {range, move, absMove:Math.abs(move), trend: range? Math.abs(move)/range : 0, up:sw.up, dn:sw.dn, swing:Math.max(sw.up,sw.dn), main, n:bars.length};
+}
+function buildMissedDays(T, money, pct){
+  const f=_dateRangeFilter||{};
+  const from = f.from || T[0].date, to = f.to || T[T.length-1].date;
+  const dayPnl={}, dayTr={}; T.forEach(t=>{ dayPnl[t.date]=(dayPnl[t.date]||0)+t.pnl; (dayTr[t.date]=dayTr[t.date]||[]).push(t); });
+  const minBars = MKT.id==='tx' ? 60 : 300;           // 太短的日子（假日、半天）不算
+  const rows = DAYS.filter(d=>d>=from && d<=to).map(d=>({d, st:diagDayStats(d), traded:d in dayPnl, pnl:dayPnl[d]})).filter(r=>r.st && r.st.n>=minBars);
+  const miss = rows.filter(r=>!r.traded), done = rows.filter(r=>r.traded);
+  const mainLbl = MKT.id==='tx' ? '日盤' : '美股盤';
+  const PTV = TRADE_PT_VALUE;
+  const avg = (a,fn)=>{ const v=a.map(fn).filter(isFinite); return v.length? v.reduce((x,y)=>x+y,0)/v.length : NaN; };
+  const f0 = v => isFinite(v) ? v.toFixed(0) : '—';
+  const wd = d => '日一二三四五六'[new Date(d+'T12:00:00').getDay()];
+  const head = `<div class="dg-card-title big">🔍 沒交易的日子：錯過了什麼</div>`;
+  if(!miss.length) return `<div class="dg-card wide dg-miss-card">${head}<div class="dg-how">${from} ~ ${to} 之間每個交易日都有做單。</div></div>`;
+  if(!done.length) return '';
+  const med = (()=>{ const a=rows.map(r=>r.st.range).sort((x,y)=>x-y); return a[Math.floor(a.length/2)]; })();
+  // 比較項目
+  const M = [
+    {k:'平均全天振幅', fn:r=>r.st.range, u:'點'},
+    {k:`平均${mainLbl}振幅`, fn:r=>r.st.main?r.st.main.range:NaN, u:'點'},
+    {k:`${mainLbl}開盤第一小時振幅`, fn:r=>r.st.main?r.st.main.first:NaN, u:'點'},
+    {k:'平均最大波段', fn:r=>r.st.swing, u:'點', tip:'當天從低點到之後最高點（或高點到之後最低點）最大的一段'},
+    {k:'平均最大上漲段／下跌段', fn:r=>Math.min(r.st.up,r.st.dn), u:'點', tip:'比較小的那一邊波段：數字大＝當天上下都有大段可做（來回都有肉）'},
+    {k:'平均單邊幅度 |收−開|', fn:r=>r.st.absMove, u:'點'},
+    {k:'單邊日比例', fn:r=>r.st.trend>=0.6?100:0, u:'%', tip:'|收−開| ÷ 振幅 ≥ 60% 的日子'},
+    {k:'振幅高於中位數的日子', fn:r=>r.st.range>med?100:0, u:'%', tip:`這段期間所有交易日的振幅中位數是 ${f0(med)} 點`},
+  ].map(m=>{ const a=avg(miss,m.fn), b=avg(done,m.fn); const diff = m.u==='%' ? a-b : (b? (a/b-1)*100 : NaN); return {...m, a, b, diff}; });
+  const cmpCell = m => {
+    const big = isFinite(m.diff) && m.diff>0;
+    const dTxt = !isFinite(m.diff) ? '' : (m.u==='%' ? `${m.diff>=0?'多':'少'} ${Math.abs(m.diff).toFixed(0)} 個百分點` : `${m.diff>=0?'大':'小'} ${Math.abs(m.diff).toFixed(0)}%`);
+    return `<div class="dg-cmp ${big?'hot':'cool'}" title="${m.tip||''}">
+      <div class="dg-cmp-k">${m.k}</div>
+      <div class="dg-cmp-v"><div><span>沒做單日</span><b>${f0(m.a)}<i>${m.u}</i></b></div><div class="vs">vs</div><div><span>有做單日</span><b class="dim">${f0(m.b)}<i>${m.u}</i></b></div></div>
+      <div class="dg-cmp-d">${dTxt?`沒做單日${dTxt}`:''}</div></div>`;
+  };
+  // 結論
+  const mR=M[0], mSw=M.find(m=>m.k==='平均最大波段'), mT=M.find(m=>m.k==='單邊日比例');
+  const lines=[];
+  if(isFinite(mR.diff)) lines.push(mR.diff>=10 ? `你沒做單的日子平均振幅 <b>${f0(mR.a)} 點</b>，比有做單的日子（${f0(mR.b)} 點）<b class="dn">大 ${mR.diff.toFixed(0)}%</b>——錯過的多半是<b>有行情</b>的日子。`
+    : mR.diff<=-10 ? `你沒做單的日子平均振幅 <b>${f0(mR.a)} 點</b>，比有做單的日子（${f0(mR.b)} 點）<b class="up">小 ${Math.abs(mR.diff).toFixed(0)}%</b>——大多是本來就沒什麼行情的日子，避開得不錯。`
+    : `你沒做單的日子跟有做單的日子振幅差不多（${f0(mR.a)} vs ${f0(mR.b)} 點），沒有特別錯過大行情。`);
+  if(isFinite(mT.diff) && Math.abs(mT.diff)>=10) lines.push(`沒做單的日子裡 <b>${f0(mT.a)}%</b> 是單邊日，有做單的日子是 ${f0(mT.b)}%——${mT.diff>0?'<b class="dn">單邊行情你比較常沒出手</b>':'你比較常在單邊日出手'}。`);
+  if(isFinite(mSw.a)) lines.push(`沒做單日平均最大波段 <b>${f0(mSw.a)} 點</b>，抓到一半、1 口大約是 <b>${money(mSw.a/2*PTV).slice(1)}</b>／天，${miss.length} 天合計約 <b>${money(mSw.a/2*PTV*miss.length).slice(1)}</b>。`);
+  // 依振幅分組（5 組，每組天數差不多）：出手率＆有做單時的表現
+  const groupBy = (valFn, nG) => {
+    const vs=rows.map(valFn).filter(isFinite).sort((a,b)=>a-b); if(vs.length<nG) nG=Math.max(1,vs.length);
+    const cuts=[]; for(let i=1;i<nG;i++) cuts.push(vs[Math.floor(vs.length*i/nG)]);
+    const out=[];
+    for(let i=0;i<nG;i++){
+      const lo=i?cuts[i-1]:-Infinity, hi=i<nG-1?cuts[i]:Infinity;
+      const all=rows.filter(r=>{ const v=valFn(r); return isFinite(v)&&v>=lo&&v<hi; });
+      const dn=all.filter(r=>r.traded), trs=dn.flatMap(r=>dayTr[r.d]||[]);
+      const pd=dn.map(r=>r.pnl).sort((a,b)=>a-b);
+      out.push({lbl: i===0?`< ${f0(hi)} 點`:(i===nG-1?`≥ ${f0(lo)} 點`:`${f0(lo)}～${f0(hi)} 點`), rank:['最小','小','中','大','最大'][nG===5?i:Math.min(4,i)],
+        n:all.length, dn:dn.length, ms:all.length-dn.length, rate:all.length?dn.length/all.length*100:NaN,
+        perDay: dn.length? trs.length/dn.length : NaN, avgP: dn.length? pd.reduce((a,v)=>a+v,0)/dn.length : NaN,
+        wrD: dn.length? dn.filter(r=>r.pnl>0).length/dn.length*100 : NaN, perTr: trs.length? sum(trs)/trs.length : NaN,
+        wrT: trs.length? trs.filter(t=>t.pnl>0).length/trs.length*100 : NaN, tot: pd.reduce((a,v)=>a+v,0),
+        best: pd.length?pd[pd.length-1]:NaN, worst: pd.length?pd[0]:NaN, med: pd.length?pd[Math.floor(pd.length/2)]:NaN,
+        avgR: all.length? all.reduce((a,r)=>a+valFn(r),0)/all.length : NaN});
+    }
+    return out;
+  };
+  const sum = a => a.reduce((x,t)=>x+t.pnl,0);
+  const nG = rows.length>=25 ? 5 : 3;
+  const gR = groupBy(r=>r.st.range, nG), gM = groupBy(r=>r.st.main?r.st.main.range:NaN, nG);
+  const gTbl = (g, title) => `<table class="dg-mini dg-grp"><thead>
+      <tr><th rowspan="2">${title}</th><th colspan="4" class="ga">出手</th><th colspan="5" class="gb sep">有做單的那幾天</th><th colspan="3" class="sep">每天損益分布</th></tr>
+      <tr><th class="ga">交易日</th><th class="ga">有做</th><th class="ga">沒做</th><th class="ga">出手率</th>
+        <th class="gb sep">筆數／天</th><th class="gb">平均／天</th><th class="gb">獲利日</th><th class="gb">每筆平均</th><th class="gb">勝率</th>
+        <th class="sep">最差</th><th>中位數</th><th>最好</th></tr></thead><tbody>
+    ${g.map(x=>`<tr><td><b>${x.rank}</b> <span class="dg-t3">${x.lbl}</span></td><td>${x.n}</td><td>${x.dn}</td><td class="${x.ms?'dn':''}">${x.ms}</td>
+      <td><div class="dg-pbar"><i style="width:${isFinite(x.rate)?x.rate:0}%"></i><span>${pct(x.rate)}</span></div></td>
+      <td class="sep">${isFinite(x.perDay)?x.perDay.toFixed(1):'—'}</td><td class="${x.avgP>=0?'up':'dn'}">${x.dn?money(x.avgP):'—'}</td><td>${pct(x.wrD)}</td>
+      <td class="${x.perTr>=0?'up':'dn'}">${isFinite(x.perTr)?money(x.perTr):'—'}</td><td>${pct(x.wrT)}</td>
+      <td class="sep ${x.worst<0?'dn':''}">${x.dn?money(x.worst):'—'}</td><td>${x.dn?money(x.med):'—'}</td><td class="${x.best>0?'up':''}">${x.dn?money(x.best):'—'}</td></tr>`).join('')}
+    <tr class="cur"><td>合計</td><td>${rows.length}</td><td>${done.length}</td><td>${miss.length}</td><td>${pct(done.length/rows.length*100)}</td><td class="sep">${(T.length/Math.max(1,done.length)).toFixed(1)}</td><td>${money(sum(T)/Math.max(1,done.length))}</td><td>${pct(done.filter(r=>r.pnl>0).length/Math.max(1,done.length)*100)}</td><td>${money(sum(T)/T.length)}</td><td>${pct(T.filter(t=>t.pnl>0).length/T.length*100)}</td><td class="sep"></td><td></td><td></td></tr>
+    </tbody></table>`;
+  const grp=[gR[0], gR[Math.floor(nG/2)], gR[nG-1]];
+  const bigG=gR[nG-1], smallG=gR[0];
+  if(isFinite(bigG.rate) && isFinite(smallG.rate)) lines.push(`振幅最大的那組日子你的出手率 <b>${pct(bigG.rate)}</b>、最小的那組 <b>${pct(smallG.rate)}</b>；有出手時，最大振幅日平均 <b class="${bigG.avgP>=0?'up':'dn'}">${money(bigG.avgP)}</b>／天、最小振幅日 <b class="${smallG.avgP>=0?'up':'dn'}">${money(smallG.avgP)}</b>／天。`);
+  { const bestG=gR.filter(x=>x.dn>=2).sort((a,b)=>b.avgP-a.avgP)[0], worstG=gR.filter(x=>x.dn>=2).sort((a,b)=>a.avgP-b.avgP)[0];
+    if(bestG && worstG && bestG!==worstG) lines.push(`你最會賺的是 <b>${bestG.rank}振幅</b>日（${bestG.lbl}，平均 <b class="up">${money(bestG.avgP)}</b>／天，出手率 ${pct(bestG.rate)}），最會賠的是 <b>${worstG.rank}振幅</b>日（平均 <b class="dn">${money(worstG.avgP)}</b>／天，出手率 ${pct(worstG.rate)}）。`); }
+  const grpTbl = gTbl(gR,'依全天振幅分組') ;
+  const grpTblM = gTbl(gM,`依${mainLbl}振幅分組`);
+  // 星期
+  const wdTbl = `<table class="dg-mini"><thead><tr><th>星期</th><th>交易日</th><th>有做單</th><th>沒做單</th><th>沒做單日 平均振幅</th><th>有做單日 平均振幅</th></tr></thead><tbody>
+    ${[1,2,3,4,5].map(w=>{ const a=rows.filter(r=>new Date(r.d+'T12:00:00').getDay()===w), dn=a.filter(r=>r.traded), ms=a.filter(r=>!r.traded);
+      return `<tr><td>星期${'日一二三四五六'[w]}</td><td>${a.length}</td><td>${dn.length}</td><td class="${ms.length?'dn':''}">${ms.length}</td><td>${f0(avg(ms,r=>r.st.range))}</td><td>${f0(avg(dn,r=>r.st.range))}</td></tr>`; }).join('')}</tbody></table>`;
+  // 每天清單
+  const sorted = miss.slice().sort((a,b)=>b.st.range-a.st.range);
+  const maxR = Math.max(1,...sorted.map(r=>r.st.range));
+  const _rs = rows.map(r=>r.st.range).sort((a,b)=>a-b), t2 = _rs[Math.floor(_rs.length*(nG-1)/nG)];   // 最大那一組的門檻
+  const big = r => r.st.range>=t2;
+  const list = sorted.map(r=>{ const m=r.st.main, mv=r.st.move, swDir=r.st.up>=r.st.dn?'漲':'跌';
+    return `<tr class="${big(r)?'big':''}" onclick="diagGoDay('${r.d}')" title="點一下跳到這一天">
+      <td>${r.d.slice(5).replace('-','/')}（${wd(r.d)}）</td>
+      <td><div class="dg-rbar"><i style="width:${(r.st.range/maxR*100).toFixed(0)}%"></i><span>${f0(r.st.range)}</span></div></td>
+      <td>${m?f0(m.range):'—'}</td><td>${m?f0(m.first):'—'}</td>
+      <td class="${mv>=0?'up':'dn'}">${mv>=0?'+':''}${f0(mv)}</td>
+      <td>${f0(r.st.swing)} <span class="dg-t3">${swDir}</span></td>
+      <td class="dg-t3">≈ ${money(r.st.swing*PTV).slice(1)}</td>
+      <td>${r.st.trend>=0.6?'<span class="dg-tag t">單邊</span>':''}${big(r)?'<span class="dg-tag b">大振幅</span>':''}</td></tr>`; }).join('');
+  return `<div class="dg-card wide dg-miss-card">${head}
+    <div class="dg-how">${from} ~ ${to} 共 <b>${rows.length}</b> 個交易日：有做單 <b>${done.length}</b> 天、沒做單 <b>${miss.length}</b> 天（出手率 ${pct(done.length/rows.length*100)}）。下面每一格都是「沒做單的日子」對比「有做單的日子」。</div>
+    <ul class="dg-verdict">${lines.map(l=>`<li>${l}</li>`).join('')}</ul>
+    ${dgMissViz(rows, dayTr)}
+    <div class="dg-cmps">${M.map(cmpCell).join('')}</div>
+    <div class="dg-sub">① 依當天振幅分 ${nG} 組（每組天數差不多）：哪種日子你比較會出手、出手後表現如何</div><div class="dg-scroll">${grpTbl}</div>
+    <div class="dg-sub">② 同上，改用${mainLbl}振幅分組</div><div class="dg-scroll">${grpTblM}</div>
+    <div class="dg-miss-2">
+      <div><div class="dg-sub">③ 星期幾比較常沒做單</div><div class="dg-scroll">${wdTbl}</div></div>
+      <div></div>
+    </div>
+    <div class="dg-sub">沒做單的每一天（依振幅大到小・點一列跳到那一天看K棒）</div>
+    <div class="dg-mtbl-wrap"><table class="dg-mini dg-miss"><thead><tr><th>日期</th><th>全天振幅</th><th>${mainLbl}振幅</th><th>開盤第一小時</th><th>收−開</th><th>最大波段</th><th>1 口</th><th></th></tr></thead><tbody>${list}</tbody></table></div>
+  </div>`;
+}
+function diagGoDay(d){
+  try{ closeTradeResult(); }catch(e){}
+  try{ loadDay(d); }catch(e){}
+}
+function buildDiagPage(){
+  const page=document.getElementById('pageDiag'); if(!page) return;
+  const tr=(_allClosedTradesCache||[]).slice();
+  if(tr.length<3){ page.innerHTML='<div class="tresult-empty">至少要 3 筆交易才能診斷（請調整統計範圍或切換版本）</div>'; return; }
+  tr.forEach(t=>{ if(t.mfe===undefined){ const m=calcMaeMfeAccurate(t); t.mfe=m.mfe; t.mae=m.mae; t.singleMDD=m.singleMDD; } });
+  try{ page.innerHTML = buildDiagnosis(tr); dgAfterRender(); }
+  catch(e){ console.error('問題診斷失敗', e); page.innerHTML='<div class="tresult-empty">問題診斷計算失敗：'+e.message+'</div>'; }
+}
+
+// ===== 🌙 前一晚美股 → 隔天的你 =====
+// NQ：前一個交易日的美股正規盤；台指：同一個交易日的夜盤裡，美股開盤（21:30／22:30）之後那一段
+function diagPrevNight(d){
+  if(MKT.id==='tx'){
+    const bars=(DATA[d]||{})['1k']||[]; const ts=MKT.am8TW(d);
+    const i=bars.findIndex(b=>b.ts===ts), j=bars.findIndex(b=>b.ts==='08:45');
+    if(i<0) return null; const seg=bars.slice(i, j>i?j:bars.length); if(seg.length<12) return null;
+    let h=-Infinity,l=Infinity; seg.forEach(b=>{ if(b.h>h)h=b.h; if(b.l<l)l=b.l; });
+    return {range:h-l, move:seg[seg.length-1].c-seg[0].o};
+  }
+  const k=DAYS.indexOf(d); if(k<=0) return null;
+  const st=diagDayStats(DAYS[k-1]); if(!st||!st.main) return null;
+  return {range:st.main.range, move:st.main.move};
+}
+function diagCorr(xs, ys){
+  const n=xs.length; if(n<5) return NaN;
+  const mx=xs.reduce((a,v)=>a+v,0)/n, my=ys.reduce((a,v)=>a+v,0)/n;
+  let sxy=0,sxx=0,syy=0; for(let i=0;i<n;i++){ const a=xs[i]-mx, b=ys[i]-my; sxy+=a*b; sxx+=a*a; syy+=b*b; }
+  return sxx&&syy ? sxy/Math.sqrt(sxx*syy) : NaN;
+}
+function buildPrevNight(T, money, pct){
+  const f=_dateRangeFilter||{};
+  const from=f.from||T[0].date, to=f.to||T[T.length-1].date;
+  const dayTr={}; T.forEach(t=>{ (dayTr[t.date]=dayTr[t.date]||[]).push(t); });
+  const minBars = MKT.id==='tx' ? 60 : 300;
+  const rows = DAYS.filter(d=>d>=from&&d<=to && ((DATA[d]||{})['1k']||[]).length>=minBars).map(d=>{
+    const pn=diagPrevNight(d), tr=dayTr[d]||[];
+    return pn ? {d, R:pn.range, M:Math.abs(pn.move), dirUp:pn.move>=0, n:tr.length, pnl:tr.reduce((a,t)=>a+t.pnl,0), tr} : null; }).filter(Boolean);
+  if(rows.length<6) return '';
+  const f0=v=>isFinite(v)?v.toFixed(0):'—';
+  const nG = rows.length>=25 ? 5 : 3;
+  const names = nG===5 ? ['最小','小','中','大','最大'] : ['小','中','大'];
+  function groups(valFn){
+    const vs=rows.map(valFn).sort((a,b)=>a-b), cuts=[]; for(let i=1;i<nG;i++) cuts.push(vs[Math.floor(vs.length*i/nG)]);
+    return names.map((nm,i)=>{
+      const lo=i?cuts[i-1]:-Infinity, hi=i<nG-1?cuts[i]:Infinity;
+      const all=rows.filter(r=>{ const v=valFn(r); return v>=lo&&v<hi; }), dn=all.filter(r=>r.n>0), trs=dn.flatMap(r=>r.tr);
+      const pd=dn.map(r=>r.pnl).sort((a,b)=>a-b), sp=pd.reduce((a,v)=>a+v,0);
+      return {nm, lbl: i===0?`< ${f0(hi)}`:(i===nG-1?`≥ ${f0(lo)}`:`${f0(lo)}～${f0(hi)}`), n:all.length, dn:dn.length,
+        rate: all.length?dn.length/all.length*100:NaN, nAll: all.length? all.reduce((a,r)=>a+r.n,0)/all.length : NaN, nDone: dn.length? trs.length/dn.length : NaN,
+        avgP: dn.length? sp/dn.length : NaN, wrD: dn.length? dn.filter(r=>r.pnl>0).length/dn.length*100 : NaN,
+        perTr: trs.length? trs.reduce((a,t)=>a+t.pnl,0)/trs.length : NaN, wrT: trs.length? trs.filter(t=>t.pnl>0).length/trs.length*100 : NaN,
+        worst: pd.length?pd[0]:NaN, med: pd.length?pd[Math.floor(pd.length/2)]:NaN, best: pd.length?pd[pd.length-1]:NaN, tot:sp};
+    });
+  }
+  const maxN = g => Math.max(0.1, ...g.map(x=>isFinite(x.nAll)?x.nAll:0));
+  const tbl=(g,title)=>{ const mn=maxN(g); return `<table class="dg-mini dg-grp"><thead>
+      <tr><th rowspan="2">${title}</th><th colspan="4" class="ga">隔天下單頻率</th><th colspan="5" class="gb sep">隔天有做單時</th><th colspan="3" class="sep">隔天每天損益分布</th></tr>
+      <tr><th class="ga">天數</th><th class="ga">出手率</th><th class="ga">平均筆數（全部天）</th><th class="ga">筆數／做單日</th>
+        <th class="gb sep">平均／天</th><th class="gb">獲利日</th><th class="gb">每筆平均</th><th class="gb">勝率</th><th class="gb">合計</th>
+        <th class="sep">最差</th><th>中位數</th><th>最好</th></tr></thead><tbody>
+    ${g.map(x=>`<tr><td><b>${x.nm}</b> <span class="dg-t3">${x.lbl} 點</span></td><td>${x.n}</td>
+      <td><div class="dg-pbar"><i style="width:${isFinite(x.rate)?x.rate:0}%"></i><span>${pct(x.rate)}</span></div></td>
+      <td><div class="dg-pbar n"><i style="width:${isFinite(x.nAll)?(x.nAll/mn*100):0}%"></i><span>${isFinite(x.nAll)?x.nAll.toFixed(1):'—'}</span></div></td>
+      <td>${isFinite(x.nDone)?x.nDone.toFixed(1):'—'}</td>
+      <td class="sep ${x.avgP>=0?'up':'dn'}">${x.dn?money(x.avgP):'—'}</td><td>${pct(x.wrD)}</td><td class="${x.perTr>=0?'up':'dn'}">${isFinite(x.perTr)?money(x.perTr):'—'}</td><td>${pct(x.wrT)}</td>
+      <td class="${x.tot>=0?'up':'dn'}">${x.dn?money(x.tot):'—'}</td>
+      <td class="sep ${x.worst<0?'dn':''}">${x.dn?money(x.worst):'—'}</td><td>${x.dn?money(x.med):'—'}</td><td class="${x.best>0?'up':''}">${x.dn?money(x.best):'—'}</td></tr>`).join('')}</tbody></table>`; };
+  const gR=groups(r=>r.R), gM=groups(r=>r.M);
+  _DG.prevGroups = gR;
+  // 前一晚漲 / 跌
+  const dirRows=[['前一晚收漲',r=>r.dirUp],['前一晚收跌',r=>!r.dirUp]].map(([lbl,fn])=>{ const a=rows.filter(fn), dn=a.filter(r=>r.n>0), trs=dn.flatMap(r=>r.tr);
+    const L=trs.filter(t=>t.dir==='long'), Sh=trs.filter(t=>t.dir==='short'), sp=l=>l.reduce((x,t)=>x+t.pnl,0);
+    return `<tr><td>${lbl}</td><td>${a.length}</td><td>${pct(a.length?dn.length/a.length*100:NaN)}</td><td>${dn.length?(trs.length/dn.length).toFixed(1):'—'}</td>
+      <td class="sep">${L.length}</td><td class="${sp(L)>=0?'up':'dn'}">${L.length?money(sp(L)):'—'}</td><td>${pct(L.length?L.filter(t=>t.pnl>0).length/L.length*100:NaN)}</td>
+      <td class="sep">${Sh.length}</td><td class="${sp(Sh)>=0?'up':'dn'}">${Sh.length?money(sp(Sh)):'—'}</td><td>${pct(Sh.length?Sh.filter(t=>t.pnl>0).length/Sh.length*100:NaN)}</td></tr>`; }).join('');
+  const dirTbl=`<table class="dg-mini"><thead><tr><th rowspan="2">前一晚方向</th><th rowspan="2">天數</th><th rowspan="2">出手率</th><th rowspan="2">筆數／做單日</th><th colspan="3" class="sep">隔天做多</th><th colspan="3" class="sep">隔天做空</th></tr>
+    <tr><th class="sep">筆數</th><th>損益</th><th>勝率</th><th class="sep">筆數</th><th>損益</th><th>勝率</th></tr></thead><tbody>${dirRows}</tbody></table>`;
+  // 相關係數
+  const dn=rows.filter(r=>r.n>0);
+  const cRn=diagCorr(rows.map(r=>r.R), rows.map(r=>r.n)), cMn=diagCorr(rows.map(r=>r.M), rows.map(r=>r.n));
+  const cRp=diagCorr(dn.map(r=>r.R), dn.map(r=>r.pnl)), cMp=diagCorr(dn.map(r=>r.M), dn.map(r=>r.pnl));
+  const word=(r,a,b)=>!isFinite(r)?'資料不夠':(Math.abs(r)<0.1?'幾乎沒關係':(Math.abs(r)<0.3?(r>0?`弱：越大${a}`:`弱：越大${b}`):(r>0?`明顯：越大${a}`:`明顯：越大${b}`)));
+  const cBox=(lbl,r,a,b)=>`<div><span>${lbl}</span><b class="${!isFinite(r)||Math.abs(r)<0.1?'':(r>0?'up':'dn')}">${isFinite(r)?(r>=0?'+':'')+r.toFixed(2):'—'}</b><em>${word(r,a,b)}</em></div>`;
+  const lines=[];
+  const big=gR[gR.length-1], small=gR[0];
+  if(isFinite(big.nAll)&&isFinite(small.nAll)) lines.push(`前一晚振幅<b>最大</b>的日子，你隔天平均做 <b>${big.nAll.toFixed(1)}</b> 筆（出手率 ${pct(big.rate)}）；振幅<b>最小</b>的日子平均做 <b>${small.nAll.toFixed(1)}</b> 筆（出手率 ${pct(small.rate)}）。`);
+  if(big.dn&&small.dn) lines.push(`有做單時，前一晚振幅最大的隔天平均 <b class="${big.avgP>=0?'up':'dn'}">${money(big.avgP)}</b>／天，最小的隔天平均 <b class="${small.avgP>=0?'up':'dn'}">${money(small.avgP)}</b>／天。`);
+  { const b=gM[gM.length-1], s2=gM[0]; if(b.dn&&s2.dn) lines.push(`前一晚單邊幅度 |收−開| 最大的隔天平均 <b class="${b.avgP>=0?'up':'dn'}">${money(b.avgP)}</b>／天（${b.nAll.toFixed(1)} 筆），最小的隔天 <b class="${s2.avgP>=0?'up':'dn'}">${money(s2.avgP)}</b>／天（${s2.nAll.toFixed(1)} 筆）。`); }
+  const lbl = MKT.id==='tx' ? '前一晚美股時段（夜盤美股開盤後）' : '前一晚美股正規盤';
+  return `<div class="dg-card wide"><div class="dg-card-title">🌙 ${lbl} → 隔天的你</div>
+    <div class="dg-how">每個交易日先看「${lbl}」的振幅（最高−最低）和單邊幅度 |收−開|，再看你隔天做幾筆、賺賠多少。共 ${rows.length} 天，依數值大小分成 ${nG} 組（每組天數差不多）。${MKT.id==='tx'?'台指用夜盤裡美股開盤之後那段代表前一晚美股。':''}</div>
+    <ul class="dg-verdict">${lines.map(l=>`<li>${l}</li>`).join('')}</ul>
+    <div class="dg-kpis">
+      ${cBox('前一晚振幅 ↔ 隔天筆數',cRn,'做越多','做越少')}
+      ${cBox('前一晚振幅 ↔ 隔天損益',cRp,'賺越多','賠越多')}
+      ${cBox('前一晚 |收−開| ↔ 隔天筆數',cMn,'做越多','做越少')}
+      ${cBox('前一晚 |收−開| ↔ 隔天損益',cMp,'賺越多','賠越多')}
+    </div>
+    <div class="dg-t3" style="margin:-2px 0 6px">相關係數 −1～+1：0 附近＝沒關係，±0.3 以上＝有明顯關係（損益只看有做單的日子）。</div>
+    ${dgPrevViz(rows)}
+    <div class="dg-sub">① 依前一晚振幅分組</div><div class="dg-scroll">${tbl(gR,'前一晚振幅')}</div>
+    <div class="dg-sub">② 依前一晚 |收−開| 分組</div><div class="dg-scroll">${tbl(gM,'前一晚 |收−開|')}</div>
+    <div class="dg-sub">③ 前一晚收漲／收跌，隔天你做多做空的結果</div><div class="dg-scroll">${dirTbl}</div>
+  </div>`;
+}
+
+// ============================================================
+// 📊 問題診斷：互動圖表（滑過看明細、拉桿即時模擬）
+// ============================================================
+window._DG = window._DG || {};
+function dgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+(function dgTipInit(){
+  if(window._dgTipInit) return; window._dgTipInit=true;
+  let tip=null;
+  document.addEventListener('mousemove', e=>{
+    const el = e.target && e.target.closest ? e.target.closest('#pageDiag [data-tip]') : null;
+    if(!el){ if(tip) tip.style.display='none'; return; }
+    if(!tip){ tip=document.createElement('div'); tip.className='dg-tip'; document.body.appendChild(tip); }
+    tip.innerHTML = dgEsc(el.getAttribute('data-tip')).split('|').join('<br>');
+    tip.style.display='block';
+    const w=tip.offsetWidth, h=tip.offsetHeight;
+    let x=e.clientX+14, y=e.clientY+14;
+    if(x+w>window.innerWidth-8) x=e.clientX-w-14;
+    if(y+h>window.innerHeight-8) y=e.clientY-h-14;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  });
+})();
+function dgNice(r, n){ const raw=(r||1)/(n||5), m=Math.pow(10,Math.floor(Math.log10(raw))); return [1,2,2.5,5,10].map(k=>k*m).find(k=>k>=raw)||raw; }
+const dgMoney = v => `${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}`;
+// 散佈圖
+function dgScatter(o){
+  const W=o.w||640, H=o.h||300, P={l:58,r:16,t:14,b:40};
+  const pts=o.pts||[]; if(!pts.length) return '<div class="dg-t3">沒有資料</div>';
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  let x0=o.xmin!=null?o.xmin:Math.min(...xs), x1=Math.max(...xs); if(x1===x0) x1=x0+1; x1+= (x1-x0)*0.04;
+  let y0=Math.min(0,...ys), y1=Math.max(0,...ys); const py=(y1-y0)*0.1||1; y0-=py; y1+=py;
+  const X=v=>P.l+(W-P.l-P.r)*(v-x0)/(x1-x0), Y=v=>P.t+(H-P.t-P.b)*(1-(v-y0)/(y1-y0));
+  let g='';
+  const sx=dgNice(x1-x0,6), sy=dgNice(y1-y0,5);
+  for(let v=Math.ceil(x0/sx)*sx; v<=x1; v+=sx) g+=`<line x1="${X(v)}" y1="${P.t}" x2="${X(v)}" y2="${H-P.b}" stroke="rgba(255,255,255,.05)"/><text x="${X(v)}" y="${H-P.b+15}" fill="#888" font-size="11" text-anchor="middle">${(o.xFmt||(v=>v.toFixed(0)))(v)}</text>`;
+  for(let v=Math.ceil(y0/sy)*sy; v<=y1; v+=sy) g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="rgba(255,255,255,${Math.abs(v)<1e-9?0.35:0.05})" ${Math.abs(v)<1e-9?'stroke-dasharray="5,4"':''}/><text x="${P.l-6}" y="${Y(v)+4}" fill="#888" font-size="11" text-anchor="end">${(o.yFmt||(v=>v.toFixed(0)))(v)}</text>`;
+  // 趨勢線（最小平方法）
+  let tl='';
+  const tp=pts.filter(p=>!p.noTrend);
+  if(o.trend && tp.length>=5){
+    const n=tp.length, mx=tp.reduce((a,p)=>a+p.x,0)/n, my=tp.reduce((a,p)=>a+p.y,0)/n;
+    let sxy=0,sxx=0; tp.forEach(p=>{ sxy+=(p.x-mx)*(p.y-my); sxx+=(p.x-mx)*(p.x-mx); });
+    if(sxx){ const b=sxy/sxx, a=my-b*mx, xa=Math.min(...tp.map(p=>p.x)), xb=Math.max(...tp.map(p=>p.x));
+      tl=`<line x1="${X(xa)}" y1="${Y(a+b*xa)}" x2="${X(xb)}" y2="${Y(a+b*xb)}" stroke="#facc15" stroke-width="2" stroke-dasharray="6,4" opacity=".85"/><text x="${X(xb)-4}" y="${Y(a+b*xb)-6}" fill="#facc15" font-size="11" text-anchor="end">趨勢線</text>`; }
+  }
+  const dots=pts.map(p=>{ const r=p.r||5;
+    const shape = p.shape==='diamond' ? `<rect x="${(X(p.x)-r).toFixed(1)}" y="${(Y(p.y)-r).toFixed(1)}" width="${2*r}" height="${2*r}" transform="rotate(45 ${X(p.x).toFixed(1)} ${Y(p.y).toFixed(1)})"` : `<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="${r}"`;
+    return `${shape} fill="${p.hollow?'transparent':p.color}" fill-opacity="${p.hollow?0:0.6}" stroke="${p.color}" stroke-width="${p.hollow?1.8:1.2}" data-tip="${dgEsc(p.tip||'')}" ${p.click?`onclick="${p.click}" style="cursor:pointer"`:''}/>`; }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="dg-svg">${g}${tl}${dots}
+    <text x="${(W+P.l)/2}" y="${H-4}" fill="#aaa" font-size="12" font-weight="700" text-anchor="middle">${o.xLabel||''}</text>
+    <text x="14" y="${(H-P.b+P.t)/2}" fill="#aaa" font-size="12" font-weight="700" text-anchor="middle" transform="rotate(-90 14 ${(H-P.b+P.t)/2})">${o.yLabel||''}</text></svg>`;
+}
+// 分組長條圖（正負都可以）
+function dgBars(o){
+  const W=o.w||640, H=o.h||260, P={l:58,r:12,t:16,b:44};
+  const cats=o.cats, S=o.series; const all=S.flatMap(s=>s.vals.filter(isFinite));
+  let y0=Math.min(0,...all), y1=Math.max(0,...all); if(y0===y1) y1=y0+1; const py=(y1-y0)*0.12; y0-=py; y1+=py;
+  const Y=v=>P.t+(H-P.t-P.b)*(1-(v-y0)/(y1-y0)), cw=(W-P.l-P.r)/cats.length, bw=Math.min(28,cw*0.8/S.length);
+  let g=''; const sy=dgNice(y1-y0,5);
+  for(let v=Math.ceil(y0/sy)*sy; v<=y1; v+=sy) g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="rgba(255,255,255,${Math.abs(v)<1e-9?0.4:0.05})"/><text x="${P.l-6}" y="${Y(v)+4}" fill="#888" font-size="11" text-anchor="end">${(o.yFmt||dgMoney)(v)}</text>`;
+  let bars='';
+  cats.forEach((c,i)=>{ const cx=P.l+cw*i+cw/2;
+    S.forEach((s,j)=>{ const v=s.vals[i]; if(!isFinite(v)) return; const x=cx-(S.length*bw)/2+j*bw, y=Math.min(Y(v),Y(0)), h=Math.max(1,Math.abs(Y(v)-Y(0)));
+      bars+=`<rect x="${x+1}" y="${y}" width="${bw-2}" height="${h}" rx="2" fill="${s.color}" opacity=".85" data-tip="${dgEsc((s.tips&&s.tips[i])||'')}"/>`; });
+    bars+=`<text x="${cx}" y="${H-P.b+16}" fill="#bbb" font-size="11" text-anchor="middle">${c}</text>`;
+  });
+  const leg=S.map((s,j)=>`<rect x="${P.l+j*150}" y="${H-14}" width="10" height="10" rx="2" fill="${s.color}"/><text x="${P.l+14+j*150}" y="${H-5}" fill="#ccc" font-size="11">${s.name}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="dg-svg">${g}${bars}${leg}</svg>`;
+}
+// 折線圖（多條線；可加一條直的標記線）
+function dgLine(o){
+  const W=o.w||640, H=o.h||240, P={l:62,r:14,t:14,b:36};
+  const xs=o.xs; const all=o.series.flatMap(s=>s.ys.filter(isFinite)); if(!all.length) return '';
+  let y0=Math.min(...all,o.zero?0:Infinity), y1=Math.max(...all,o.zero?0:-Infinity); if(y0===y1){y0-=1;y1+=1;} const py=(y1-y0)*0.1; y0-=py; y1+=py;
+  const x0=xs[0], x1=xs[xs.length-1]===x0?x0+1:xs[xs.length-1];
+  const X=v=>P.l+(W-P.l-P.r)*(v-x0)/(x1-x0), Y=v=>P.t+(H-P.t-P.b)*(1-(v-y0)/(y1-y0));
+  let g=''; const sy=dgNice(y1-y0,5);
+  for(let v=Math.ceil(y0/sy)*sy; v<=y1; v+=sy) g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="rgba(255,255,255,${Math.abs(v)<1e-9?0.35:0.05})"/><text x="${P.l-6}" y="${Y(v)+4}" fill="#888" font-size="11" text-anchor="end">${(o.yFmt||dgMoney)(v)}</text>`;
+  const tick=Math.max(1,Math.ceil(xs.length/10));
+  xs.forEach((v,i)=>{ if(i%tick===0||i===xs.length-1) g+=`<text x="${X(v)}" y="${H-P.b+15}" fill="#888" font-size="11" text-anchor="middle">${(o.xFmt||(v=>v))(v)}</text>`; });
+  const lines=o.series.map(s=>`<polyline fill="none" stroke="${s.color}" stroke-width="${s.w||2.4}" ${s.dash?`stroke-dasharray="${s.dash}"`:''} stroke-linejoin="round" points="${s.ys.map((y,i)=>isFinite(y)?`${X(xs[i]).toFixed(1)},${Y(y).toFixed(1)}`:'').join(' ')}"/>`).join('');
+  let mk='';
+  if(o.marker!=null){ const mx=X(o.marker); mk=`<line x1="${mx}" y1="${P.t}" x2="${mx}" y2="${H-P.b}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="4,3"/>`; }
+  const dots=(o.dots||[]).map(d=>`<circle cx="${X(d.x)}" cy="${Y(d.y)}" r="${d.r||4}" fill="${d.color}" stroke="#000" data-tip="${dgEsc(d.tip||'')}"/>`).join('');
+  const hits=(o.hits||[]).map(h=>`<rect x="${X(h.x)-h.w/2}" y="${P.t}" width="${h.w}" height="${H-P.t-P.b}" fill="transparent" data-tip="${dgEsc(h.tip)}" ${h.click?`onclick="${h.click}" style="cursor:pointer"`:''}/>`).join('');
+  const leg=o.series.filter(s=>s.name).map((s,j)=>`<line x1="${P.l+j*170}" y1="${P.t-4}" x2="${P.l+18+j*170}" y2="${P.t-4}" stroke="${s.color}" stroke-width="3" ${s.dash?`stroke-dasharray="${s.dash}"`:''}/><text x="${P.l+24+j*170}" y="${P.t}" fill="#ccc" font-size="11">${s.name}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H+8}" class="dg-svg"><g transform="translate(0,8)">${g}${lines}${mk}${dots}${hits}</g>${leg}</svg>`;
+}
+
+// ---------- 🔍 錯過了什麼：振幅×損益散佈＋振幅分布（有做 vs 沒做）----------
+function dgMissViz(rows, dayTr){
+  if(!rows.length) return '';
+  const pts=rows.map(r=>({x:r.st.range, y:r.traded?r.pnl:0, r:r.traded?Math.min(10,4+(dayTr[r.d]||[]).length):6, color:r.traded?(r.pnl>=0?'#22c55e':'#ef4444'):'#ffffff', hollow:!r.traded, noTrend:!r.traded,
+    tip:`${r.d}（${'日一二三四五六'[new Date(r.d+'T12:00:00').getDay()]}）|振幅 ${r.st.range.toFixed(0)} 點${r.st.main?`・主要時段 ${r.st.main.range.toFixed(0)} 點`:''}|${r.traded?`${(dayTr[r.d]||[]).length} 筆・${dgMoney(r.pnl)}`:'沒做單'}|點一下跳到這一天`, click:`diagGoDay('${r.d}')`}));
+  const sc=dgScatter({w:640,h:330,pts,trend:true,xLabel:'當天振幅（點）',yLabel:'當天損益',yFmt:dgMoney});
+  // 振幅分布：每一格有幾天做單、幾天沒做
+  const rs=rows.map(r=>r.st.range), lo=Math.min(...rs), hi=Math.max(...rs);
+  const step=dgNice((hi-lo)/8||1,1), b0=Math.floor(lo/step)*step, nb=Math.max(1,Math.ceil((hi-b0+1e-9)/step));
+  const cats=[], dn=[], ms=[], tdn=[], tms=[];
+  for(let i=0;i<nb;i++){ const a=b0+i*step, b=a+step; const inb=rows.filter(r=>r.st.range>=a&&(r.st.range<b||(i===nb-1&&r.st.range<=b)));
+    const d1=inb.filter(r=>r.traded), m1=inb.filter(r=>!r.traded), p=d1.reduce((s,r)=>s+r.pnl,0);
+    cats.push(`${a.toFixed(0)}`); dn.push(d1.length); ms.push(m1.length);
+    tdn.push(`振幅 ${a.toFixed(0)}～${b.toFixed(0)} 點|有做單 ${d1.length} 天・合計 ${dgMoney(p)}`); tms.push(`振幅 ${a.toFixed(0)}～${b.toFixed(0)} 點|沒做單 ${m1.length} 天${m1.length?'：'+m1.map(r=>r.d.slice(5).replace('-','/')).join('、'):''}`); }
+  const bars=dgBars({w:640,h:300,cats,yFmt:v=>v.toFixed(0),series:[{name:'有做單的天數',color:'#60a5fa',vals:dn,tips:tdn},{name:'沒做單的天數',color:'#facc15',vals:ms,tips:tms}]});
+  return `<div class="dg-viz2">
+    <div><div class="dg-sub">📈 當天振幅 × 當天損益（空心白圈＝沒做單的日子，圓點大小＝筆數，點一下跳到那天）</div>${sc}
+      <div class="dg-t3">空心白圈集中在右邊＝大振幅的日子你常沒出手；圓點在右邊往下＝大振幅日你反而賠。</div></div>
+    <div><div class="dg-sub">📊 振幅分布：每種振幅的日子，你有做幾天、沒做幾天（橫軸＝振幅起點，點）</div>${bars}
+      <div class="dg-t3">黃柱比藍柱高的那幾格＝這種行情你常常沒出手。滑過黃柱可以看是哪幾天。</div></div>
+  </div>`;
+}
+// ---------- 😤 賠錢後的下一筆：間隔 × 損益散佈＋各間隔平均 ----------
+function dgAfterLossViz(T){
+  const nx=T.filter(t=>t._prev);
+  if(nx.length<3) return '';
+  const cap=300;
+  const pts=nx.map(t=>({x:Math.sqrt(Math.min(cap,t._gap)), y:t.pnl, r:Math.min(9,3+t.qty), color:t._prev.pnl<=0?'#ef4444':'#22c55e',
+    tip:`${t.date} ${t.entryTime||''} ${t.dir==='long'?'多':'空'} ${t.qty}口|上一筆 ${t._prev.pnl<=0?'賠':'賺'} ${dgMoney(t._prev.pnl)}（${t._prev.dir==='long'?'多':'空'}）|隔 ${t._gap.toFixed(0)} 分鐘・離上一筆出場 ${t._dist!=null?t._dist.toFixed(1):'—'} 點|${t._same?'同方向':'反手'}・這一筆 ${dgMoney(t.pnl)}`}));
+  const sc=dgScatter({w:620,h:320,pts,xmin:0,xLabel:'隔多久再進場（分鐘，越右越久）',yLabel:'這一筆損益',yFmt:dgMoney,xFmt:v=>Math.round(v*v)+(v*v>=cap-1?'+':'')});
+  const B=[[0,5],[5,10],[10,20],[20,30],[30,60],[60,90],[90,120],[120,180],[180,240],[240,Infinity]];
+  const lab=B.map(([a,b])=>b===Infinity?`${a}+`:`${a}-${b}`);
+  const agg=(arr)=>B.map(([a,b])=>{ const x=arr.filter(t=>t._gap>=a&&t._gap<b); return x.length?x.reduce((s,t)=>s+t.pnl,0)/x.length:NaN; });
+  const cnt=(arr)=>B.map(([a,b])=>arr.filter(t=>t._gap>=a&&t._gap<b).length);
+  const L=nx.filter(t=>t._prev.pnl<=0), W=nx.filter(t=>t._prev.pnl>0);
+  const aL=agg(L), aW=agg(W), cL=cnt(L), cW=cnt(W);
+  const bars=dgBars({w:680,h:300,cats:lab,series:[
+    {name:'上一筆賠錢後', color:'#ef4444', vals:aL, tips:aL.map((v,i)=>`賠錢後 ${lab[i]} 分鐘進場|${cL[i]} 筆・平均 ${isFinite(v)?dgMoney(v):'—'}／筆`)},
+    {name:'上一筆賺錢後', color:'#22c55e', vals:aW, tips:aW.map((v,i)=>`賺錢後 ${lab[i]} 分鐘進場|${cW[i]} 筆・平均 ${isFinite(v)?dgMoney(v):'—'}／筆`)}]});
+  return `<div class="dg-viz2">
+    <div><div class="dg-sub">🎯 每一筆：隔多久進場 × 結果（紅＝上一筆賠錢後、綠＝上一筆賺錢後）</div>${sc}
+      <div class="dg-t3">紅點擠在左邊而且偏下＝賠完很快又進場，而且又賠。</div></div>
+    <div><div class="dg-sub">📊 依間隔（分鐘）：平均每筆損益（紅柱比綠柱低很多＝賠錢後判斷變差）</div>${bars}</div>
+  </div>`;
+}
+
+// 點數刻度：一律用 5 點的倍數
+function dgStep5(range, n){ const raw=(range||5)/(n||6); const base=[5,10,20,25,50,100,200,250,500,1000]; return base.find(b=>b>=raw)||Math.ceil(raw/500)*500; }
+// ---------- 📉 單筆停損／停利（點數）：每一筆的盤中走勢＋拉桿模擬 ----------
+function dgDayViz(T, X){
+  if(!T.length) return '';
+  _DG.X=X;
+  return `<div class="dg-viz2 r">
+    <div><div class="dg-sub">🧵 每一筆的盤中走勢（每條線＝一筆；橫軸＝進場後第幾分鐘；<b>直軸＝浮動點數</b>，相對進場均價；綠＝最後賺、紅＝最後賠）</div>
+      <div class="dg-ctl"><span class="dg-tog"><button class="on" onclick="dgTPset(this,'dir','all')">全部</button><button onclick="dgTPset(this,'dir','long')">做多</button><button onclick="dgTPset(this,'dir','short')">做空</button></span>
+        <span class="dg-t3">黃色虛線＝右邊拉桿的單筆停損／停利（點）；碰到停損線的單會變暗</span></div>
+      <div id="dgTPchart"></div>
+      <div id="dgTPres" class="dg-tpres"></div></div>
+    <div class="dg-sim-box"><div class="dg-sub">🎚 單筆停損／停利（點）：每一筆盤中一碰到就出場</div>
+      <label>單筆停損：<b id="dgDLv">—</b><input type="range" id="dgDL" min="0" max="200" step="5" value="0" oninput="dgDayUpd()"></label>
+      <label>單筆停利：<b id="dgDPv">—</b><input type="range" id="dgDP" min="0" max="300" step="5" value="0" oninput="dgDayUpd()"></label>
+      <div class="dg-t3">每格 5 點，拉到最左邊＝不設。用1分K逐根重跑（當下實際口數、均價），同一根K棒同時碰到停損和停利時先算停損。</div>
+      <div id="dgDayRes" class="dg-simres"></div></div>
+  </div>
+  ${dgPostExitViz()}`;
+}
+function dgTPset(btn, key, val){ _DG['tp_'+key]=val; btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn)); dgTPUpd(); }
+function dgTPUpd(){
+  const D=_DG; if(!D.pathOf || !document.getElementById('dgTPchart')) return;
+  const MU = MKT.id==='tx' ? 5 : 1;
+  const dir=D.tp_dir||'all';
+  const list=D.T.filter(t=>dir==='all'||t.dir===dir).map(t=>({t, P:D.pathOf(t)})).filter(o=>o.P&&o.P.length);
+  const Lv=+(document.getElementById('dgDL')||{value:0}).value||null, Pv=+(document.getElementById('dgDP')||{value:0}).value||null;
+  const fmtV=v=>`${v>0?'+':''}${v.toFixed(0)} 點`;
+  if(!list.length){ document.getElementById('dgTPchart').innerHTML='<div class="dg-t3">沒有資料</div>'; document.getElementById('dgTPres').innerHTML=''; return; }
+  const holds=list.map(o=>(o.P[o.P.length-1].idx-o.t.entryIdx)*MU).sort((a,b)=>a-b);
+  const xMax=Math.max(10, Math.min(holds[Math.floor(holds.length*0.95)]||60, 480));
+  const ys=list.flatMap(o=>o.P.filter(b=>(b.idx-o.t.entryIdx)*MU<=xMax).map(b=>b.c));
+  let y0=Math.min(Lv?-Lv:0,...ys), y1=Math.max(...ys,Pv||0,0); const py=(y1-y0)*0.06||5; y0-=py; y1+=py;
+  const W=680, H=360, Pd={l:58,r:14,t:16,b:34};
+  const Xf=m=>Pd.l+(W-Pd.l-Pd.r)*Math.min(1,m/xMax), Y=v=>Pd.t+(H-Pd.t-Pd.b)*(1-(v-y0)/(y1-y0));
+  let g=''; const sy=dgStep5(y1-y0,8), sx=dgNice(xMax,8);
+  for(let v=Math.ceil(y0/sy)*sy; v<=y1; v+=sy) g+=`<line x1="${Pd.l}" y1="${Y(v)}" x2="${W-Pd.r}" y2="${Y(v)}" stroke="rgba(255,255,255,${Math.abs(v)<1e-9?0.45:0.06})"/><text x="${Pd.l-6}" y="${Y(v)+4}" fill="#999" font-size="11" text-anchor="end">${v>0?'+':''}${v.toFixed(0)}</text>`;
+  for(let m=0; m<=xMax; m+=sx) g+=`<line x1="${Xf(m)}" y1="${Pd.t}" x2="${Xf(m)}" y2="${H-Pd.b}" stroke="rgba(255,255,255,.04)"/><text x="${Xf(m)}" y="${H-Pd.b+15}" fill="#888" font-size="11" text-anchor="middle">${m}分</text>`;
+  g+=`<text x="${Pd.l-6}" y="${Pd.t-4}" fill="#facc15" font-size="11" font-weight="800" text-anchor="end">點</text>`;
+  const info=list.map(o=>{ const lo=Math.min(...o.P.map(b=>b.l)), hi=Math.max(...o.P.map(b=>b.h)); return {o, lo, hi, hitL: Lv && lo<=-Lv, hitP: Pv && hi>=Pv}; });
+  const lines=info.map(({o,lo,hi,hitL,hitP})=>{ const t=o.t, win=t.pnl>0;
+    const pts=o.P.filter(b=>(b.idx-t.entryIdx)*MU<=xMax).map(b=>`${Xf((b.idx-t.entryIdx)*MU).toFixed(1)},${Y(b.c).toFixed(1)}`).join(' ');
+    const fin=o.P[o.P.length-1];
+    const tip=`${t.date} ${t.entryTime||''} ${t.dir==='long'?'做多':'做空'} ${t.qty}口|最多被套 ${fmtV(lo)}・最多浮盈 ${fmtV(hi)}|持有 ${((fin.idx-t.entryIdx)*MU).toFixed(0)} 分鐘・最後 ${fmtV(fin.c)}（${dgMoney(t.pnl)}）${hitL?`|⚠ 盤中碰到停損 -${Lv} 點，`+(win?'最後卻賺回來':'最後還是賠'):''}${hitP?`|✔ 盤中碰到停利 +${Pv} 點，最後 ${fin.c>=Pv?'走更遠':'吐回去了'}`:''}`;
+    return `<polyline class="dg-path" fill="none" stroke="${win?'#22c55e':'#ef4444'}" stroke-width="${hitL?1.1:1.8}" opacity="${hitL?0.14:0.7}" points="${pts}" data-tip="${dgEsc(tip)}"/>`; }).join('');
+  const lineAt=(v,label,up)=>`<line x1="${Pd.l}" y1="${Y(v)}" x2="${W-Pd.r}" y2="${Y(v)}" stroke="#facc15" stroke-width="2" stroke-dasharray="7,4"/><text x="${W-Pd.r-4}" y="${Y(v)+(up?-6:14)}" fill="#facc15" font-size="12" font-weight="700" text-anchor="end">${label}</text>`;
+  const sl=(Lv?lineAt(-Lv,`停損 -${Lv} 點`,false):'')+(Pv?lineAt(Pv,`停利 +${Pv} 點`,true):'');
+  document.getElementById('dgTPchart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="dg-svg">${g}${sl}${lines}</svg>`;
+  const grp = dir==='all' ? [['全部',info],['做多',info.filter(x=>x.o.t.dir==='long')],['做空',info.filter(x=>x.o.t.dir==='short')]] : [[dir==='long'?'做多':'做空',info]];
+  const sumP=a=>a.reduce((s,x)=>s+x.o.t.pnl,0), finOf=x=>x.o.P[x.o.P.length-1].c;
+  const stopTbl = !Lv ? '<div class="dg-t3">單筆停損拉到最左邊＝不設，所以沒有停損線的表。</div>' : `<div class="dg-sub">盤中碰到停損 -${Lv} 點的單</div><table class="dg-mini"><thead><tr><th></th><th>筆數</th><th>碰到停損線</th><th>碰到後最後賺回</th><th>碰到後最後還是賠</th><th>還是賠的最後平均</th><th>沒碰到的勝率</th></tr></thead><tbody>
+    ${grp.map(([lb,a])=>{ const h=a.filter(x=>x.hitL), hw=h.filter(x=>x.o.t.pnl>0), hl=h.filter(x=>x.o.t.pnl<=0), nh=a.filter(x=>!x.hitL);
+      const fin=hl.length?hl.reduce((s,x)=>s+finOf(x),0)/hl.length:NaN;
+      return `<tr><td>${lb}</td><td>${a.length}</td><td><b>${h.length}</b> 筆（${a.length?(h.length/a.length*100).toFixed(0):0}%）</td><td class="${hw.length?'up':''}">${hw.length} 筆（${dgMoney(sumP(hw))}）</td><td class="${hl.length?'dn':''}">${hl.length} 筆（${dgMoney(sumP(hl))}）</td><td class="dn">${isFinite(fin)?fmtV(fin):'—'}</td><td>${nh.length?(nh.filter(x=>x.o.t.pnl>0).length/nh.length*100).toFixed(0)+'%':'—'}</td></tr>`; }).join('')}</tbody></table>
+    <div class="dg-t3">「最後賺回」＝停損設 -${Lv} 點會被誤殺的單；「還是賠」＝設 -${Lv} 點能少賠的單。</div>`;
+  const tpTbl = !Pv ? '' : `<div class="dg-sub">盤中碰到停利 +${Pv} 點的單</div><table class="dg-mini"><thead><tr><th></th><th>筆數</th><th>碰到停利線</th><th>碰到後最後走更遠</th><th>碰到後吐回（還是賺）</th><th>碰到後反而賠</th><th>碰到的單最後平均</th></tr></thead><tbody>
+    ${grp.map(([lb,a])=>{ const h=a.filter(x=>x.hitP), more=h.filter(x=>finOf(x)>=Pv), back=h.filter(x=>finOf(x)<Pv&&x.o.t.pnl>0), neg=h.filter(x=>x.o.t.pnl<=0);
+      const fin=h.length?h.reduce((s,x)=>s+finOf(x),0)/h.length:NaN;
+      return `<tr><td>${lb}</td><td>${a.length}</td><td><b>${h.length}</b> 筆（${a.length?(h.length/a.length*100).toFixed(0):0}%）</td><td class="${more.length?'up':''}">${more.length} 筆</td><td>${back.length} 筆（${dgMoney(sumP(back))}）</td><td class="${neg.length?'dn':''}">${neg.length} 筆（${dgMoney(sumP(neg))}）</td><td>${isFinite(fin)?fmtV(fin):'—'}</td></tr>`; }).join('')}</tbody></table>
+    <div class="dg-t3">「吐回」「反而賠」＝碰到 +${Pv} 點時直接出場會更好的單。</div>`;
+  document.getElementById('dgTPres').innerHTML = stopTbl + tpTbl;
+}
+// 單筆停損／停利模擬（點數，逐根）
+function dgDayUpd(){
+  const D=_DG; if(!D.pathOf || !document.getElementById('dgDayRes')) return;
+  const PTV=TRADE_PT_VALUE, comm=t=>t.commission||0;
+  const sl=document.getElementById('dgDL'), tp=document.getElementById('dgDP');
+  if(!D._tsInit){ D._tsInit=true;
+    const mae=D.T.map(t=>{ const P=D.pathOf(t); return P&&P.length?-Math.min(...P.map(b=>b.l)):0; }).sort((a,b)=>a-b);
+    const mfe=D.T.map(t=>{ const P=D.pathOf(t); return P&&P.length?Math.max(...P.map(b=>b.h)):0; }).sort((a,b)=>a-b);
+    sl.max=Math.max(20,Math.ceil((mae[Math.floor(mae.length*0.95)]||50)*1.2/5)*5); tp.max=Math.max(20,Math.ceil((mfe[Math.floor(mfe.length*0.95)]||50)*1.2/5)*5);
+    sl.value=D.stopBest||Math.round(sl.max/2/5)*5; tp.value=0; }
+  const X=+sl.value||null, Yp=+tp.value||null;
+  document.getElementById('dgDLv').textContent = X?`-${X} 點`:'不設';
+  document.getElementById('dgDPv').textContent = Yp?`+${Yp} 點`:'不設';
+  let tot=0, base=0, hitS=0, hitP=0, killW=0, saveL=0, cutW=0, wins=0; const det=[];
+  D.T.forEach(t=>{ const P=D.pathOf(t); let r=t.pnl, how='';
+    base+=t.pnl;
+    if(P && (X||Yp)) for(const b of P){
+      if(X && b.l<=-X){ r=b.real - X*b.q*PTV - comm(t); how='S'; break; }
+      if(Yp && b.h>=Yp){ r=b.real + Yp*b.q*PTV - comm(t); how='P'; break; } }
+    if(how==='S'){ hitS++; if(t.pnl>0) killW++; else if(r>t.pnl) saveL++; }
+    if(how==='P'){ hitP++; if(r<t.pnl) cutW++; }
+    if(how) det.push({t, r, how}); tot+=r; if(r>0) wins++; });
+  const diff=tot-base;
+  det.sort((a,b)=>Math.abs(b.r-b.t.pnl)-Math.abs(a.r-a.t.pnl));
+  document.getElementById('dgDayRes').innerHTML=`<div class="dg-simbig ${diff>=0?'up':'dn'}">${dgMoney(diff)}</div><div class="dg-t3">跟現在比</div>
+    <div class="dg-simgrid"><span>模擬總損益</span><b>${dgMoney(tot)}</b><span>現在總損益</span><b>${dgMoney(base)}</b>
+    <span>模擬勝率</span><b>${(wins/Math.max(1,D.T.length)*100).toFixed(0)}%</b><span>現在勝率</span><b>${(D.T.filter(t=>t.pnl>0).length/Math.max(1,D.T.length)*100).toFixed(0)}%</b>
+    <span>被停損出場</span><b>${hitS} 筆</b><span>其中原本會賺（誤殺）</span><b class="${killW?'dn':''}">${killW} 筆</b>
+    <span>其中少賠的</span><b class="${saveL?'up':''}">${saveL} 筆</b><span>被停利出場</span><b>${hitP} 筆</b>
+    <span>停利後原本能賺更多</span><b class="${cutW?'dn':''}">${cutW} 筆</b></div>
+    ${det.length?`<div class="dg-sub" style="margin-top:8px">影響最大的幾筆</div><table class="dg-mini"><tbody>${det.slice(0,6).map(x=>`<tr onclick="diagGoDay('${x.t.date}')" style="cursor:pointer" title="點一下跳到這一天"><td>${x.t.date.slice(5).replace('-','/')} ${x.t.entryTime||''}</td><td>${x.t.dir==='long'?'多':'空'}・${x.how==='S'?'停損':'停利'}</td><td>原本 ${dgMoney(x.t.pnl)}</td><td class="${x.r>=x.t.pnl?'up':'dn'}">→ ${dgMoney(x.r)}</td></tr>`).join('')}</tbody></table>`:''}
+    <div class="dg-t3" style="margin-top:6px">＊碰到就當作剛好在那個點數出場（不算滑價）。</div>`;
+  try{ dgTPUpd(); }catch(e){ console.error(e); }
+}
+
+// ---------- 🚪 出場之後：停利單／停損單 後面的潛在漲幅、潛在回檔，用多少回檔風險換後面的利潤 ----------
+function dgPostExitViz(){
+  return `<div class="dg-px">
+    <div class="dg-sub">🚪 出場之後：如果當時沒出場、繼續抱，會怎樣？（全部用<b>點數</b>，相對出場價；停利單＝最後賺錢出場、停損單＝最後賠錢出場）</div>
+    <div class="dg-t3" style="margin-bottom:8px">潛在漲幅＝出場後價格最多再往你的方向走幾點；潛在回檔＝在走到那個最高點之前，要先扛住往反方向走幾點。下面兩支拉桿模擬「出場後繼續抱，最多扛 R 點回檔、最多再抱 H 分鐘」，碰到 -R 點就出場，否則抱到 H 分鐘出場。</div>
+    <div class="dg-px-ctl">
+      <label>回檔容忍 R：<b id="dgHRv">—</b><input type="range" id="dgHR" min="5" max="150" step="5" value="30" oninput="dgPXUpd()"></label>
+      <label>最多再抱 H：<b id="dgHHv">—</b><input type="range" id="dgHH" min="15" max="240" step="15" value="60" oninput="dgPXUpd()"></label>
+    </div>
+    <div class="dg-px-res" id="dgPXres"></div>
+    <div class="dg-px-bot">
+      <div><div class="dg-sub2">🟢 停利單：潛在回檔 × 潛在漲幅（每個點＝一筆；黃線左邊＝回檔沒超過 R、撐得住）</div><div id="dgPXscW"></div></div>
+      <div><div class="dg-sub2">🔴 停損單：潛在回檔 × 潛在漲幅（停損後如果繼續抱，會不會漲回來）</div><div id="dgPXscL"></div></div>
+    </div>
+    <div class="dg-px-bot">
+      <div><div class="dg-sub2">📈 回檔容忍 R 設幾點最好？（直軸＝繼續抱平均每筆多賺幾點；滑過看金額；點一下套用）</div><div id="dgPXsweep"></div></div>
+      <div><div class="dg-sub2">🗺 回檔容忍 R × 最多再抱 H：平均每筆多賺幾點（越綠越好、越紅越差；點格子套用）</div>
+        <div class="dg-ctl"><span class="dg-tog" id="dgPXhmTog"><button class="on" onclick="dgPXhm(this,'W')">停利單</button><button onclick="dgPXhm(this,'L')">停損單</button><button onclick="dgPXhm(this,'A')">全部</button></span></div>
+        <div id="dgPXheat"></div></div>
+    </div>
+  </div>`;
+}
+function dgPXdata(){
+  const D=_DG; if(D._px2) return D._px2;
+  const MU = MKT.id==='tx' ? 5 : 1, nB=Math.ceil(240/MU);
+  const list=D.T.map(t=>{
+    const bars=(DATA[t.date]||{})['1k']||[], k=bars.findIndex(b=>b.idx===t.exitIdx); if(k<0) return null;
+    const sg=t.dir==='long'?1:-1, seg=bars.slice(k+1, k+1+nB); if(seg.length<2) return null;
+    return {t, win:t.pnl>0, h:seg.map(b=>sg>0?b.h-t.exitPrice:t.exitPrice-b.l), l:seg.map(b=>sg>0?b.l-t.exitPrice:t.exitPrice-b.h), c:seg.map(b=>sg*(b.c-t.exitPrice))};
+  }).filter(Boolean);
+  D._px2={list, MU}; return D._px2;
+}
+// 出場後 H 分鐘內：潛在漲幅、到達前的潛在回檔；模擬繼續抱（回檔 R 點停損）
+function dgPXone(o, R, H, MU){
+  const n=Math.min(o.h.length, Math.max(1,Math.round(H/MU)));
+  let mf=0, mfK=-1; for(let i=0;i<n;i++) if(o.h[i]>mf){ mf=o.h[i]; mfK=i; }
+  let ma=0; for(let i=0;i<=mfK;i++) if(o.l[i]<ma) ma=o.l[i];
+  let ex=o.c[n-1], hit=false, hitK=-1;
+  if(R!=null) for(let i=0;i<n;i++){ if(o.l[i]<=-R){ ex=-R; hit=true; hitK=i; break; } }
+  return {mf, ma:-ma, mfM:(mfK+1)*MU, ex, hit, hitM:(hitK+1)*MU, endM:n*MU};
+}
+function dgPXhm(btn,g){ _DG.pxHm=g; btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn)); dgPXUpd(); }
+function dgPXset(R,H){ if(R!=null) document.getElementById('dgHR').value=R; if(H!=null) document.getElementById('dgHH').value=H; dgPXUpd(); }
+function dgPXUpd(){
+  if(!document.getElementById('dgPXres')) return;
+  const X=dgPXdata(), {list, MU}=X, PTV=TRADE_PT_VALUE;
+  const R=+document.getElementById('dgHR').value, H=+document.getElementById('dgHH').value;
+  document.getElementById('dgHRv').textContent=`${R} 點`; document.getElementById('dgHHv').textContent=`${H} 分鐘`;
+  if(!list.length){ document.getElementById('dgPXres').innerHTML='<div class="dg-t3">沒有資料</div>'; return; }
+  const rs=list.map(o=>({o, r:dgPXone(o,R,H,MU)}));
+  const grp=[['停利單',rs.filter(x=>x.o.win),'#22c55e'],['停損單',rs.filter(x=>!x.o.win),'#ef4444']];
+  const med=a=>{ if(!a.length) return NaN; const s=a.slice().sort((x,y)=>x-y); return s[Math.floor(s.length/2)]; };
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+  const f1=v=>isFinite(v)?(v>0?'+':'')+v.toFixed(1):'—';
+  // 結果卡
+  document.getElementById('dgPXres').innerHTML = grp.map(([nm,a,col])=>{
+    const ex=a.map(x=>x.r.ex), money=a.reduce((s,x)=>s+x.r.ex*x.o.t.qty*PTV,0), better=a.filter(x=>x.r.ex>0).length, hit=a.filter(x=>x.r.hit).length;
+    return `<div class="dg-pxc" style="--c:${col}"><div class="dg-pxc-h">${nm}（${a.length} 筆）</div>
+      <div class="dg-pxc-big ${money>=0?'up':'dn'}">${dgMoney(money)}</div><div class="dg-t3">出場後繼續抱（扛 ${R} 點、最多 ${H} 分鐘）比實際出場 ${money>=0?'多賺':'多賠'}（金額依每筆口數計算，點數是每筆平均）</div>
+      <div class="dg-simgrid">
+        <span>平均每筆多賺</span><b class="${avg(ex)>=0?'up':'dn'}">${f1(avg(ex))} 點</b>
+        <span>繼續抱比較好的</span><b>${better} 筆（${a.length?(better/a.length*100).toFixed(0):0}%）</b>
+        <span>被 -${R} 點回檔掃出場</span><b>${hit} 筆</b>
+        <span>潛在漲幅（中位數）</span><b class="up">+${isFinite(med(a.map(x=>x.r.mf)))?med(a.map(x=>x.r.mf)).toFixed(1):'—'} 點</b>
+        <span>拿到之前要扛的回檔（中位數）</span><b class="dn">-${isFinite(med(a.map(x=>x.r.ma)))?med(a.map(x=>x.r.ma)).toFixed(1):'—'} 點</b>
+        <span>潛在漲幅出現在（中位數）</span><b>第 ${isFinite(med(a.map(x=>x.r.mfM)))?med(a.map(x=>x.r.mfM)):'—'} 分鐘</b>
+        <span>潛在漲幅合計（理論上限）</span><b class="up">${dgMoney(a.reduce((s,x)=>s+x.r.mf*x.o.t.qty*PTV,0))}</b>
+      </div></div>`; }).join('');
+  // 散佈圖
+  const scatter=(a,elId)=>{
+    if(!a.length){ document.getElementById(elId).innerHTML='<div class="dg-t3">沒有這種單</div>'; return; }
+    const W=640,Ht=330,P={l:52,r:14,t:18,b:38};
+    const xm=Math.max(R*1.15, ...a.map(x=>x.r.ma))*1.05||10, ym=Math.max(10,...a.map(x=>x.r.mf))*1.08;
+    const Xf=v=>P.l+(W-P.l-P.r)*Math.min(1,v/xm), Y=v=>P.t+(Ht-P.t-P.b)*(1-Math.min(1,v/ym));
+    let g=''; const sx=dgStep5(xm,7), sy=dgStep5(ym,6);
+    for(let v=0; v<=xm; v+=sx) g+=`<line x1="${Xf(v)}" y1="${P.t}" x2="${Xf(v)}" y2="${Ht-P.b}" stroke="rgba(255,255,255,.05)"/><text x="${Xf(v)}" y="${Ht-P.b+15}" fill="#999" font-size="11" text-anchor="middle">${v}</text>`;
+    for(let v=0; v<=ym; v+=sy) g+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="rgba(255,255,255,.05)"/><text x="${P.l-6}" y="${Y(v)+4}" fill="#999" font-size="11" text-anchor="end">${v}</text>`;
+    const dm=Math.min(xm,ym);
+    g+=`<rect x="${P.l}" y="${P.t}" width="${Xf(R)-P.l}" height="${Ht-P.t-P.b}" fill="rgba(250,204,21,.06)"/><line x1="${Xf(R)}" y1="${P.t}" x2="${Xf(R)}" y2="${Ht-P.b}" stroke="#facc15" stroke-width="2" stroke-dasharray="6,4"/><text x="${Xf(R)+4}" y="${P.t+12}" fill="#facc15" font-size="11" font-weight="700">回檔容忍 ${R} 點</text>`;
+    g+=`<line x1="${Xf(0)}" y1="${Y(0)}" x2="${Xf(dm)}" y2="${Y(dm)}" stroke="rgba(255,255,255,.25)" stroke-dasharray="4,4"/><text x="${Xf(dm)-4}" y="${Y(dm)+14}" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="end">漲幅＝回檔</text>`;
+    const dots=a.map(({o,r})=>{ const t=o.t, good=r.ex>0;
+      const tip=`${t.date} ${t.exitTime||''} 出場（${t.dir==='long'?'做多':'做空'} ${t.qty}口・${dgMoney(t.pnl)}）|出場後 ${H} 分鐘內：潛在漲幅 +${r.mf.toFixed(1)} 點（第 ${r.mfM} 分鐘）|拿到之前要先扛 -${r.ma.toFixed(1)} 點回檔|繼續抱（扛 ${R} 點）：${r.hit?`第 ${r.hitM} 分鐘被掃出場 -${R} 點`:`抱到第 ${r.endM} 分鐘，${f1(r.ex)} 點`}|→ 比實際出場 ${r.ex>=0?'多賺':'多賠'} ${dgMoney(r.ex*t.qty*PTV).slice(1)}`;
+      return `<circle cx="${Xf(r.ma).toFixed(1)}" cy="${Y(r.mf).toFixed(1)}" r="${Math.min(9,4+t.qty)}" fill="${good?'#22c55e':'#ef4444'}" fill-opacity=".6" stroke="${good?'#22c55e':'#ef4444'}" data-tip="${dgEsc(tip)}" onclick="diagGoDay('${t.date}')" style="cursor:pointer"/>`; }).join('');
+    document.getElementById(elId).innerHTML=`<svg viewBox="0 0 ${W} ${Ht}" class="dg-svg">${g}${dots}
+      <text x="${P.l-6}" y="${P.t-4}" fill="#facc15" font-size="11" font-weight="800" text-anchor="end">點</text>
+      <text x="${(W+P.l)/2}" y="${Ht-4}" fill="#aaa" font-size="12" font-weight="700" text-anchor="middle">潛在回檔（點）：走到最高點之前，要先扛住多少反向</text>
+      <text x="12" y="${(Ht-P.b+P.t)/2}" fill="#aaa" font-size="12" font-weight="700" text-anchor="middle" transform="rotate(-90 12 ${(Ht-P.b+P.t)/2})">潛在漲幅（點）</text></svg>
+      <div class="dg-legend"><span><i style="background:#22c55e"></i>扛 ${R} 點繼續抱 → 多賺</span><span><i style="background:#ef4444"></i>扛 ${R} 點繼續抱 → 多賠</span><span>點一下跳到那天</span></div>`;
+  };
+  scatter(grp[0][1],'dgPXscW'); scatter(grp[1][1],'dgPXscL');
+  // R 掃描（目前的 H）
+  const Rs=[]; for(let v=5; v<=150; v+=5) Rs.push(v);
+  const sw=g=>Rs.map(v=>{ const a=list.filter(g); const ex=a.map(o=>dgPXone(o,v,H,MU).ex); return {avg:avg(ex), money:a.reduce((s,o,i)=>s+ex[i]*o.t.qty*PTV,0)}; });
+  const sW=sw(o=>o.win), sL=sw(o=>!o.win), sA=sw(()=>true);
+  const bestOf=s=>{ let bi=0; s.forEach((x,i)=>{ if(x.avg>s[bi].avg) bi=i; }); return bi; };
+  const bW=bestOf(sW), bL=bestOf(sL);
+  document.getElementById('dgPXsweep').innerHTML = dgLine({w:680,h:300,xs:Rs,xFmt:v=>v+'點',marker:R,zero:true,yFmt:v=>(v>0?'+':'')+v.toFixed(0)+'點',
+    series:[{name:'停利單',color:'#22c55e',ys:sW.map(x=>x.avg)},{name:'停損單',color:'#ef4444',ys:sL.map(x=>x.avg)},{name:'全部',color:'#e5e7eb',ys:sA.map(x=>x.avg),dash:'5,4',w:1.6}],
+    dots:[{x:Rs[bW],y:sW[bW].avg,r:6,color:'#22c55e',tip:`停利單最好：扛 ${Rs[bW]} 點|平均每筆 ${f1(sW[bW].avg)} 點・合計 ${dgMoney(sW[bW].money)}`},{x:Rs[bL],y:sL[bL].avg,r:6,color:'#ef4444',tip:`停損單最好：扛 ${Rs[bL]} 點|平均每筆 ${f1(sL[bL].avg)} 點・合計 ${dgMoney(sL[bL].money)}`}],
+    hits:Rs.map((v,i)=>({x:v,w:20,tip:`回檔容忍 ${v} 點（最多再抱 ${H} 分鐘）|停利單：平均 ${f1(sW[i].avg)} 點・合計 ${dgMoney(sW[i].money)}|停損單：平均 ${f1(sL[i].avg)} 點・合計 ${dgMoney(sL[i].money)}|點一下套用`,click:`dgPXset(${v},null)`}))})
+    + `<div class="dg-t3">停利單最好扛 <b>${Rs[bW]}</b> 點（平均 ${f1(sW[bW].avg)} 點／筆）；停損單最好扛 <b>${Rs[bL]}</b> 點（平均 ${f1(sL[bL].avg)} 點／筆）。在 0 以下＝繼續抱反而更差，原本出場是對的。</div>`;
+  // 熱力圖 R × H
+  const gsel=_DG.pxHm||'W', gf = gsel==='W'?(o=>o.win):gsel==='L'?(o=>!o.win):(()=>true);
+  const HRs=[10,20,30,40,50,60,80,100], HHs=[15,30,60,90,120,180,240];
+  const a=list.filter(gf);
+  const cells=HHs.map(h=>HRs.map(r=>{ const ex=a.map(o=>dgPXone(o,r,h,MU).ex); return {r,h,avg:avg(ex),money:a.reduce((s,o,i)=>s+ex[i]*o.t.qty*PTV,0)}; }));
+  const mx=Math.max(0.1,...cells.flat().map(c=>Math.abs(c.avg||0)));
+  document.getElementById('dgPXheat').innerHTML = !a.length ? '<div class="dg-t3">沒有這種單</div>' : `<div class="dg-heat" style="grid-template-columns:70px repeat(${HRs.length},minmax(0,1fr))">
+      <div class="dg-heat-h">H＼R</div>${HRs.map(r=>`<div class="dg-heat-h">${r}點</div>`).join('')}
+      ${cells.map((row,i)=>`<div class="dg-heat-h">${HHs[i]}分</div>${row.map(c=>{ const k=Math.min(1,Math.abs(c.avg)/mx), on=c.r===R&&c.h===H;
+        return `<div class="dg-heat-c${on?' on':''}" style="background:${c.avg>=0?`rgba(34,197,94,${0.1+k*0.75})`:`rgba(239,68,68,${0.1+k*0.75})`}" data-tip="${dgEsc(`扛 ${c.r} 點、最多再抱 ${c.h} 分鐘|平均每筆 ${f1(c.avg)} 點|合計 ${dgMoney(c.money)}|點一下套用`)}" onclick="dgPXset(${c.r},${c.h})">${f1(c.avg)}</div>`; }).join('')}`).join('')}
+    </div><div class="dg-t3">格子裡的數字＝繼續抱平均每筆多賺幾點。整排都是紅的＝那種單出場後繼續抱都不划算，出場是對的。</div>`;
+}
+
+// ---------- 🌙 前一晚美股 × 隔天：散佈圖＋出手頻率＋詳細拆解 ----------
+function dgPrevViz(rows){
+  _DG.prevRows=rows; _DG.prevKey=_DG.prevKey||'R';
+  return `<div class="dg-viz-prev">
+    <div class="dg-sub">切換：<span class="dg-tog" id="dgPrevTog"><button class="${_DG.prevKey==='R'?'on':''}" onclick="dgPrevTog(this,'R')">前一晚振幅</button><button class="${_DG.prevKey==='M'?'on':''}" onclick="dgPrevTog(this,'M')">前一晚 |收−開|</button></span></div>
+    <div class="dg-viz2">
+      <div><div class="dg-sub">📈 前一晚 × 隔天損益（空心白圈＝隔天沒做單、圓點越大＝隔天做越多筆、黃虛線＝趨勢）</div><div id="dgPrevSc"></div></div>
+      <div><div class="dg-sub">🔁 前一晚 × 隔天做幾筆（出手頻率；空心白圈＝隔天 0 筆）</div><div id="dgPrevN"></div></div>
+    </div>
+    <div id="dgPrevAna"></div>
+  </div>`;
+}
+function dgPrevTog(btn,k){ _DG.prevKey=k; btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn)); dgPrevUpd(); }
+function dgLinFit(xs, ys){ const n=xs.length; if(n<3) return null; const mx=xs.reduce((a,v)=>a+v,0)/n, my=ys.reduce((a,v)=>a+v,0)/n;
+  let sxy=0,sxx=0,syy=0; for(let i=0;i<n;i++){ sxy+=(xs[i]-mx)*(ys[i]-my); sxx+=(xs[i]-mx)**2; syy+=(ys[i]-my)**2; }
+  if(!sxx) return null; const b=sxy/sxx; return {b, a:my-b*mx, r: syy? sxy/Math.sqrt(sxx*syy) : 0}; }
+function dgPrevUpd(){
+  const rows=_DG.prevRows; if(!rows || !document.getElementById('dgPrevSc')) return;
+  const k=_DG.prevKey||'R', lbl = k==='R' ? '前一晚振幅' : '前一晚 |收−開|';
+  const v=r=>r[k];
+  const tipOf=r=>`${r.d}|前一晚振幅 ${r.R.toFixed(0)} 點・|收−開| ${r.M.toFixed(0)} 點（${r.dirUp?'收漲':'收跌'}）|${r.n?`隔天做 ${r.n} 筆・${dgMoney(r.pnl)}`:'隔天沒做單'}|點一下跳到這一天`;
+  document.getElementById('dgPrevSc').innerHTML = dgScatter({w:640,h:330,trend:true,xLabel:`${lbl}（點）`,yLabel:'隔天損益',yFmt:dgMoney,
+    pts:rows.map(r=>({x:v(r), y:r.n?r.pnl:0, r:r.n?Math.min(10,4+r.n):6, color:r.n?(r.pnl>=0?'#22c55e':'#ef4444'):'#ffffff', hollow:!r.n, noTrend:!r.n, tip:tipOf(r), click:`diagGoDay('${r.d}')`}))});
+  document.getElementById('dgPrevN').innerHTML = dgScatter({w:640,h:330,trend:true,xLabel:`${lbl}（點）`,yLabel:'隔天做幾筆',yFmt:x=>x.toFixed(0),
+    pts:rows.map(r=>({x:v(r), y:r.n, r:6, color:r.n?'#60a5fa':'#ffffff', hollow:!r.n, tip:tipOf(r), click:`diagGoDay('${r.d}')`}))});
+  // ---- 詳細拆解
+  const dn=rows.filter(r=>r.n>0);
+  const fP=dgLinFit(dn.map(v), dn.map(r=>r.pnl)), fN=dgLinFit(rows.map(v), rows.map(r=>r.n));
+  const fA=dgLinFit(rows.map(v), rows.map(r=>r.n>0?1:0));
+  const unit = 100;
+  const med=(()=>{ const a=rows.map(v).sort((x,y)=>x-y); return a[Math.floor(a.length/2)]; })();
+  const big=rows.filter(r=>v(r)>=med), small=rows.filter(r=>v(r)<med);
+  const q=(arr)=>{ const d1=arr.filter(r=>r.n>0), w=d1.filter(r=>r.pnl>0), l=d1.filter(r=>r.pnl<=0);
+    return {n:arr.length, none:arr.length-d1.length, w:w.length, l:l.length, wp:w.reduce((a,r)=>a+r.pnl,0), lp:l.reduce((a,r)=>a+r.pnl,0), trades:arr.reduce((a,r)=>a+r.n,0)}; };
+  const QB=q(big), QS=q(small);
+  const qCell=(Q,which)=>{ const n=Q.n||1;
+    if(which==='w') return `<div class="dg-q w" style="--a:${(Q.w/n).toFixed(2)}"><b>${Q.w} 天</b><span>賺 ${dgMoney(Q.wp)}</span><em>${(Q.w/n*100).toFixed(0)}%</em></div>`;
+    if(which==='l') return `<div class="dg-q l" style="--a:${(Q.l/n).toFixed(2)}"><b>${Q.l} 天</b><span>賠 ${dgMoney(Q.lp)}</span><em>${(Q.l/n*100).toFixed(0)}%</em></div>`;
+    return `<div class="dg-q z" style="--a:${(Q.none/n).toFixed(2)}"><b>${Q.none} 天</b><span>沒做單</span><em>${(Q.none/n*100).toFixed(0)}%</em></div>`; };
+  const quad=`<div class="dg-quad">
+      <div></div><div class="dg-qh">隔天賺</div><div class="dg-qh">隔天賠</div><div class="dg-qh">隔天沒做</div><div class="dg-qh">平均筆數</div>
+      <div class="dg-qr"><b>${lbl}大</b><em>≥ ${med.toFixed(0)} 點・${QB.n} 天</em></div>${qCell(QB,'w')}${qCell(QB,'l')}${qCell(QB,'z')}<div class="dg-q n"><b>${(QB.trades/Math.max(1,QB.n)).toFixed(1)}</b><span>筆／天</span></div>
+      <div class="dg-qr"><b>${lbl}小</b><em>< ${med.toFixed(0)} 點・${QS.n} 天</em></div>${qCell(QS,'w')}${qCell(QS,'l')}${qCell(QS,'z')}<div class="dg-q n"><b>${(QS.trades/Math.max(1,QS.n)).toFixed(1)}</b><span>筆／天</span></div>
+    </div>`;
+  const rTxt=r=>!isFinite(r)?'—':(Math.abs(r)<0.1?'幾乎沒關係':Math.abs(r)<0.3?'弱相關':'明顯相關');
+  const kpi=`<div class="dg-kpis">
+      <div><span>${lbl}每多 ${unit} 點 → 隔天損益</span><b class="${fP&&fP.b>=0?'up':'dn'}">${fP?dgMoney(fP.b*unit):'—'}／天</b><em>相關係數 ${fP?fP.r.toFixed(2):'—'}（${fP?rTxt(fP.r):'—'}）・只算有做單的天</em></div>
+      <div><span>${lbl}每多 ${unit} 點 → 隔天筆數</span><b>${fN?(fN.b*unit>=0?'+':'')+(fN.b*unit).toFixed(2):'—'} 筆</b><em>相關係數 ${fN?fN.r.toFixed(2):'—'}（${fN?rTxt(fN.r):'—'}）</em></div>
+      <div><span>${lbl}每多 ${unit} 點 → 隔天出手率</span><b>${fA?(Math.round(fA.b*unit*100)>0?'+':'')+Math.round(fA.b*unit*100):'—'} 個百分點</b><em>整體出手率 ${(dn.length/rows.length*100).toFixed(0)}%</em></div>
+      <div><span>中位數切一半</span><b>${med.toFixed(0)} 點</b><em>大的那半平均 ${dgMoney((QB.wp+QB.lp)/Math.max(1,QB.w+QB.l))}／天・小的那半 ${dgMoney((QS.wp+QS.lp)/Math.max(1,QS.w+QS.l))}／天</em></div>
+    </div>`;
+  // 最好／最差幾天
+  const sorted=dn.slice().sort((a,b)=>a.pnl-b.pnl);
+  const li=a=>a.map(r=>`<tr onclick="diagGoDay('${r.d}')" style="cursor:pointer"><td>${r.d.slice(5).replace('-','/')}</td><td>${v(r).toFixed(0)} 點</td><td>${r.n} 筆</td><td class="${r.pnl>=0?'up':'dn'}">${dgMoney(r.pnl)}</td></tr>`).join('');
+  const hd=`<thead><tr><th>隔天</th><th>${lbl}</th><th>筆數</th><th>損益</th></tr></thead>`;
+  // 結論
+  const lines=[];
+  if(fP) lines.push(`${lbl}每多 ${unit} 點，你隔天平均 <b class="${fP.b>=0?'up':'dn'}">${fP.b>=0?'多賺':'多賠'} ${dgMoney(Math.abs(fP.b*unit)).slice(1)}</b>（${rTxt(fP.r)}，r＝${fP.r.toFixed(2)}）。`);
+  if(fN){ const ar=fA?Math.round(fA.b*unit*100):0; lines.push(`${lbl}每多 ${unit} 點，你隔天平均 <b>${fN.b>=0?'多做':'少做'} ${Math.abs(fN.b*unit).toFixed(2)} 筆</b>，出手率${ar===0?'幾乎不變':(ar>0?`提高 ${ar}`:`降低 ${-ar}`)+' 個百分點'}。`); }
+  { const bw=QB.w+QB.l, sw=QS.w+QS.l; if(bw&&sw) lines.push(`${lbl}偏大的日子，隔天有做單時 <b>${(QB.w/bw*100).toFixed(0)}%</b> 是賺的；偏小的日子是 <b>${(QS.w/sw*100).toFixed(0)}%</b>。`); }
+  if(fP && fN && fP.b<0 && fN.b>0 && Math.abs(fP.r)>=0.1 && Math.abs(fN.r)>=0.1) lines.push(`<b class="dn">前一晚波動越大，你隔天做越多、也賠越多</b>——大波動之後容易過度交易。`);
+  document.getElementById('dgPrevAna').innerHTML = `<div class="dg-prev-ana">
+    <div><div class="dg-sub">🔎 左邊散佈圖的拆解</div><ul class="dg-verdict">${lines.map(l=>`<li>${l}</li>`).join('')}</ul>${kpi}
+      <div class="dg-sub">四象限：以${lbl}中位數切成大／小兩半，看隔天的結果</div>${quad}</div>
+    <div class="dg-prev-lists"><div><div class="dg-sub">隔天賠最多的 5 天</div><table class="dg-mini">${hd}<tbody>${li(sorted.slice(0,5))}</tbody></table></div>
+      <div><div class="dg-sub">隔天賺最多的 5 天</div><table class="dg-mini">${hd}<tbody>${li(sorted.slice(-5).reverse())}</tbody></table></div></div>
+  </div>`;
+}
+
+// ---------- 🛑 停損：拉桿即時模擬（固定停損＋保本）----------
+function dgStopViz(){
+  const D=_DG; if(!D.pathOf) return '';
+  return `<div class="dg-viz2 r">
+    <div><div class="dg-sub">📈 累積損益：現在（白）vs 套用右邊停損設定後（黃）</div><div id="dgStopEq"></div>
+      <div class="dg-sub">📉 固定停損幾點 → 總損益（黃色虛線＝目前拉桿位置，滑過看數字）</div><div id="dgStopSweep"></div></div>
+    <div class="dg-sim-box"><div class="dg-sub">🎚 拉拉看：停損設幾點最好？</div>
+      <label>固定停損：<b id="dgSXv">—</b><input type="range" id="dgSX" min="0" max="${D.stopMax}" step="${D.stopStep}" value="${D.stopBest||0}" oninput="dgStopUpd()"></label>
+      <label>保本：浮盈到 <b id="dgSYv">—</b> 就把停損拉到成本<input type="range" id="dgSY" min="0" max="${D.beMax}" step="${D.stopStep}" value="0" oninput="dgStopUpd()"></label>
+      <div class="dg-t3">拉到最左邊＝不設。用1分K逐根重跑（當下實際口數、均價）。</div>
+      <div id="dgStopRes" class="dg-simres"></div></div>
+  </div>`;
+}
+function dgStopUpd(){
+  const D=_DG; if(!D.simCombo) return;
+  const x=+document.getElementById('dgSX').value, y=+document.getElementById('dgSY').value;
+  document.getElementById('dgSXv').textContent = x?`${x} 點`:'不設';
+  document.getElementById('dgSYv').textContent = y?`${y} 點`:'不設';
+  const r=D.simCombo(x||null, y||null);
+  document.getElementById('dgStopRes').innerHTML=`<div class="dg-simbig ${r.diff>=0?'up':'dn'}">${dgMoney(r.diff)}</div><div class="dg-t3">跟現在比</div>
+    <div class="dg-simgrid"><span>模擬總損益</span><b>${dgMoney(r.tot)}</b><span>現在總損益</span><b>${dgMoney(r.base)}</b>
+    <span>模擬勝率</span><b>${r.wr.toFixed(0)}%</b><span>現在勝率</span><b>${r.wr0.toFixed(0)}%</b>
+    <span>被固定停損出場</span><b>${r.hitS} 筆</b><span>其中原本會賺</span><b class="${r.killW?'dn':''}">${r.killW} 筆</b>
+    <span>被保本出場</span><b>${r.hitB} 筆</b><span>其中原本賠錢</span><b class="${r.beSave?'up':''}">${r.beSave} 筆</b>
+    <span>模擬最大回撤</span><b>${dgMoney(-r.mdd).slice(1)}</b><span>現在最大回撤</span><b>${dgMoney(-r.mdd0).slice(1)}</b></div>`;
+  const xs=r.curve.map((_,i)=>i);
+  document.getElementById('dgStopEq').innerHTML = dgLine({w:640,h:230,xs,zero:true,xFmt:i=>i?('#'+i):'',series:[{name:'現在',color:'#e5e7eb',ys:r.curve0,w:2},{name:'套用停損設定後',color:'#facc15',ys:r.curve,w:2.6}]});
+  // 停損掃描
+  if(!D._sweep){ D._sweep=[]; for(let v=D.stopStep; v<=D.stopMax; v+=D.stopStep) D._sweep.push(v); }
+  const key=y||0; D._sweepCache=D._sweepCache||{};
+  if(!D._sweepCache[key]) D._sweepCache[key]=D._sweep.map(v=>D.simCombo(v, y||null).tot);
+  const ys=D._sweepCache[key];
+  document.getElementById('dgStopSweep').innerHTML = dgLine({w:640,h:220,xs:D._sweep,xFmt:v=>v+'點',marker:x||null,zero:true,
+    series:[{color:'#60a5fa',ys},{color:'rgba(255,255,255,.4)',ys:D._sweep.map(()=>r.base),dash:'4,4',name:'現在（沒固定停損）'}],
+    dots:D._sweep.map((v,i)=>({x:v,y:ys[i],r:3.5,color:ys[i]>=r.base?'#22c55e':'#ef4444',tip:`停損 ${v} 點|總損益 ${dgMoney(ys[i])}|跟現在比 ${dgMoney(ys[i]-r.base)}`})),
+    hits:D._sweep.map(v=>({x:v,w:Math.max(8,600/D._sweep.length),tip:`停損 ${v} 點（點一下套用）`,click:`document.getElementById('dgSX').value=${v};dgStopUpd()`}))});
+}
+// 頁面畫完後，把需要 JS 畫的圖補上
+function dgAfterRender(){
+  try{ _DG._tsInit=false; dgDayUpd(); }catch(e){ console.error(e); }
+  try{ _DG._px2=null; dgPXUpd(); }catch(e){ console.error(e); }
+  try{ if(document.getElementById('dgStopRes')) dgStopUpd(); }catch(e){ console.error(e); }
+  try{ dgPrevUpd(); }catch(e){ console.error(e); }
 }
 </script>
 </body>
