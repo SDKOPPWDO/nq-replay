@@ -1271,6 +1271,33 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
 .dgw-t{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px;} .dgw-t span{display:block;font-size:11.5px;color:#9ca3af;font-weight:500;margin-top:2px;}
 .dgw-svg{width:100%;height:auto;display:block;}
 .dgw-ax{font-size:11.5px;fill:#9ca3af;} .dgw-n{font-size:11px;fill:#e5e7eb;font-weight:700;} .dgw-lab{font-size:12px;font-weight:800;}
+.tm-modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px;}
+.tm-box{background:#16161b;border:1px solid var(--b2);border-radius:14px;width:min(980px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.tm-head{display:flex;align-items:baseline;gap:10px;padding:14px 18px;border-bottom:1px solid var(--b1);} .tm-head b{font-size:17px;color:#fff;} .tm-head span{font-size:12px;color:var(--t3);flex:1;}
+.tm-x{background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer;}
+.tm-src{padding:10px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--t2);}
+.tm-chip{font:inherit;font-size:12.5px;padding:4px 11px;border-radius:999px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);cursor:pointer;} .tm-chip.on{background:#facc15;color:#000;border-color:#facc15;font-weight:800;}
+.tm-note{margin:0 18px 6px;font-size:12.5px;color:#e5e7eb;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:7px 10px;}
+.tm-list{overflow-y:auto;padding:6px 18px;display:flex;flex-direction:column;gap:8px;min-height:120px;}
+.tm-month{border:1px solid var(--b1);border-radius:10px;background:rgba(255,255,255,.02);} .tm-month.on{border-color:#facc15;background:rgba(250,204,21,.06);}
+.tm-mh{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--t2);} .tm-mh b{font-size:15px;color:#fff;} .tm-mh .up{color:#4ade80;font-weight:800;} .tm-mh .dn{color:#f87171;font-weight:800;}
+.tm-made{margin-left:auto;font-size:12px;color:var(--t3);}
+.tm-cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--b2);flex:none;} .tm-cb.on{background:#facc15;border-color:#facc15;} .tm-cb.part{background:linear-gradient(135deg,#facc15 50%,transparent 50%);border-color:#facc15;}
+.tm-days{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 10px 40px;}
+.tm-day{font-size:12px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);color:#e5e7eb;cursor:pointer;background:var(--bg3);} .tm-day.on{background:rgba(250,204,21,.2);border-color:#facc15;}
+.tm-day i{font-style:normal;margin-left:3px;font-size:11px;} .tm-day i.up{color:#4ade80;} .tm-day i.dn{color:#f87171;}
+.tm-empty{color:var(--t3);padding:20px;text-align:center;}
+.tm-act{border-top:1px solid var(--b1);padding:12px 18px;display:flex;flex-direction:column;gap:8px;}
+.tm-sel{font-size:13px;color:var(--t2);} .tm-sel b{color:#facc15;}
+.tm-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;} .tm-btns button:disabled{opacity:.4;cursor:not-allowed;}
+.tm-to{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--t2);flex-wrap:wrap;} .tm-to select{background:var(--bg3);color:#fff;border:1px solid var(--b2);border-radius:6px;padding:4px 6px;font:inherit;}
+.tm-keep{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t3);}
+.tm-undo{font-size:12px;color:var(--t3);display:flex;align-items:center;gap:8px;}
+.trade-day-warn{font-size:11.5px;line-height:1.5;color:#fde68a;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.4);border-radius:8px;padding:6px 8px;margin:4px 0;}
+.trade-day-warn b{color:#fff;} .tdw-btns{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.tdw-btns button{font:inherit;font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid rgba(250,204,21,.5);background:rgba(0,0,0,.3);color:#fde68a;cursor:pointer;}
+.tver-meta b{color:#e5e7eb;}
+.trade-pts-live{font-size:.92em;font-weight:800;margin-top:2px;}
 .rg-wrap{width:100%;}
 .rg-tiles{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin-bottom:10px;}
 .rg-tile{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 11px;cursor:pointer;min-width:0;}
@@ -1386,6 +1413,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
         <button class="trade-action-btn trade-flat" id="tradeFlatBtn" onclick="tradeAction('flat')">平倉</button>
         <button class="trade-action-btn trade-be" id="tradeBEBtn" onclick="toggleBreakeven()" title="保本：價格打到「成本＋2點」就自動出場，出場價就是成本＋2點。再按一次取消">🛡 保本</button>
         <div class="trade-be-info" id="tradeBEInfo"></div>
+        <div class="trade-day-warn" id="tradeDayWarn" style="display:none"></div>
         <button class="trade-action-btn" id="tradeUndoBtn" onclick="undoTradeAction()" style="background:#78716c;" title="復原上一次買進/賣出/平倉的操作">↩ 上一步</button>
         <button class="trade-action-btn trade-settle" id="tradeSettleBtn" onclick="showTradeResult()">📊 結算</button>
         <button class="trade-action-btn" id="tradeResetBtn" onclick="resetTradeSystem()" style="background:var(--bg3);border:1px solid var(--b2);color:var(--t2);">↺ 重置</button>
@@ -3433,12 +3461,14 @@ function finalizeActiveTrade(active, closed){
     exitIdx: lastExit.idx,
     pnl, grossPnl, commission,
     date: currentDay,
-    legs: active.legs // 保留腳位細節，供日後查看加碼明細
+    legs: active.legs, // 保留腳位細節，供日後查看加碼明細
+    madeAt: Date.now() // 真實世界「哪天打的」：用來找出忘記重置混進來的單
   });
 }
 
 function refreshTradePosDisplay(){
   if(!tradeSystemOn) return;
+  try{ tmDayWarn(); }catch(e){}
   try{ refreshBEDisplay(); }catch(e){}
   const positions = getDayPositions();
   const qtyEl = document.getElementById('tradeCurQty');
@@ -3467,7 +3497,8 @@ function refreshTradePosDisplay(){
     pnl += pts * p.qty * TRADE_PT_VALUE;
   });
   if(pnlEl){
-    pnlEl.textContent = `浮動 ${pnl>=0?'+':''}$${pnl.toFixed(0)}`;
+    const ptsNow = pnl/(totalQty*TRADE_PT_VALUE);   // 每口賺幾點（相對平均成本）
+    pnlEl.innerHTML = `浮動 ${pnl>=0?'+':''}$${pnl.toFixed(0)}<div class="trade-pts-live">目前 ${ptsNow>=0?'+':''}${ptsNow.toFixed(MKT.tick<1?2:0)} 點</div>`;
     pnlEl.style.color = pnl >= 0 ? 'var(--up)' : 'var(--dn)';
   }
 }
@@ -4452,6 +4483,153 @@ function tvDelete(){
 }
 function tvSelect(id){ tvActive=id; showTradeResult(true); }
 
+// ================= 🧹 整理紀錄：把忘記重置的月份／日子刪掉、搬到別的版本 =================
+// 「目前進行中」關掉程式也會保留（存在這台電腦的瀏覽器），下次接著打都算同一輪；
+// 忘記重置混進來的月份，用這裡挑出來刪掉或搬走。每次整理前自動備份一份，可以復原。
+const TM_BAK_KEY = 'nqTradeMgrBak_'+MARKET;
+const APP_START_MS = Date.now();
+let _tmSrc = 'live', _tmSel = new Set();
+function tmMoney(v){ return `${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}`; }
+function tmMadeTxt(arr){
+  const ms=arr.map(t=>t.madeAt).filter(Boolean);
+  if(!ms.length) return '打單時間：較早（那時還沒記錄）';
+  const a=Math.min(...ms), b=Math.max(...ms), f=x=>{ const d=new Date(x); return `${d.getMonth()+1}/${d.getDate()}`; };
+  return `打單時間：${f(a)}${f(a)!==f(b)?' ～ '+f(b):''}`;
+}
+function tmBackup(){
+  try{ localStorage.setItem(TM_BAK_KEY, JSON.stringify({at:Date.now(), live:{positions:dayPositions, closed:dayClosedTrades, markers:dayMarkers, active:dayActiveTrade}, tv:tvList})); }
+  catch(e){ alert('備份失敗（瀏覽器空間可能不夠），這次不整理：'+e.message); return false; }
+  return true;
+}
+function tmUndo(){
+  let b=null; try{ b=JSON.parse(localStorage.getItem(TM_BAK_KEY)||'null'); }catch(e){}
+  if(!b){ alert('沒有可以復原的備份。'); return; }
+  if(!confirm(`復原到 ${tvFmtTime(b.at)} 整理之前的狀態？\n（目前進行中＋所有版本都會回到那時候）`)) return;
+  dayPositions=b.live.positions||{}; dayClosedTrades=b.live.closed||{}; dayMarkers=b.live.markers||{}; dayActiveTrade=b.live.active||{};
+  tvList=b.tv||[]; tvSave();
+  try{ localStorage.removeItem(TM_BAK_KEY); }catch(e){}
+  tmAfterChange();
+}
+function tmAfterChange(){
+  try{ snrSaveTrades(); }catch(e){}
+  tradeUndoStack=[];
+  try{ refreshTradePosDisplay(); if(mode1kBars.length) renderAll(); }catch(e){}
+  if(tvActive!=='live' && !tvGet(tvActive)) tvActive='live';
+  try{ if(document.getElementById('tresultOverlay').classList.contains('show')) showTradeResult(true); }catch(e){}
+  tmRender();
+}
+function tmOpen(src){
+  _tmSrc = src || (typeof tvActive!=='undefined' ? tvActive : 'live'); _tmSel=new Set();
+  let el=document.getElementById('tmModal');
+  if(!el){ el=document.createElement('div'); el.id='tmModal'; el.className='tm-modal'; el.onclick=e=>{ if(e.target===el) tmClose(); }; document.body.appendChild(el); }
+  el.style.display='flex'; tmRender();
+}
+function tmClose(){ const el=document.getElementById('tmModal'); if(el) el.style.display='none'; }
+function tmPickSrc(id){ _tmSrc=id; _tmSel=new Set(); tmRender(); }
+function tmToggleDay(d){ _tmSel.has(d)?_tmSel.delete(d):_tmSel.add(d); tmRender(); }
+function tmToggleMonth(m){
+  const ds=Object.keys(tvClosedOf(_tmSrc)).filter(d=>d.slice(0,7)===m && (tvClosedOf(_tmSrc)[d]||[]).length);
+  const all=ds.every(d=>_tmSel.has(d)); ds.forEach(d=>all?_tmSel.delete(d):_tmSel.add(d)); tmRender();
+}
+function tmRender(){
+  const el=document.getElementById('tmModal'); if(!el || el.style.display==='none') return;
+  if(_tmSrc!=='live' && !tvGet(_tmSrc)) _tmSrc='live';
+  const closed=tvClosedOf(_tmSrc);
+  const days=Object.keys(closed).filter(d=>(closed[d]||[]).length).sort();
+  const months={}; days.forEach(d=>(months[d.slice(0,7)]=months[d.slice(0,7)]||[]).push(d));
+  const srcOpts=[{id:'live'},...tvList];
+  const selDays=[...(_tmSel)].filter(d=>days.includes(d)).sort();
+  const selN=selDays.reduce((a,d)=>a+closed[d].length,0);
+  const targets=[...(_tmSrc==='live'?[]:[{id:'live'}]), ...tvList.filter(v=>v.id!==_tmSrc)];
+  let bak=null; try{ bak=JSON.parse(localStorage.getItem(TM_BAK_KEY)||'null'); }catch(e){}
+  const mRows=Object.keys(months).sort().map(m=>{
+    const ds=months[m], trs=ds.flatMap(d=>closed[d]), pnl=trs.reduce((a,t)=>a+t.pnl,0), on=ds.every(d=>_tmSel.has(d)), part=!on&&ds.some(d=>_tmSel.has(d));
+    const old = _tmSrc==='live' && trs.some(t=>!t.madeAt || t.madeAt<APP_START_MS-6*3600e3);
+    return `<div class="tm-month${on?' on':''}">
+      <div class="tm-mh" onclick="tmToggleMonth('${m}')">
+        <span class="tm-cb${on?' on':(part?' part':'')}"></span>
+        <b>${+m.slice(0,4)} 年 ${+m.slice(5)} 月</b>
+        <span>${ds.length} 天・${trs.length} 筆</span>
+        <span class="${pnl>=0?'up':'dn'}">${tmMoney(pnl)}</span>
+        <span class="tm-made">${tmMadeTxt(trs)}</span>
+      </div>
+      <div class="tm-days">${ds.map(d=>{ const a=closed[d], p=a.reduce((x,t)=>x+t.pnl,0);
+        return `<span class="tm-day${_tmSel.has(d)?' on':''}" onclick="tmToggleDay('${d}')" title="${d}：${a.length} 筆 ${tmMoney(p)}｜${tmMadeTxt(a)}">${+d.slice(5,7)}/${+d.slice(8)} <i class="${p>=0?'up':'dn'}">${a.length}筆</i></span>`; }).join('')}</div>
+    </div>`; }).join('');
+  el.innerHTML=`<div class="tm-box">
+    <div class="tm-head"><b>🧹 整理紀錄</b><span>忘記重置、混進來的月份或日子，挑出來刪掉或搬到別的版本。每次整理前都會自動備份，可以復原。</span><button class="tm-x" onclick="tmClose()">✕</button></div>
+    <div class="tm-src">要整理的是：${srcOpts.map(v=>`<button class="tm-chip${v.id===_tmSrc?' on':''}" onclick="tmPickSrc('${v.id}')">${escapeHtml(tvName(v.id))}（${tvCount(v.id)}筆）</button>`).join('')}</div>
+    ${_tmSrc==='live'?`<div class="tm-note">💡「目前進行中」關掉程式也會保留，下次接著打（例如 1 月打一半、下次打 2 月）都算在同一輪，打完一輪再「💾 存成新版本」就好。</div>`:''}
+    <div class="tm-list">${mRows || '<div class="tm-empty">這裡沒有任何交易紀錄。</div>'}</div>
+    <div class="tm-act">
+      <div class="tm-sel">已選 <b>${selDays.length}</b> 天・<b>${selN}</b> 筆${selDays.length?`（${selDays[0]}${selDays.length>1?' ～ '+selDays[selDays.length-1]:''}）`:'　← 點月份選整個月，或點日子單選'}</div>
+      <div class="tm-btns">
+        <button class="tver-btn danger" ${selN?'':'disabled'} onclick="tmDo('del')">🗑 刪掉這些天</button>
+        <button class="tver-btn primary" ${selN?'':'disabled'} onclick="tmDo('new')">📦 搬到新版本</button>
+        ${targets.length?`<span class="tm-to">搬到已有的版本（同一天會被覆蓋）：<select id="tmTarget">${targets.map(v=>`<option value="${v.id}">${escapeHtml(tvName(v.id))}（${tvCount(v.id)}筆）</option>`).join('')}</select>
+          <button class="tver-btn" ${selN?'':'disabled'} onclick="tmDo('to')">➡ 搬過去</button>
+          <label class="tm-keep"><input type="checkbox" id="tmKeep"> 這裡也保留一份（複製）</label></span>`:''}
+      </div>
+      ${bak?`<div class="tm-undo">上次整理：${tvFmtTime(bak.at)} <button class="tver-btn" onclick="tmUndo()">↩ 復原到整理之前</button></div>`:''}
+    </div>
+  </div>`;
+}
+function tmMarkersFromTrades(arr){
+  const out=[];
+  arr.forEach(t=>(t.legs||[]).forEach(l=>{ const isExit=l.type==='exit'; const buy=(t.dir==='long')!==isExit;
+    out.push({type:buy?'buy':'sell', idx:l.idx, ts:l.time, price:l.price, ...(isExit?{isFlat:true}:{})}); }));
+  return out;
+}
+function tmRemoveDays(src, days){
+  if(src==='live'){ days.forEach(d=>{ delete dayClosedTrades[d]; delete dayMarkers[d]; delete dayPositions[d]; if(dayActiveTrade) delete dayActiveTrade[d]; }); }
+  else { const v=tvGet(src); if(!v) return; days.forEach(d=>delete v.closed[d]); v.updatedAt=Date.now(); }
+}
+function tmWriteDays(dst, days, srcClosed){
+  if(dst==='live'){ days.forEach(d=>{ dayClosedTrades[d]=JSON.parse(JSON.stringify(srcClosed[d])); dayMarkers[d]=tmMarkersFromTrades(dayClosedTrades[d]); dayPositions[d]=[]; if(dayActiveTrade) delete dayActiveTrade[d]; }); }
+  else { const v=tvGet(dst); if(!v) return; days.forEach(d=>{ v.closed[d]=JSON.parse(JSON.stringify(srcClosed[d])); }); v.updatedAt=Date.now(); }
+}
+function tmDo(kind){
+  const closed=tvClosedOf(_tmSrc);
+  const days=[..._tmSel].filter(d=>(closed[d]||[]).length).sort(); if(!days.length) return;
+  const n=days.reduce((a,d)=>a+closed[d].length,0), rng=`${days[0]}${days.length>1?' ～ '+days[days.length-1]:''}`;
+  const srcName=tvName(_tmSrc);
+  if(kind==='del'){
+    if(!confirm(`從「${srcName}」刪掉 ${days.length} 天、${n} 筆（${rng}）？\n刪錯可以按「↩ 復原到整理之前」。`)) return;
+    if(!tmBackup()) return; tmRemoveDays(_tmSrc, days);
+  } else if(kind==='new'){
+    const ms=[...new Set(days.map(d=>+d.slice(5,7)+'月'))].join('、');
+    const name=prompt(`把 ${days.length} 天、${n} 筆（${rng}）搬到一個新版本。\n版本名稱：`, `${ms}（從「${srcName}」搬出）`); if(name===null) return;
+    if(!tmBackup()) return;
+    const v={id:'v'+Date.now().toString(36), name:name.trim()||ms, savedAt:Date.now(), updatedAt:Date.now(), closed:{}};
+    days.forEach(d=>v.closed[d]=JSON.parse(JSON.stringify(closed[d])));
+    tvList.push(v); tmRemoveDays(_tmSrc, days);
+  } else if(kind==='to'){
+    const dst=(document.getElementById('tmTarget')||{}).value; if(!dst) return;
+    const keep=(document.getElementById('tmKeep')||{}).checked;
+    const dc=tvClosedOf(dst), clash=days.filter(d=>(dc[d]||[]).length);
+    if(!confirm(`把 ${days.length} 天、${n} 筆（${rng}）${keep?'複製':'搬'}到「${tvName(dst)}」？${clash.length?`\n\n⚠「${tvName(dst)}」裡這 ${clash.length} 天原本的單會被覆蓋：${clash.slice(0,8).join('、')}${clash.length>8?'…':''}`:''}${keep?'':`\n「${srcName}」這幾天會移除。`}`)) return;
+    if(!tmBackup()) return;
+    const snap=JSON.parse(JSON.stringify(closed));
+    tmWriteDays(dst, days, snap); if(!keep) tmRemoveDays(_tmSrc, days);
+  }
+  tvSave(); _tmSel=new Set(); tmAfterChange();
+}
+// 打開一天時，如果「目前進行中」這天已經有之前打的單 → 交易面板顯示提醒
+function tmDayWarn(){
+  const el=document.getElementById('tradeDayWarn'); if(!el) return;
+  const a=(dayClosedTrades[currentDay]||[]), old=a.filter(t=>!t.madeAt || t.madeAt<APP_START_MS);
+  if(!old.length){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  el.innerHTML=`⚠ 這天已經有 <b>${old.length}</b> 筆之前打的單${tmMadeTxt(old).includes('較早')?'':'（'+tmMadeTxt(old).replace('打單時間：','打於 ')+'）'}。接著打會加在後面。
+    <div class="tdw-btns"><button onclick="tmClearToday()">清掉這天重打</button><button onclick="tmOpen('live')">🧹 整理紀錄</button></div>`;
+}
+function tmClearToday(){
+  const a=dayClosedTrades[currentDay]||[];
+  if(!confirm(`清掉 ${currentDay} 在「目前進行中」的 ${a.length} 筆單，這天重新打？\n（可以在 🧹 整理紀錄 裡復原）`)) return;
+  if(!tmBackup()) return;
+  tmRemoveDays('live',[currentDay]); tmAfterChange();
+}
+
 function renderVersionBar(){
   const el=document.getElementById('tverBar'); if(!el) return;
   const opts=[{id:'live'}, ...tvList];
@@ -4465,10 +4643,13 @@ function renderVersionBar(){
     ${statsSplitSelectHtml()}
     <div class="tver-actions">
       <button class="tver-btn primary" onclick="tvSaveCurrentAsNew()" title="把目前進行中的模擬單存成新版本">💾 存成新版本</button>
+      <button class="tver-btn" onclick="tmOpen()" title="忘記重置混進來的月份／日子：刪掉或搬到別的版本">🧹 整理紀錄</button>
       ${saved?`<button class="tver-btn" onclick="tvOverwrite()" title="同一輪分幾天模擬時，用目前的模擬單更新這個版本">⟳ 用目前紀錄更新</button>
       <button class="tver-btn" onclick="tvRename()">✏️ 改名</button>
       <button class="tver-btn danger" onclick="tvDelete()">🗑</button>`:''}
     </div>
+    ${!saved?(()=>{ const c=dayClosedTrades, ms={}; Object.keys(c).forEach(d=>{ const n=(c[d]||[]).length; if(n) ms[d.slice(0,7)]=(ms[d.slice(0,7)]||0)+n; });
+      const k=Object.keys(ms).sort(); return k.length?`<div class="tver-meta">「目前進行中」裡有：${k.map(m=>`<b>${+m.slice(5)} 月</b> ${ms[m]} 筆`).join('・')}　（關掉程式也會保留，下次接著打都算這一輪；混進不要的月份 → 🧹 整理紀錄）</div>`:''; })():''}
     ${saved?`<div class="tver-meta">「${escapeHtml(tvName(tvActive))}」存於 ${tvFmtTime(tvGet(tvActive).savedAt)}${tvGet(tvActive).updatedAt>tvGet(tvActive).savedAt+1000?`・最後更新 ${tvFmtTime(tvGet(tvActive).updatedAt)}`:''} ・ 範圍 ${tvDaysRange(tvGet(tvActive).closed)}</div>`:''}`;
 }
 
