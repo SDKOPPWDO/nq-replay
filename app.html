@@ -284,10 +284,10 @@ canvas.cross{pointer-events:none;}
 .trade-detail-leg-tag.exit{color:#a855f7;}
 .simple-tip-box{position:fixed;transform:translate(-50%,-100%);background:rgba(20,20,24,0.97);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;border-radius:8px;z-index:10000;display:none;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);pointer-events:none;}
 .simple-tip-box.show{display:block;animation:tipFadeIn .15s ease-out;}
-.chart-info-panel{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.3);border-radius:8px;padding:8px 12px;font-size:11.5px;color:var(--t2);margin-bottom:8px;font-weight:600;min-height:16px;}
+.chart-info-panel{background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.3);border-radius:8px;padding:0 10px;font-size:11.5px;color:var(--t2);margin-bottom:8px;font-weight:600;height:40px;box-sizing:border-box;display:flex;align-items:center;overflow:hidden;white-space:nowrap;}
 .chart-info-panel.active{color:#fff;border-color:rgba(250,204,21,0.55);}
-.chart-info-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
-.chart-info-stat{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border-radius:6px;padding:5px 11px;}
+.chart-info-row{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;overflow:hidden;min-width:0;}
+.chart-info-stat{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.08);border-radius:6px;padding:4px 8px;flex:none;}
 .chart-info-lbl{font-size:9.5px;font-weight:700;letter-spacing:.3px;}
 .chart-info-val{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;}
 @keyframes tipFadeIn{from{opacity:0;transform:translate(-50%,-95%);}to{opacity:1;transform:translate(-50%,-100%);}}
@@ -1299,6 +1299,30 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
 .tver-meta b{color:#e5e7eb;}
 .trade-pnl-live{display:flex;flex-direction:column;gap:4px;}
 .trade-live-box{font-size:12px;font-weight:800;text-align:center;background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:5px 0;}
+.mkov-layout.cls-open{grid-template-columns:240px minmax(0,1fr) 300px;}
+.mkov-cls{display:none;}
+.mkov-layout.cls-open .mkov-cls{display:flex;flex-direction:column;gap:7px;background:var(--bg2);border:1px solid rgba(250,204,21,.4);border-radius:10px;padding:12px;overflow-y:auto;min-height:0;}
+.mkov-cls-btn{font-size:11.5px;padding:0 10px;width:auto;height:26px;border-color:rgba(250,204,21,.5)!important;color:#facc15!important;font-weight:800;}
+.mkov-cls-btn.on{background:#facc15!important;color:#000!important;}
+.mkc-h{display:flex;align-items:center;gap:6px;} .mkc-h b{font-size:14px;color:#fff;flex:1;} .mkc-x{background:none;border:none;color:var(--t2);cursor:pointer;font-size:15px;}
+.mkc-st{font-size:12px;color:#e5e7eb;background:rgba(255,255,255,.04);border-radius:8px;padding:6px 8px;} .mkc-st.no{color:#facc15;}
+.mkc-ed{display:inline-block;margin-left:6px;font-size:10.5px;color:#000;background:#facc15;border-radius:999px;padding:0 6px;font-weight:800;}
+.mkc-sub{font-size:12.5px;font-weight:800;color:#fff;margin-top:4px;} .mkc-sub span{font-size:10.5px;color:var(--t3);font-weight:500;margin-left:4px;}
+.mkc-tools{display:flex;gap:5px;} .mkc-tool{flex:1;font:inherit;font-size:12px;font-weight:800;padding:6px 0;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:#e5e7eb;cursor:pointer;}
+.mkc-tool.on{background:#facc15;color:#000;border-color:#facc15;}
+.mkc-hint{font-size:11px;color:var(--t3);line-height:1.5;} .mkc-hint b{color:#facc15;}
+.mkc-marks{display:flex;flex-direction:column;gap:3px;max-height:150px;overflow-y:auto;}
+.mkc-m{display:flex;align-items:center;gap:4px;font-size:11.5px;color:#e5e7eb;background:rgba(255,255,255,.04);border-radius:6px;padding:3px 6px;}
+.mkc-m span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .mkc-m button{background:none;border:none;color:var(--t2);cursor:pointer;font-size:11px;}
+.mkc-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;} .mkc-saved{font-size:11.5px;min-height:14px;}
+.mkov-cls .sn-ta{min-height:220px;}
+.mkc-tf{font-size:10px;color:var(--t3);border:1px solid var(--b2);border-radius:3px;padding:0 3px;}
+.mkc-num{display:inline-block;min-width:16px;text-align:center;border-radius:4px;color:#fff;font-size:11px;padding:0 3px;} .mkc-num.up{background:#ef4444;} .mkc-num.down{background:#22c55e;}
+.mkov-canvas-body.placing{cursor:crosshair;} .mkov-canvas-body.mdrag{cursor:grabbing;}
+.mkov-cal-d{position:relative;} .mkov-cal-d .cls-ic{position:absolute;top:0;right:1px;font-size:8px;line-height:1;}
+.sn-tip-cls{font-size:11.5px;line-height:1.55;color:var(--t2);background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.3);border-radius:8px;padding:8px 10px;} .sn-tip-cls b{color:#facc15;}
+@media(max-width:1200px){ .mkov-layout.cls-open{grid-template-columns:200px minmax(0,1fr) 270px;} }
+@media(max-width:820px){ .mkov-layout.cls-open{grid-template-columns:1fr;} }
 .rg-wrap{width:100%;}
 .rg-tiles{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin-bottom:10px;}
 .rg-tile{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 11px;cursor:pointer;min-width:0;}
@@ -1437,12 +1461,12 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
     </div>
     <div class="story-col sn-col" id="storyCol">
       <div class="sn-head">
-        <span class="sn-title">📷 行情截圖</span>
+        <span class="sn-title">🗂 行情分類</span>
         <span class="sn-now" id="snNow">—</span>
       </div>
       <button class="sns-status sns-bar" onclick="snsOpen()">☁ 同步：未設定</button>
       <div class="sn-body" id="snBody">
-        <button class="sn-snap-btn" id="snSnapBtn" onclick="snCapture()" title="把目前 5 分 K 圖的畫面截下來（快捷鍵 S）">📷 截下目前畫面 <span class="sn-key">S</span></button>
+        <div class="sn-tip-cls">行情分類改到 <b>📊 結算 → 🌐 總體行情回顧</b>，按「🏷 分類這天行情」（5K＋60K 一起存，可以加箭頭和文字）。</div>
         <div class="sn-draft" id="snDraft" hidden>
           <div class="sn-pv sn-chartbox" id="snPvWrap" onclick="snOpenDraftView()" title="點一下放大"><canvas id="snPv"></canvas></div>
           <div class="sn-pv-meta" id="snPvMeta"></div>
@@ -1474,7 +1498,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
           </div>
         </div>
         <div class="sn-day">
-          <div class="sn-lb">這一天的截圖 <span class="sn-lb-sub" id="snDayCnt"></span></div>
+          <div class="sn-lb">這一天的分類 <span class="sn-lb-sub" id="snDayCnt"></span></div>
           <div class="sn-daylist" id="snDayList"></div>
         </div>
       </div>
@@ -1509,7 +1533,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
       <div class="tresult-tab on" id="tabStats" onclick="switchTResultTab('stats')">📊 績效統計</div>
       <div class="tresult-tab" id="tabDiag" onclick="switchTResultTab('diag')">🩺 問題診斷</div>
       <div class="tresult-tab" id="tabRanking" onclick="switchTResultTab('ranking')">🏆 排行榜</div>
-      <div class="tresult-tab" id="tabReplay" onclick="switchTResultTab('replay')">🎬 進場回顧</div>
+      <div class="tresult-tab" id="tabReplay" onclick="switchTResultTab('replay')" style="display:none">🎬 進場回顧</div>
       <div class="tresult-tab" id="tabMkov" onclick="switchTResultTab('mkov')">🌐 總體行情回顧</div>
       <div class="tresult-tab" id="tabCmp" onclick="switchTResultTab('cmp')">🆚 版本對比</div>
     </div>
@@ -1630,7 +1654,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
           <div class="sn-fld"><div class="sn-lb">資料夾</div><select class="sn-inp" id="snDFolder"></select></div>
           <div class="sn-actions">
             <button class="sn-btn pri" onclick="snSaveDetail()">儲存修改</button>
-            <button class="sn-btn" onclick="snJumpTo()" title="切到這一天，K 棒停在截圖當下">↩ 回到這根 K 棒</button>
+            <button class="sn-btn" id="snDJump" onclick="snJumpTo()" title="切到這一天">↩ 回到這根 K 棒</button>
             <button class="sn-btn danger" id="snDDel" onclick="snDeleteDetail()">刪除</button>
           </div>
           <div class="sn-saved" id="snDSaved"></div>
@@ -3153,7 +3177,6 @@ document.addEventListener('keydown',e=>{
   if(document.getElementById('sneOv') && document.getElementById('sneOv').classList.contains('show')) return;
   if(document.getElementById('journalOverlay') && document.getElementById('journalOverlay').classList.contains('show')) return;
   if(document.getElementById('snLibOv').classList.contains('show') || document.getElementById('snModal').classList.contains('show')) return;
-  if((e.key==='s'||e.key==='S') && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); if(typeof snCapture==='function') snCapture(); return; }
   if(isNextDayKey(e)){ e.preventDefault(); goNextDay(); return; }
   if(isPrevDayKey(e)){ e.preventDefault(); goPrevDay(); return; }
   if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); stepPlayback(1); }
@@ -3978,7 +4001,7 @@ function tradeLegs(t){
 }
 
 // o = {prefix, wrapId, getDay(), getTFs(), getMarks() → [{t, i, color?, tag?, row?}], rows(), onHit(mark)}
-function DayChart(o){ this.o=o; this.view={}; this.hits={}; }
+function DayChart(o){ this.o=o; this.view={}; this.hits={}; this.uhits={}; }
 DayChart.prototype.bars=function(tf){ return dayWindowBars(this.o.getDay(), tf); };
 DayChart.prototype.getView=function(tf){
   const bars=this.bars(tf);
@@ -4056,18 +4079,20 @@ DayChart.prototype.render=function(tf){
   }
   const v=this.getView(tf), startPos=v.end-v.n+1, segment=bars.slice(startPos, v.end+1);
   const marks=this.o.getMarks()||[];
+  const umk=this.o.getUserMarks?(this.o.getUserMarks()||[]):[];   // 總體行情回顧：自己加的箭頭／文字
   const rows=this.o.rows?this.o.rows():[];      // 版本對比：底部每個版本一條持倉時間帶
   const stripH=rows.length?(rows.length*9+6):0;
   const Pd={t:30,r:60,b:24+stripH,l:4};
   const cw=(W-Pd.l-Pd.r)/segment.length;
   const allP=segment.flatMap(b=>[b.h,b.l]);
+  umk.forEach(m=>{ if(tf!=='60k' && m.tf==='60k') return; const p=dayFindPos(bars,m.idx,tf); if(p>=startPos && p<=v.end) allP.push(m.price); });
   let lo=Math.min(...allP), hi=Math.max(...allP);
   const _ph=H-Pd.t-Pd.b, _mpx=marks.length?Math.min(70,_ph*0.22):0;
   const pad=Math.max((hi-lo)*0.1, _mpx?(hi-lo)*_mpx/Math.max(40,_ph-2*_mpx):0)||1; lo-=pad; hi+=pad;
   const rng=hi-lo||1;
   const Y2=p=>Pd.t+(H-Pd.t-Pd.b)*(1-(p-lo)/rng), X2=i=>Pd.l+i*cw+cw/2;
   const last=bars[bars.length-1];
-  canvas._layout={P:Pd,W,H,segment,X:X2,Y:Y2,view:segment,cw,startPos,cap:(last.idx_end||last.idx),capPx:last.c,day};
+  canvas._layout={P:Pd,W,H,segment,X:X2,Y:Y2,view:segment,cw,startPos,cap:(last.idx_end||last.idx),capPx:last.c,day,hi,rng};
 
   for(let i=0;i<=4;i++){
     const y=Pd.t+(H-Pd.t-Pd.b)*i/4, price=hi-rng*i/4;
@@ -4096,10 +4121,7 @@ DayChart.prototype.render=function(tf){
     if(b<0 || a>=segment.length) return null;
     return [Math.max(Pd.l, X2(Math.max(a,0))-cw/2), Math.min(W-Pd.r, X2(Math.min(b,segment.length-1))+cw/2)];
   };
-  if(!rows.length){
-    marks.forEach(({t})=>{ const s=span(t); if(!s||s[1]<=s[0]) return;
-      ctx.fillStyle=t.dir==='long'?'rgba(239,68,68,0.07)':'rgba(34,197,94,0.07)'; ctx.fillRect(s[0],Pd.t,s[1]-s[0],H-Pd.t-Pd.b); });
-  }
+  if(tf!=='60k') umk.forEach(m=>{ if(m.tf!=='60k') return; const r=mk60Range(day,m.idx); if(r) mkShade(ctx, segment, X2, cw, r, Pd.t, H-Pd.b); });   // 60K 上放的牌子：5K 只把那根 60K 的範圍淡淡反白
   const bw=Math.max(1, Math.min(cw*0.7, 14));
   segment.forEach((b,i)=>{
     const x=X2(i), col=b.c>=b.o?UP:DN;
@@ -4134,7 +4156,7 @@ DayChart.prototype.render=function(tf){
   // 進出場標記：買（多單進場／空單平倉）畫在K棒下方、箭頭朝上、字在箭頭下面；
   //             賣（空單進場／多單平倉）畫在K棒上方、箭頭朝下、字在箭頭上面。箭頭離K棒留一段距離，不擋K棒
   const hits=[], seen={};
-  const GAP=24, AH=15, AW=9, STK=34;
+  const GAP=tf==='60k'?8:24, AH=15, AW=9, STK=34;   // 60K 的箭頭靠近K棒一點
   marks.forEach(m=>{
     const {t}=m, vColor=m.color;
     if(m.dim) ctx.globalAlpha=0.35;
@@ -4175,6 +4197,10 @@ DayChart.prototype.render=function(tf){
     ctx.globalAlpha=1;
   });
   this.hits[tf]=hits;
+  const uh=[], unum=mkNums(umk);
+  umk.forEach((m,k)=>{ if(tf!=='60k' && m.tf==='60k') return; const pos=dayFindPos(bars,m.idx,tf)-startPos; if(pos<0||pos>=segment.length) return;
+    const x=X2(pos), y=Y2(m.price), r=mkDrawMark(ctx,m,x,y,1,unum[k]); uh.push({k, ...r, x:r.lx+r.lw/2, y:r.ly+r.lh/2}); });
+  this.uhits[tf]=uh;
   ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='center';
   const step=Math.max(1,Math.ceil(52/cw));
   segment.forEach((b,i)=>{ if((startPos+i)%step===0) ctx.fillText(b.ts,X2(i),H-Pd.b+14-(stripH?0:0)); });
@@ -4237,9 +4263,30 @@ DayChart.prototype.attach=function(tf){
     const r=body.getBoundingClientRect();
     self.zoom(tf, e.deltaY<0?1.2:1/1.2, Math.max(0,Math.min(1,(e.clientX-r.left-l.P.l)/(l.W-l.P.l-l.P.r))));
   }, {passive:false});
-  body.addEventListener('mousedown', e=>{ drag={x:e.clientX, end:self.getView(tf).end, moved:false}; });
+  let mdrag=null;
+  body.addEventListener('mousedown', e=>{
+    if(self.o.canDragMarks && self.o.canDragMarks() && e.button===0){
+      const r=body.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top, list=self.uhits[tf]||[];
+      let hit=null;
+      for(const h of list){ if((h.ax-mx)**2+(h.ay-my)**2<=8*8){ hit={k:h.k,mode:'anchor'}; break; } }
+      if(!hit) for(const h of list){ if(mx>=h.lx-2 && mx<=h.lx+h.lw+2 && my>=h.ly-2 && my<=h.ly+h.lh+2){ hit={k:h.k,mode:'label'}; break; } }
+      if(hit){ const m=(self.o.getUserMarks()||[])[hit.k]; if(m){ e.preventDefault(); e.stopImmediatePropagation();
+        mdrag={...hit, sx:e.clientX, sy:e.clientY, dx0:m.dx||0, dy0:(m.dy!=null?m.dy:(m.t==='up'?46:-46)), moved:false}; body.classList.add('mdrag'); return; } }
+    }
+    drag={x:e.clientX, end:self.getView(tf).end, moved:false};
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!mdrag) return;
+    if(Math.abs(e.clientX-mdrag.sx)+Math.abs(e.clientY-mdrag.sy)>2) mdrag.moved=true;
+    if(mdrag.mode==='label') self.o.onMarkDrag(mdrag.k,'label',{dx:mdrag.dx0+(e.clientX-mdrag.sx), dy:mdrag.dy0+(e.clientY-mdrag.sy)});
+    else { const l=L(); if(!l) return; const r=body.getBoundingClientRect(), my=Math.max(l.P.t,Math.min(l.H-l.P.b,e.clientY-r.top));
+      self.o.onMarkDrag(mdrag.k,'anchor',{price:l.hi-(my-l.P.t)/(l.H-l.P.t-l.P.b)*l.rng}); }
+  });
+  window.addEventListener('mouseup', ()=>{ if(!mdrag) return; const mv=mdrag.moved; mdrag=null; body.classList.remove('mdrag');
+    if(mv){ self._noClick=true; setTimeout(()=>self._noClick=false,0); if(self.o.onMarkDone) self.o.onMarkDone(); } else { self._noClick=true; setTimeout(()=>self._noClick=false,0); } });
   window.addEventListener('mouseup', ()=>{ if(drag){ body.classList.remove('drag'); setTimeout(()=>drag=null,0);} });
   body.addEventListener('mousemove', e=>{
+    if(mdrag) return;
     if(drag && (e.buttons&1)){
       const l=L(); if(!l) return;
       const dx=e.clientX-drag.x;
@@ -4259,6 +4306,15 @@ DayChart.prototype.attach=function(tf){
   body.addEventListener('mouseleave', ()=>self.clearCross());
   body.addEventListener('click', e=>{
     if(drag && drag.moved) return;
+    if(self._noClick) return;
+    if(self.o.placing && self.o.placing()){
+      const r0=body.getBoundingClientRect(), mx=e.clientX-r0.left, my=e.clientY-r0.top;
+      const uh=(self.uhits[tf]||[]).find(h=>(h.x-mx)**2+(h.y-my)**2<16*16);
+      if(uh){ if(self.o.onRemove) self.o.onRemove(uh.k); return; }
+      const l=L(); if(!l) return;
+      const price=l.hi-(my-l.P.t)/(l.H-l.P.t-l.P.b)*l.rng;
+      if(self.o.onPlace) self.o.onPlace(tf, barAt(e.clientX), price); return;
+    }
     const r=body.getBoundingClientRect(), h=self.hitAt(tf, e.clientX-r.left, e.clientY-r.top);
     if(h && self.o.onHit) self.o.onHit(h.m);
   });
@@ -4310,8 +4366,13 @@ const mkovChart = new DayChart({
   prefix:'mkov', wrapId:'mkovCanvasMulti',
   getDay:()=>mkovDay, getTFs:()=>mkovTFs||[],
   getMarks:()=>mkovTradesOf(mkovDay),
-  onHit:m=>jumpToReplayTrade(m.i),
-  tipText:h=>`#${h.m.i+1} ${h.m.t.dir==='long'?'多':'空'} ${h.l.type==='entry'?'進場':'出場'} ${h.l.qty}口 @${(h.l.price||0).toFixed(1)}<br><span style="color:#94a3b8">點一下到進場回顧</span>`
+  getUserMarks:()=>mkUserMarks(mkovDay),
+  placing:()=>!!(mkCls&&mkCls.tool), onPlace:(tf,b,p)=>mkClsPlace(tf,b,p), onRemove:k=>mkClsRemove(k),
+  canDragMarks:()=>!!mkCls,
+  onMarkDrag:(k,mode,v)=>{ const m=mkCls&&mkCls.rec.marks[k]; if(!m) return; if(mode==='label'){ m.dx=Math.round(v.dx); m.dy=Math.round(v.dy); } else { const tk=MKT.tick||0.25; m.price=Math.round(v.price/tk)*tk; } mkovChart.renderAll(); },
+  onMarkDone:()=>{ mkClsDirty(); mkClsRender(); },
+  onHit:m=>mkovChart.focusIdx(m.t.entryIdx),
+  tipText:h=>`#${h.m.i+1} ${h.m.t.dir==='long'?'多':'空'} ${h.l.type==='entry'?'進場':'出場'} ${h.l.qty}口 @${(h.l.price||0).toFixed(1)}<br><span style="color:#94a3b8">點一下放大到這筆</span>`
 });
 function mkovRenderAll(){ mkovChart.renderAll(); }
 
@@ -4337,11 +4398,12 @@ function buildMktOverviewPage(){
             <button onclick="mkovStepDay(-1)" id="mkovPrev" title="上一個交易日（－ 或 ←）">‹</button>
             <div class="treplay-detail-hdr" id="mkovHdr">—</div>
             <button onclick="mkovStepDay(1)" id="mkovNext" title="下一個交易日（＋ 或 →）">›</button>
-            <span class="mkov-hint">＋明天 －昨天・滾輪縮放・拖曳平移・點標記跳到進場回顧</span>
+            <span class="mkov-hint">＋明天 －昨天・滾輪縮放・拖曳平移・點標記放大那筆</span>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
             <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="兩個格局上下排或左右排" style="font-size:11px;padding:0 9px;width:auto;height:26px;">${tfLayoutLabel()}</button>
           <button class="day-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="開啟指標選單（設定和主畫面共用）" style="font-size:11px;padding:0 9px;width:auto;height:26px;">📐 指標</button>
+            <button class="day-btn mkov-cls-btn" id="mkovClsBtn" onclick="mkClsToggle()" title="把這天的行情（5K＋60K）分類存起來，可以加箭頭和文字">🏷 分類這天行情</button>
             <div style="display:flex;gap:6px;" id="mkovTFButtons">
               ${TF_ORDER.map(tf=>`<div class="tresult-tab${mkovTFs.includes(tf)?' on':''}" data-tf="${tf}" onclick="toggleMkovTF('${tf}')" style="padding:5px 12px;font-size:11px;">${tfDisp(tf)}</div>`).join('')}
             </div>
@@ -4349,10 +4411,14 @@ function buildMktOverviewPage(){
         </div>
         <div class="treplay-canvas-multi" id="mkovCanvasMulti"></div>
       </div>
+      <aside class="mkov-cls" id="mkovCls"></aside>
     </div>`;
+  if(mkCls && mkCls.rec.day!==mkovDay) mkCls=null;
+  if(mkCls) document.querySelector('.mkov-layout').classList.add('cls-open');
   mkovChart.buildCanvases();
   updateIndicatorBtn();
   mkovSelectDay(mkovDay);
+  if(mkCls) mkClsRender(); else mkClsBtn();
   syncDayLayoutHeight('.mkov-layout', ()=>mkovChart.renderAll());
 }
 function syncDayLayoutHeight(sel, after){
@@ -4367,15 +4433,19 @@ function syncDayLayoutHeight(sel, after){
 function renderMkovCalendar(){
   const pnl={}; _allClosedTradesCache.forEach(t=>{ pnl[t.date]=(pnl[t.date]||0)+t.pnl; });
   renderMiniCalendar('mkovCal', mkovMonth, mkovDay, 'mkovSelectDay', 'mkovStepMonth', ds=>{
-    if(pnl[ds]!==undefined) return {cls:pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'), tip:`${ds} 有交易 ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`, html:'<span class="dot"></span>'};
-    return {cls:'notrade', tip:`${ds} 沒有交易`, html:'<span class="dot"></span>'};
+    const ck=mkClsOfDay(ds)?'<span class="cls-ic" title="已分類">🏷</span>':'';
+    if(pnl[ds]!==undefined) return {cls:pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'), tip:`${ds} 有交易 ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`, html:'<span class="dot"></span>'+ck};
+    return {cls:'notrade', tip:`${ds} 沒有交易`, html:'<span class="dot"></span>'+ck};
   }, `<span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span><span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span><span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒交易</span>`);
 }
 function mkovStepMonth(dir){ mkovMonth=stepMonthStr(mkovMonth,dir); renderMkovCalendar(); }
 function mkovStepDay(dir){ const j=DAYS.indexOf(mkovDay)+dir; if(j>=0 && j<DAYS.length) mkovSelectDay(DAYS[j]); }
 function mkovSelectDay(d){
   if(!DATA[d]) return;
+  let reopen=false;
+  if(mkCls && mkCls.rec.day!==d){ if(mkCls.dirty && confirm(`${mkCls.rec.day} 的分類還沒存，要先存起來嗎？`)) mkClsSave(); mkCls=null; reopen=true; }
   mkovDay=d; mkovMonth=d.slice(0,7); mkovChart.resetAll();
+  if(reopen) mkClsOpen(); else mkClsBtn();
   renderMkovCalendar(); renderMkovInfo();
   const i=DAYS.indexOf(d), hdr=document.getElementById('mkovHdr');
   if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_WIN_LABEL}</span>`;
@@ -4407,7 +4477,7 @@ function renderMkovInfo(){
     const tot=items.reduce((a,x)=>a+x.t.pnl,0);
     tr=`<div class="treplay-day-summary-title">🎯 當日交易 ${items.length} 筆 ・ <span style="color:${tot>=0?'#22c55e':'#ef4444'}">${tot>=0?'+':''}$${tot.toFixed(0)}</span></div>
       ${items.map(({t,i})=>`
-        <div class="mkov-trade-row" onclick="jumpToReplayTrade(${i})" title="到進場回顧看這筆">
+        <div class="mkov-trade-row" onclick="mkovChart.focusIdx(${t.entryIdx})" title="放大到這筆">
           <span style="color:var(--t3);width:20px;">#${i+1}</span>
           <span class="tresult-dir-tag ${t.dir}">${t.dir==='long'?'多':'空'}</span>
           <span><b>${t.entryTime}</b> → ${t.exitTime}</span>
@@ -4945,11 +5015,11 @@ window.addEventListener('resize', ()=>{
   }, 200);
 });
 
+// 排行榜／問題診斷點一筆 → 到總體行情回顧那一天，畫面移到那筆
 function jumpToReplayTrade(i){
-  switchTResultTab('replay');
-  setTimeout(()=>{
-    if(typeof selectReplayTrade === 'function') selectReplayTrade(i);
-  }, 50);
+  const t=(_allClosedTradesCache||[])[i]; if(!t) return;
+  mkovDay=t.date; switchTResultTab('mkov');
+  setTimeout(()=>{ try{ mkovChart.focusIdx(t.entryIdx); }catch(e){} }, 80);
 }
 
 let replayCurrentTF = '1k';
@@ -9180,6 +9250,7 @@ function snResolve(list, s, um){
   return null;
 }
 function snSegHtml(s){
+  if(s.kind==='mk') return '<span class="sn-seg">🌐 '+snDayFmt(s.day)+' 整天・'+(s.nTr?'有做 '+s.nTr+' 筆':'沒做單')+'</span>';
   if(!s.from) return '<span class="sn-seg none">未標時間段</span>';
   const d=(s.fromIdx!=null)?snDateOfIdx(s.fromIdx):'';
   return '<span class="sn-seg">'+(d?d+' ':'')+s.from+(s.to&&s.to!==s.from?' → '+s.to:'')+'</span>';
@@ -9225,6 +9296,7 @@ function snTfDefault(){ return Object.keys(MKT.tfDisp).find(k=>MKT.tfDisp[k]==='
 // ---- 畫行情圖（分類頁大圖、右側預覽、清單縮圖共用）----
 // opt.mini：縮圖；opt.tf：格局；opt.n／opt.end：顯示幾根、最右邊是第幾根（放大縮小、平移）；opt.cross：十字線
 function snDrawChart(cv, s, opt){
+  if(s && s.kind==='mk'){ snDrawMk(cv, s, opt); return; }
   opt=opt||{};
   const W=cv.clientWidth||cv.parentElement.clientWidth||300, H=cv.clientHeight||cv.parentElement.clientHeight||150;
   const dpr=window.devicePixelRatio||2;
@@ -9539,7 +9611,7 @@ function snRenderDay(){
   const box=document.getElementById('snDayList'); if(!box) return;
   const list=SN.snaps.filter(s=>s.day===currentDay).sort((a,b)=>a.capIdx-b.capIdx);
   document.getElementById('snDayCnt').textContent=list.length?(list.length+' 張'):'';
-  if(!list.length){ box.innerHTML='<div class="sn-empty">這一天還沒有截圖。<br>一根一根看，覺得值得記的時候按上面的 📷（或鍵盤 S）。</div>'; return; }
+  if(!list.length){ box.innerHTML='<div class="sn-empty">這一天還沒有分類。</div>'; return; }
   box.innerHTML='';
   list.forEach(s=>{
     const b=document.createElement('button'); b.className='sn-dayitem';
@@ -9618,7 +9690,7 @@ function snRenderLib(){
   if(!list.find(s=>s.id===snSel)) snSel=list.length?list[0].id:null;
   list.forEach(s=>{
     const c=document.createElement('div'); c.className='sn-li'+(s.id===snSel?' on':''); c.draggable=true; c.dataset.id=s.id;
-    c.innerHTML='<canvas></canvas><div class="sn-li-b"><div class="sn-li-when">'+snSegHtml(s)+'</div><div class="sn-li-when"><span>'+(s.capDate||snDayFmt(s.day))+' 截於 '+s.capTs+'</span></div>'
+    c.innerHTML='<canvas></canvas><div class="sn-li-b"><div class="sn-li-when">'+snSegHtml(s)+'</div><div class="sn-li-when"><span>'+(s.kind==='mk'?'5K＋60K・'+(s.marks||[]).length+' 個標示牌':(s.capDate||snDayFmt(s.day))+' 截於 '+s.capTs)+'</span></div>'
       +'<div class="sn-li-n">'+(escapeHtml(s.note)||'<span style="color:var(--t3)">（沒有筆記）</span>')+'</div>'
       +'<div class="sn-li-m">'+(s.folder?'<span class="sn-ftag">📁 '+escapeHtml(s.folder)+'</span>':'')+(s.tags||[]).map(t=>'<span class="sn-tag">'+escapeHtml(t)+'</span>').join('')+'</div></div>';
     c.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',s.id); c.classList.add('dragging'); });
@@ -9642,7 +9714,13 @@ function snRenderDetail(){
   snDEdit={...s, tags:[...(s.tags||[])]};
   snDV={tf:snTfDefault(),n:null,end:null}; snRenderTfBtns();
   const list=snFilteredList(), pos=list.findIndex(x=>x.id===s.id);
-  document.getElementById('snDWhen').textContent=(s.capDate||s.day)+' 截於 '+s.capTs;
+  const mk=s.kind==='mk';
+  document.getElementById('snDWhen').textContent=mk?(s.day+'（'+weekdayZh(s.day)+'）整天・5K＋60K'+(s.nTr?'・有做 '+s.nTr+' 筆':'・沒做單')):((s.capDate||s.day)+' 截於 '+s.capTs);
+  document.getElementById('snDTfs').style.display=mk?'none':'';
+  { const z=document.querySelector('#snDChartCol .sn-zoom'); if(z) z.style.display=mk?'none':''; }
+  { const f=document.getElementById('snDTrow').closest('.sn-fld'); if(f) f.style.display=mk?'none':''; }
+  { const h=document.querySelector('#snDChartCol .sn-det-hint'); if(h) h.textContent=mk?'從總體行情回顧分類的（不含進出場）。要移動、新增標示牌 → 右下「到總體行情回顧改標記」':'滾輪＝放大縮小 · 右鍵拖曳＝左右移動 · 左鍵拖曳＝反白時間段'; }
+  { const j=document.getElementById('snDJump'); if(j) j.textContent=mk?'✏ 到總體行情回顧改標記':'↩ 回到這根 K 棒'; }
   document.getElementById('snDPos').textContent=pos>=0?((pos+1)+' / '+list.length):'';
   document.getElementById('snDFrom').value=s.from||''; document.getElementById('snDTo').value=s.to||'';
   document.getElementById('snDNote').value=s.note||'';
@@ -9654,6 +9732,12 @@ function snRenderDetail(){
 }
 function snDRedraw(cross){
   if(!snDEdit) return;
+  if(snDEdit.kind==='mk'){
+    const oh=document.getElementById('snDOhlc'); oh.textContent=(snDEdit.marks||[]).length+' 個標示牌';
+    snDrawChart(document.getElementById('snDCv'), snDEdit, {cross, onHover:(b,tl)=>{ const dec=(MKT.tick||1)<1?2:0, chg=b.c-b.o;
+      oh.innerHTML=escapeHtml(tl+' '+snDateOfIdx(b.idx,true)+' '+b.ts)+'<b>開</b> '+b.o.toFixed(dec)+'<b>高</b> '+b.h.toFixed(dec)+'<b>低</b> '+b.l.toFixed(dec)
+        +'<b>收</b> <span style="color:'+(chg>=0?'var(--up)':'var(--dn)')+'">'+b.c.toFixed(dec)+' ('+(chg>=0?'+':'')+chg.toFixed(dec)+')</span>'; }});
+    return; }
   snDrawChart(document.getElementById('snDCv'), snDEdit, {tf:snDV.tf, n:snDV.n, end:snDV.end, cross:cross, onHover:(b,d)=>{
     const dec=(MKT.tick||1)<1?2:0, chg=b.c-b.o;
     document.getElementById('snDOhlc').innerHTML=escapeHtml(d+' '+b.ts)+'<b>開</b> '+b.o.toFixed(dec)+'<b>高</b> '+b.h.toFixed(dec)+'<b>低</b> '+b.l.toFixed(dec)
@@ -9684,6 +9768,7 @@ function snDeleteDetail(){
 }
 function snJumpTo(){
   const s=SN.snaps.find(x=>x.id===snSel); if(!s) return;
+  if(s.kind==='mk'){ mkOpenFromLib(s.id); return; }
   if(!DAYS_SET.has(s.day)){ snToast('資料裡沒有 '+s.day+' 這一天'); return; }
   snCloseLib();
   if(currentDay!==s.day) loadDay(s.day);
@@ -9702,6 +9787,233 @@ document.addEventListener('keydown',e=>{
     if(n) snSelect(n.id);
   }
 });
+
+// ================= 🏷 總體行情回顧：把這天的行情分類（5K＋60K 一起存，不含進出場）=================
+// 可以在圖上加 ▲ 上箭頭、▼ 下箭頭、文字；存到 🗂 行情分類，跟其他截圖一起用分類／資料夾整理
+let mkCls=null;   // {rec, id, tool, dirty}
+function mkTf5(){ return defaultFiveKTF(); }
+function mkClsOfDay(d){ return SN.snaps.find(s=>s.kind==='mk' && s.day===d); }
+function mkUserMarks(d){
+  if(mkCls && mkCls.rec.day===d) return mkCls.rec.marks;
+  const s=mkClsOfDay(d); return s ? (s.marks||[]) : [];
+}
+// 畫一個標記（主圖和分類縮圖共用）：x,y＝箭頭尖端／文字中心
+// 編號：依時間先後 1、2、3…
+function mk60Range(day, idx){ const b=(dayWindowBars(day,'60k')||[]).find(x=>x.idx<=idx && idx<=(x.idx_end||x.idx)); return b?[b.idx,(b.idx_end||b.idx)]:null; }
+function mkShade(ctx, bars, X, cw, r, top, bot){
+  let a=-1, z=-1; bars.forEach((b,i)=>{ const e=b.idx_end||b.idx; if(e>=r[0] && b.idx<=r[1]){ if(a<0) a=i; z=i; } });
+  if(a<0) return; ctx.save(); ctx.fillStyle='rgba(255,255,255,0.07)'; ctx.fillRect(X(a)-cw/2, top, X(z)-X(a)+cw, bot-top); ctx.restore();
+}
+function mkNums(marks){
+  const ord=marks.map((m,k)=>({m,k})).filter(o=>o.m.t!=='text').sort((a,b)=>a.m.idx-b.m.idx||a.k-b.k), out={};
+  ord.forEach((o,i)=>out[o.k]=i+1); return out;
+}
+function mkRRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
+// 畫一個標示牌：(x,y)＝錨點（白點，指到的價位）；牌子在錨點 + (dx,dy)；回傳牌子範圍給拖曳用
+function mkDrawMark(ctx, m, x, y, sc, num){
+  sc=sc||1; ctx.save();
+  if(m.t==='text'){   // 舊版的文字標記：照舊畫
+    ctx.font=`bold ${Math.round(14*sc)}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    const w=ctx.measureText(m.text||'').width+12*sc, h=20*sc;
+    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.strokeStyle='#facc15'; ctx.lineWidth=1.2*sc; ctx.beginPath(); ctx.rect(x-w/2,y-h/2,w,h); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#facc15'; ctx.fillText(m.text||'',x,y+1); ctx.restore();
+    return {lx:x-w/2, ly:y-h/2, lw:w, lh:h, ax:x, ay:y};
+  }
+  const up=m.t==='up', col=up?UP:DN;
+  const dx=(m.dx||0)*sc, dy=(m.dy!=null?m.dy:(up?46:-46))*sc;
+  const txt=String(num||''), lh=22*sc;
+  ctx.font=`bold ${Math.round(13*sc)}px sans-serif`;
+  const lw=Math.max(24*sc, ctx.measureText(txt).width+14*sc);
+  const cx=x+dx, cy=y+dy, rx=cx-lw/2, ry=cy-lh/2, below=dy>=0, PT=6*sc;
+  const tipY = below ? ry-PT : ry+lh+PT;
+  // 白線：錨點 → 牌子的尖角
+  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=1.4*sc; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(cx,tipY); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,3.2*sc,0,Math.PI*2); ctx.fill();
+  // 牌子＋尖角
+  ctx.fillStyle=col; ctx.strokeStyle='#fff'; ctx.lineWidth=1.2*sc;
+  mkRRect(ctx,rx,ry,lw,lh,4*sc); ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  if(below){ ctx.moveTo(cx-5*sc,ry+0.5); ctx.lineTo(cx,ry-PT); ctx.lineTo(cx+5*sc,ry+0.5); }
+  else { ctx.moveTo(cx-5*sc,ry+lh-0.5); ctx.lineTo(cx,ry+lh+PT); ctx.lineTo(cx+5*sc,ry+lh-0.5); }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(txt,cx,cy+0.5*sc);
+  ctx.restore();
+  return {lx:rx, ly:ry-(below?PT:0), lw, lh:lh+PT, ax:x, ay:y};
+}
+function mkMarkLbl(m){
+  const b=(dayWindowBars(m.day||mkovDay, mkTf5())||[]).find(x=>x.idx<=m.idx && m.idx<=(x.idx_end||x.idx));
+  const ic=m.t==='up'?'▲':(m.t==='down'?'▼':'T'); if(m.num) return `<b class="mkc-num ${m.t}">${m.num}</b> ${ic} <span class="mkc-tf">${m.tf==='60k'?'60K':'5K'}</span> ${b?b.ts:''} @${(+m.price).toFixed((MKT.tick||1)<1?2:0)}`;
+  return `${ic} ${b?b.ts:''} @${(+m.price).toFixed((MKT.tick||1)<1?2:0)}${m.text?` 「${escapeHtml(m.text)}」`:''}`;
+}
+function mkClsToggle(){ if(mkCls) mkClsClose(); else mkClsOpen(); }
+function mkClsOpen(){
+  const d=mkovDay; if(!d) return;
+  const ex=mkClsOfDay(d);
+  mkCls={tool:null, dirty:false, id:ex?ex.id:null,
+    rec: ex ? JSON.parse(JSON.stringify(ex)) : {kind:'mk', day:d, marks:[], note:'', tags:[], folder:''}};
+  mkCls.rec.marks=mkCls.rec.marks||[]; mkCls.rec.tags=mkCls.rec.tags||[];
+  const lay=document.querySelector('.mkov-layout'); if(lay) lay.classList.add('cls-open');
+  mkClsRender(); setTimeout(()=>mkovChart.renderAll(),0);
+}
+function mkClsClose(force){
+  if(!force && mkCls && mkCls.dirty && confirm('這天的分類還沒存，要先存起來嗎？')) mkClsSave();
+  mkCls=null;
+  const lay=document.querySelector('.mkov-layout'); if(lay) lay.classList.remove('cls-open');
+  const p=document.getElementById('mkovCls'); if(p) p.innerHTML='';
+  document.querySelectorAll('.mkov-canvas-body').forEach(el=>el.classList.remove('placing'));
+  mkClsBtn(); setTimeout(()=>mkovChart.renderAll(),0);
+}
+function mkClsBtn(){
+  const b=document.getElementById('mkovClsBtn'); if(!b) return;
+  const has=mkovDay && mkClsOfDay(mkovDay);
+  b.classList.toggle('on', !!mkCls); b.textContent = mkCls ? '✕ 關閉分類' : (has ? '🏷 已分類・編輯' : '🏷 分類這天行情');
+}
+function mkClsTool(t){ if(!mkCls) return; mkCls.tool = mkCls.tool===t ? null : t; mkClsRender(); }
+function mkClsDirty(){ if(mkCls){ mkCls.dirty=true; const el=document.getElementById('mkcSaved'); if(el){ el.textContent='有修改，記得按「存到行情分類」'; el.style.color='#facc15'; } } }
+function mkClsPlace(tf, bar, price){
+  if(!mkCls || !mkCls.tool || !bar) return;
+  const tick=MKT.tick||0.25; price=Math.round(price/tick)*tick;
+  const m={t:mkCls.tool, tf:(tf==='60k'?'60k':'5k'), idx:bar.idx, price, dx:0, dy:mkCls.tool==='up'?46:-46};
+  mkCls.rec.marks.push(m); mkClsDirty(); mkClsRender(); mkovChart.renderAll();
+}
+function mkClsRemove(k){ if(!mkCls) return; mkCls.rec.marks.splice(k,1); mkClsDirty(); mkClsRender(); mkovChart.renderAll(); }
+function mkClsEditText(k){
+  if(!mkCls) return; const m=mkCls.rec.marks[k]; if(!m) return;
+  const v=prompt(m.t==='text'?'文字：':'箭頭旁邊的文字（可以空白）：', m.text||''); if(v===null) return;
+  if(m.t==='text' && !v.trim()){ mkClsRemove(k); return; }
+  m.text=v.trim(); mkClsDirty(); mkClsRender(); mkovChart.renderAll();
+}
+function mkClsRender(){
+  mkClsBtn();
+  document.querySelectorAll('.mkov-canvas-body').forEach(el=>el.classList.toggle('placing', !!(mkCls&&mkCls.tool)));
+  const p=document.getElementById('mkovCls'); if(!p) return;
+  if(!mkCls){ p.innerHTML=''; return; }
+  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d), tot=items.reduce((a,x)=>a+x.t.pnl,0);
+  const tb=(t,lbl)=>`<button class="mkc-tool${mkCls.tool===t?' on':''}" onclick="mkClsTool('${t}')">${lbl}</button>`;
+  p.innerHTML=`
+    <div class="mkc-h"><b>🏷 分類 ${d.slice(5).replace('-','/')}（${weekdayZh(d)}）的行情</b><button class="mkc-x" onclick="mkClsClose()">✕</button></div>
+    <div class="mkc-st ${items.length?'':'no'}">${items.length?`這天有做單 <b>${items.length}</b> 筆・<b style="color:${tot>=0?'#22c55e':'#ef4444'}">${tot>=0?'+':''}$${tot.toFixed(0)}</b>`:'這天<b>沒有做單</b>'}${mkCls.id?'<span class="mkc-ed">已分類過・編輯中</span>':''}</div>
+    <div class="mkc-sub">① 在圖上放標示牌 <span>選好 → 點 5K 或 60K 圖上的位置</span></div>
+    <div class="mkc-tools">${tb('up','▲ 看漲牌')}${tb('down','▼ 看跌牌')}</div>
+    <div class="mkc-hint">${mkCls.tool?`<b>${mkCls.tool==='up'?'▲ 看漲牌':'▼ 看跌牌'}</b>：點圖上的位置放上去（白點＝指到的價位）；點到已經放的牌子會刪掉。再按一次就停止。`:'拖曳<b>牌子</b>＝換位置；拖曳<b>白點</b>＝上下調價位。編號照時間 1、2、3…'}</div>
+    <div class="mkc-marks">${(()=>{ const nm=mkNums(r.marks); const ord=r.marks.map((m,k)=>k).sort((a,b)=>(nm[a]||999)-(nm[b]||999));
+      return r.marks.length?ord.map(k=>{ const m=r.marks[k]; return `<div class="mkc-m"><span>${mkMarkLbl({...m,day:d,num:nm[k]})}</span><button onclick="mkClsRemove(${k})" title="刪除">✕</button></div>`; }).join(''):'<div class="dg-t3" style="font-size:11.5px">還沒有標示牌</div>'; })()}</div>
+    <div class="mkc-sub">② 分類（可多選）</div><div class="sn-chips" id="mkcTags"></div>
+    <div class="mkc-sub">③ 資料夾</div><select class="sn-inp" id="mkcFolder"></select>
+    <div class="mkc-sub">④ 筆記</div><textarea class="sn-inp sn-ta" id="mkcNote" placeholder="這天的行情是什麼型態？你做了／沒做的原因？">${escapeHtml(r.note||'')}</textarea>
+    <div class="mkc-btns">
+      <button class="sn-btn pri" onclick="mkClsSave()">💾 存到行情分類</button>
+      <button class="sn-btn" onclick="${mkCls.id?`snOpenLib('${mkCls.id}')`:'snOpenLib()'}">🗂 打開行情分類</button>
+      ${mkCls.id?'<button class="sn-btn danger" id="mkcDel" onclick="mkClsDelete()">刪除這天的分類</button>':''}
+    </div>
+    <div class="mkc-saved" id="mkcSaved">${mkCls.dirty?'有修改，記得按「存到行情分類」':''}</div>
+    <div class="dg-t3" style="font-size:11px;line-height:1.5">存下來的是這天的 <b>5K＋60K</b>（60K 含前 5 天），不會畫進出場點，只畫你放的標示牌；說明寫在筆記裡。</div>`;
+  snRenderTagChips(document.getElementById('mkcTags'), r.tags, mkClsDirty);
+  const fs=document.getElementById('mkcFolder'); snFillFolderSel(fs, r.folder); fs.onchange=()=>{ r.folder=fs.value; mkClsDirty(); };
+  const nt=document.getElementById('mkcNote'); nt.oninput=()=>{ r.note=nt.value; mkClsDirty(); };
+}
+function mkClsSave(){
+  if(!mkCls) return;
+  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d);
+  const nt=document.getElementById('mkcNote'); if(nt) r.note=nt.value.trim();
+  const fs=document.getElementById('mkcFolder'); if(fs) r.folder=fs.value;
+  const b5=dayWindowBars(d, mkTf5()), last=b5[b5.length-1];
+  Object.assign(r, {kind:'mk', mkt:MARKET, tf:mkTf5(), capIdx:last?(last.idx_end||last.idx):0, capTs:last?last.ts:'', capDate:last?snDateOfIdx(last.idx):snDayFmt(d),
+    price:last?last.c:0, from:'', to:'', fromIdx:null, toIdx:null, nTr:items.length, pnl:items.reduce((a,x)=>a+x.t.pnl,0)});
+  if(mkCls.id){ const s=SN.snaps.find(x=>x.id===mkCls.id); if(s){ Object.keys(s).forEach(k=>{ if(k!=='id'&&k!=='created') delete s[k]; }); Object.assign(s, JSON.parse(JSON.stringify(r)), {id:mkCls.id}); snDbPut(s); } }
+  else { const rec={...JSON.parse(JSON.stringify(r)), id:snUid(), created:Date.now()}; SN.snaps.push(rec); snDbPut(rec); mkCls.id=rec.id; }
+  mkCls.dirty=false;
+  try{ snRenderDay(); if(snIsLibOpen()) snRenderLib(); }catch(e){}
+  mkClsRender();
+  const el=document.getElementById('mkcSaved'); if(el){ el.textContent='✓ 已存到行情分類'+(r.folder?'「'+r.folder+'」':''); el.style.color='#22c55e'; }
+  snToast('已存到行情分類');
+}
+function mkClsDelete(){
+  if(!mkCls || !mkCls.id) return;
+  const b=document.getElementById('mkcDel');
+  if(b && !b.classList.contains('armed')){ b.classList.add('armed'); b.textContent='再按一次確定刪除'; return; }
+  SN.snaps=SN.snaps.filter(x=>x.id!==mkCls.id); snDbDel(mkCls.id);
+  try{ snRenderDay(); if(snIsLibOpen()) snRenderLib(); }catch(e){}
+  snToast('已刪除這天的分類'); mkClsClose(true);
+}
+// 從行情分類回到總體行情回顧編輯
+function mkOpenFromLib(id){
+  const s=SN.snaps.find(x=>x.id===id); if(!s) return;
+  snCloseLib();
+  try{ if(!document.getElementById('tresultOverlay').classList.contains('show')) showTradeResult(); }catch(e){}
+  mkovDay=s.day; mkCls=null; switchTResultTab('mkov');
+  setTimeout(()=>mkClsOpen(),60);
+}
+
+// ---- 分類頁：5K＋60K 畫在同一張圖（左 5K、右 60K）----
+function snMkPane(ctx, s, tf, x0, y0, w, h, mini){
+  const bars=dayWindowBars(s.day, tf);
+  ctx.save(); ctx.beginPath(); ctx.rect(x0,y0,w,h); ctx.clip();
+  ctx.fillStyle='#0d0d0f'; ctx.fillRect(x0,y0,w,h);
+  if(!bars.length){ ctx.fillStyle='#71717a'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText('沒有 '+tfDisp(tf)+' 資料',x0+w/2,y0+h/2); ctx.restore(); return null; }
+  const P=mini?{t:12,r:3,b:3,l:3}:{t:24,r:54,b:20,l:4};
+  const n=bars.length, cw=(w-P.l-P.r)/n, X=i=>x0+P.l+cw*(i+0.5);
+  let lo=Infinity, hi=-Infinity; bars.forEach(b=>{ if(b.l<lo) lo=b.l; if(b.h>hi) hi=b.h; });
+  const pad=(hi-lo)*0.12||1; lo-=pad; hi+=pad; const rg=hi-lo||1;
+  const Y=p=>y0+P.t+(h-P.t-P.b)*(1-(p-lo)/rg);
+  if(!mini){
+    for(let i=0;i<=4;i++){ const yy=y0+P.t+(h-P.t-P.b)*i/4, pr=hi-rg*i/4;
+      ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0+P.l,yy); ctx.lineTo(x0+w-P.r,yy); ctx.stroke();
+      ctx.fillStyle='#999'; ctx.font='10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(1),x0+w-P.r+4,yy+3); }
+  }
+  if(tf==='60k'){
+    const i=DAYS.indexOf(s.day);
+    for(let j=Math.max(0,i-DAY60_PREV);j<=i;j++){
+      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null) continue;
+      let p=-1; for(let k=0;k<n;k++){ if((bars[k].idx_end||bars[k].idx)>=dw.lo){ p=k; break; } }
+      if(p<0) continue; const x=X(p)-cw/2;
+      ctx.strokeStyle=j===i?'rgba(100,180,255,0.6)':'rgba(255,255,255,0.16)'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(x,y0+P.t); ctx.lineTo(x,y0+h-P.b); ctx.stroke(); ctx.setLineDash([]);
+      if(!mini){ ctx.fillStyle=j===i?'rgba(100,180,255,0.95)':'#8a8a99'; ctx.font='bold 10px sans-serif'; ctx.textAlign='left'; ctx.fillText(DAYS[j].slice(5).replace('-','/')+(j===i?' 今天':''),x+3,y0+P.t-6); }
+    }
+  }
+  if(tf!=='60k') (s.marks||[]).forEach(m=>{ if(m.tf!=='60k') return; const r=mk60Range(s.day,m.idx); if(r) mkShade(ctx, bars, X, cw, r, y0+P.t, y0+h-P.b); });
+  const bw=Math.max(1,Math.min(cw*0.7,12));
+  bars.forEach((b,i)=>{ const x=Math.round(X(i))+.5, col=b.c>=b.o?UP:DN;
+    ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,Y(b.h)); ctx.lineTo(x,Y(b.l)); ctx.stroke();
+    const t=Math.min(Y(b.o),Y(b.c)), bh=Math.max(Math.abs(Y(b.c)-Y(b.o)),1); ctx.fillStyle=col; ctx.fillRect(x-bw/2,t,bw,bh); });
+  ['m5','m10','m20','m60'].forEach((k,mi)=>{ const ma=maConfig[mi]; if(!ma||!ma.on) return;
+    ctx.strokeStyle=ma.c; ctx.lineWidth=mini?1:(mi===3?1.8:1.2); ctx.beginPath(); let st=false;
+    bars.forEach((b,i)=>{ const v=b[k]; if(v==null) return; st?ctx.lineTo(X(i),Y(v)):(ctx.moveTo(X(i),Y(v)),st=true); }); ctx.stroke(); });
+  const nm=mkNums(s.marks||[]);
+  (s.marks||[]).forEach((m,k)=>{ if(tf!=='60k' && m.tf==='60k') return; const pos=dayFindPos(bars,m.idx,tf); if(pos<0) return; mkDrawMark(ctx,m,X(pos),Y(m.price),mini?0.6:1,nm[k]); });
+  ctx.fillStyle='rgba(255,255,255,.85)'; ctx.font=`bold ${mini?9:12}px sans-serif`; ctx.textAlign='left'; ctx.fillText(tfDisp(tf), x0+4, y0+(mini?10:14));
+  if(!mini){ ctx.fillStyle='#999'; ctx.font='10px sans-serif'; ctx.textAlign='center'; const step=Math.max(1,Math.ceil(56/cw)); bars.forEach((b,i)=>{ if(i%step===0) ctx.fillText(b.ts,X(i),y0+h-6); }); }
+  ctx.restore();
+  return {tf, bars, x0, y0, w, h, P, cw, X, Y, lo, hi, rg};
+}
+function snDrawMk(cv, s, opt){
+  opt=opt||{};
+  const W=cv.clientWidth||cv.parentElement.clientWidth||300, H=cv.clientHeight||cv.parentElement.clientHeight||150;
+  const dpr=window.devicePixelRatio||2; cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#08080a'; ctx.fillRect(0,0,W,H); cv._snL=null;
+  if(!DATA || !DATA[s.day]){ ctx.fillStyle='#71717a'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText(DAYS.length?'資料裡沒有 '+s.day+' 這一天':'K 棒資料載入中…',W/2,H/2); return; }
+  const mini=!!opt.mini, g=mini?3:8, w5=Math.round((W-g)*0.56);
+  const A=snMkPane(ctx, s, s.tf||mkTf5(), 0, 0, w5, H, mini);
+  const B=snMkPane(ctx, s, '60k', w5+g, 0, W-w5-g, H, mini);
+  // 十字線：滑鼠在哪一邊就畫那邊，另一邊同一時間畫一條虛線
+  const c=opt.cross; if(mini || !c) return;
+  const L=[A,B].find(p=>p && c.x>=p.x0+p.P.l && c.x<=p.x0+p.w-p.P.r), O=L===A?B:A; if(!L) return;
+  const n=L.bars.length, i=Math.max(0,Math.min(n-1,Math.round((c.x-L.x0-L.P.l)/L.cw-0.5))), b=L.bars[i], sx=Math.round(L.X(i))+.5;
+  const top=L.y0+L.P.t, bot=L.y0+L.h-L.P.b, cy=Math.max(top,Math.min(bot,c.y)), tick=MKT.tick||0.25;
+  const pr=Math.round((L.hi-(cy-top)/(bot-top)*L.rg)/tick)*tick, dec=tick<1?2:0;
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(sx,top); ctx.lineTo(sx,bot); ctx.moveTo(L.x0+L.P.l,cy); ctx.lineTo(L.x0+L.w-L.P.r,cy); ctx.stroke();
+  if(O){ const j=dayFindPos(O.bars,b.idx,O.tf); if(j>=0){ const ox=Math.round(O.X(j))+.5; ctx.strokeStyle='rgba(250,204,21,0.45)'; ctx.beginPath(); ctx.moveTo(ox,O.y0+O.P.t); ctx.lineTo(ox,O.y0+O.h-O.P.b); ctx.stroke(); } }
+  ctx.setLineDash([]);
+  const rx=L.x0+L.w-L.P.r+1; ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(rx,cy-9,L.P.r-3,18);
+  ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(dec),rx+3,cy+4);
+  const lbl=snDateOfIdx(b.idx,true)+' '+b.ts; ctx.font='bold 10px sans-serif'; const tw=ctx.measureText(lbl).width+12, tx=Math.max(L.x0+L.P.l+tw/2,Math.min(L.x0+L.w-L.P.r-tw/2,sx));
+  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tx-tw/2,bot,tw,16); ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText(lbl,tx,bot+12);
+  ctx.restore();
+  if(opt.onHover) opt.onHover(b, tfDisp(L.tf));
+}
 
 // ---- 換K棒／換日時同步 ----
 const _snOrigRenderAll=renderAll;
