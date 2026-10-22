@@ -1,10 +1,10 @@
 {
-  "version": "8d26a632f547",
-  "updated_at": "2026-10-15T22:29:26.309306",
+  "version": "b0cef1037c8f",
+  "updated_at": "2026-10-22T21:33:26.769572",
   "date_range": [
     "2025-05-20",
-    "2026-10-15"
+    "2026-10-22"
   ],
-  "trading_days": 366,
-  "ndx_days": 21
+  "trading_days": 371,
+  "ndx_days": 25
 }
