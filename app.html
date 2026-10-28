@@ -4301,7 +4301,28 @@ function tradeLegs(t){
 
 // o = {prefix, wrapId, getDay(), getTFs(), getMarks() → [{t, i, color?, tag?, row?}], rows(), onHit(mark)}
 function DayChart(o){ this.o=o; this.view={}; this.hits={}; this.uhits={}; }
-DayChart.prototype.bars=function(tf){ return dayWindowBars(this.o.getDay(), tf); };
+// 總體行情回顧／版本對比：一次看「昨天＋今天」（昨天 04:00 → 今天的隔天 03:30），60K 本來就含前 5 天
+const DAY_VIEW_PREV = 1;
+const DAY_VIEW_LABEL = '前一天 12:00 → 隔天 03:30';
+const DAY_VIEW_FROM = '12:00';   // 前一天從幾點開始看
+function dayViewBars(d, tf){
+  if(tf==='60k') return dayWindowBars(d, tf);
+  const key='view|'+d+'|'+tf;
+  if(_dayWinCache[key]) return _dayWinCache[key];
+  const i=DAYS.indexOf(d), w=dayWindowOf(d);
+  if(i<=0 || w.lo===null) return (_dayWinCache[key]=dayWindowBars(d, tf));
+  let lo=w.lo; const ds=[d];
+  for(let j=i-1;j>=0 && j>=i-DAY_VIEW_PREV;j--){
+    const pb=dayWindow1k(DAYS[j]); if(!pb.length) continue;
+    const st=(j===i-DAY_VIEW_PREV) ? (pb.find(b=>b.ts>=DAY_VIEW_FROM)||pb[0]) : pb[0];   // 最前面那天從 12:00 開始
+    lo=Math.min(lo,st.idx); ds.unshift(DAYS[j]);
+  }
+  if(i-DAY_VIEW_PREV-1>=0) ds.unshift(DAYS[i-DAY_VIEW_PREV-1]);
+  const map=new Map();
+  ds.forEach(x=>((DATA[x]&&DATA[x][tf])||[]).forEach(b=>{ if(b.idx>=lo && b.idx<=w.hi) map.set(b.idx,b); }));
+  return (_dayWinCache[key]=[...map.values()].sort((a,b)=>a.idx-b.idx));
+}
+DayChart.prototype.bars=function(tf){ return dayViewBars(this.o.getDay(), tf); };
 DayChart.prototype.getView=function(tf){
   const bars=this.bars(tf);
   let v=this.view[tf];
@@ -4414,6 +4435,22 @@ DayChart.prototype.render=function(tf){
       ctx.fillText(DAYS[j].slice(5).replace('-','/')+(j===i?' 今天':''), x+4, Pd.t-8);
     }
   }
+  if(tf!=='60k'){   // 昨天＋今天：每一天的起點畫分隔線＋日期
+    const i=DAYS.indexOf(day);
+    for(let j=Math.max(0,i-DAY_VIEW_PREV);j<=i;j++){
+      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null) continue;
+      let p=-1; for(let k=0;k<segment.length;k++){ if((segment[k].idx_end||segment[k].idx)>=dw.lo){ p=k; break; } }
+      if(p<0) continue;
+      const x=X2(p)-cw/2;
+      if(p>0 || startPos===0){
+        ctx.strokeStyle=j===i?'rgba(100,180,255,0.6)':'rgba(255,255,255,0.18)'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+        if(p>0){ ctx.beginPath(); ctx.moveTo(x,Pd.t); ctx.lineTo(x,H-Pd.b); ctx.stroke(); }
+        ctx.setLineDash([]);
+      }
+      ctx.fillStyle=j===i?'rgba(100,180,255,0.95)':'#8a8a99'; ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
+      ctx.fillText(DAYS[j].slice(5).replace('-','/')+'（'+weekdayZh(DAYS[j])+'）'+(j===i?' 今天':' 前一天'), Math.max(Pd.l+70,x+4), Pd.t-8);
+    }
+  }
   drawIndicators(ctx, canvas._layout, tf, 'back');
   const span=(t)=>{
     const a=dayFindPos(bars,t.entryIdx,tf)-startPos, b=dayFindPos(bars,t.exitIdx,tf)-startPos;
@@ -4512,7 +4549,7 @@ DayChart.prototype.chdr=function(tf, bar){
   const px=document.getElementById(P+'px_'+tf); if(px) px.textContent=bar.c.toFixed(1);
   const te=document.getElementById(P+'time_'+tf); if(te) te.textContent=bar.ts||'—';
 };
-DayChart.prototype.crossAt=function(idx){
+DayChart.prototype.crossAt=function(idx, price){
   const P=this.o.prefix;
   this.o.getTFs().forEach(tf=>{
     const main=document.getElementById(P+'cv_'+tf), cv=document.getElementById(P+'cv_'+tf+'_cross');
@@ -4522,12 +4559,14 @@ DayChart.prototype.crossAt=function(idx){
     const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
     const pos=dayFindPos(this.bars(tf), idx, tf)-L.startPos;
     if(pos<0||pos>=L.segment.length) return;
-    const bar=L.segment[pos], sx=L.X(pos), cy=L.Y(bar.c), {W,H}=L, Pd=L.P;
+    const bar=L.segment[pos], sx=L.X(pos), {W,H}=L, Pd=L.P;
+    const pr = price!=null ? price : bar.c, cy=L.Y(pr), showH = cy>=Pd.t && cy<=H-Pd.b;   // 水平線跟著滑鼠的高度
     ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
     ctx.beginPath();ctx.moveTo(sx,Pd.t);ctx.lineTo(sx,H-Pd.b);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(Pd.l,cy);ctx.lineTo(W-Pd.r,cy);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-Pd.r+1,cy-9,Pd.r-3,18);
-    ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';ctx.fillText(bar.c.toFixed(1),W-Pd.r+4,cy+4);
+    if(showH){ ctx.beginPath();ctx.moveTo(Pd.l,cy);ctx.lineTo(W-Pd.r,cy);ctx.stroke(); }
+    ctx.setLineDash([]);
+    if(showH){ ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-Pd.r+1,cy-9,Pd.r-3,18);
+      ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';ctx.fillText(pr.toFixed((MKT.tick||1)<1?2:0),W-Pd.r+4,cy+4); }
     const tlW=36,tlX=Math.max(tlW/2+Pd.l,Math.min(W-Pd.r-tlW/2,sx));
     ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-Pd.b,tlW,14);
     ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(bar.ts,tlX,H-Pd.b+10);
@@ -4592,7 +4631,9 @@ DayChart.prototype.attach=function(tf){
       if(Math.abs(dx)>3){ drag.moved=true; body.classList.add('drag'); }
       if(drag.moved){ self.view[tf].end=drag.end-dx/l.cw; self.render(tf); self.clearCross(); return; }
     }
-    const b=barAt(e.clientX); if(b) self.crossAt(b.idx);
+    const b=barAt(e.clientX);
+    if(b){ const l=L(), r0=body.getBoundingClientRect(), my=e.clientY-r0.top;
+      self.crossAt(b.idx, (l && l.rng) ? l.hi-(my-l.P.t)/(l.H-l.P.t-l.P.b)*l.rng : null); }
     // 滑到標記上：顯示這筆的版本／進出場資訊
     const r=body.getBoundingClientRect(), h=self.hitAt(tf, e.clientX-r.left, e.clientY-r.top);
     const tip=document.getElementById(P+'tip_'+tf);
@@ -4747,7 +4788,7 @@ function mkovSelectDay(d){
   if(reopen) mkClsOpen(); else mkClsBtn();
   renderMkovCalendar(); renderMkovInfo();
   const i=DAYS.indexOf(d), hdr=document.getElementById('mkovHdr');
-  if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_WIN_LABEL}</span>`;
+  if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_VIEW_LABEL}</span>`;
   const p=document.getElementById('mkovPrev'), n=document.getElementById('mkovNext');
   if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1;
   mkovChart.renderAll();
@@ -5196,7 +5237,7 @@ function cmpSelectDay(d){
   cmpDay=d; cmpMonth=d.slice(0,7); cmpChart.resetAll();
   renderCmpCalendar(); renderCmpInfo();
   const hdr=document.getElementById('cmpHdr');
-  if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_WIN_LABEL}</span>`;
+  if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_VIEW_LABEL}</span>`;
   const days=cmpAllDays(), i=days.indexOf(d);
   const p=document.getElementById('cmpPrev'), n=document.getElementById('cmpNext');
   if(p) p.disabled=!days.length||(i===0)||(i<0&&d<=days[0]); if(n) n.disabled=!days.length||(i>=0&&i===days.length-1)||(i<0&&d>=days[days.length-1]);
