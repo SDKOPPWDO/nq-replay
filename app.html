@@ -1779,11 +1779,11 @@ const MKT_ALL = {
     rthOpenTW:d=>_isDST(d)?'21:30':'22:30', rthLen:390, tick:0.25,
     rthName:'美股開盤區間',
     rthDesc:'框出美股正規盤（夏令 21:30–04:00／冬令 22:30–05:00，台北時間）的走勢。方框上緣＝當日高點、下緣＝當日低點，高低點虛線一路延伸到隔天開盤前。只用目前播放到的K棒計算，不會看到未來。',
-    vbName:'美股盤中最大量帶',
-    vbDesc:'把美股盤中每根 1 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。收盤後才出現，延伸到隔天美股開盤前。',
+    vbName:'前日最大量帶（全天）',
+    vbDesc:'把前一天一整天（台北 06:00～隔天 05:00，美東 18:00～17:00 全部時段）每根 1 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子，畫在今天：從今天開盤一路延伸到收盤（播放到哪就畫到哪）。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。',
     histBars:0,          // NQ 一天就有 1380 根1分K，不用往前帶
     daySepTs:null,
-    vbWholeDay:false,
+    vbWholeDay:true,     // 最大量帶：用前一天全天（06:00～隔天 05:00）的量，畫在今天
     ptValue:2, commission:1, // MNQ $2/點；手續費每口來回 $1
     backupName:'NQ故事線+交易備份_'
   },
@@ -9075,7 +9075,9 @@ const INDICATORS = [
     id:'rthRange',
     name:MKT.rthName,
     desc:MKT.rthDesc,
-    opts:[{key:'labels', label:'顯示高低點價格標籤', def:true}],
+    opts:[
+      {key:'boxFill', label:'方框底色濃度（0＝透明，越大越深）', type:'number', def:6, min:0, max:40, step:1},
+      {key:'labels', label:'顯示高低點價格標籤', def:true}],
     back:(ctx,L,tf)=>drawRthRange(ctx,L,tf,'back'),
     top:(ctx,L,tf)=>drawRthRange(ctx,L,tf,'top')
   },
@@ -9285,7 +9287,7 @@ function drawRthRange(ctx, L, tf, layer){
     if(layer==='back'){
       // 方框
       if(s.endIdx>=vFirst){
-        ctx.fillStyle='rgba(37,99,235,0.13)';
+        { const fa=indOpt('rthRange','boxFill'); ctx.fillStyle='rgba(37,99,235,'+(Math.max(0,Math.min(40,+(fa==null||fa===''?6:fa)))/100).toFixed(3)+')'; }
         ctx.fillRect(x1, yH, Math.max(1,xBoxR-x1), Math.max(1,yL-yH));
         ctx.strokeStyle='rgba(59,130,246,0.55)'; ctx.lineWidth=1;
         ctx.strokeRect(x1+0.5, yH+0.5, Math.max(1,xBoxR-x1)-1, Math.max(1,yL-yH)-1);
@@ -9350,7 +9352,8 @@ function drawVolBandPrevDay(ctx, L, tf, layer){
         ctx.fillRect(x1, yTop, Math.max(1,x2-x1), h);
       } else if(showLbl){
         const typ = px>=bd.hi ? '支撐' : (px<=bd.lo ? '壓力' : '帶內');
-        const txt = (bd.main?'前日最大量 ':'前日高量 ')+typ+' '+bd.lo+'–'+bd.hi+'（'+(bd.main?100:Math.min(99,Math.round(bd.ratio*100)))+'%）';
+        const fp = v=>(MKT.tick||1)<1 ? v.toFixed(2) : v;
+        const txt = (bd.main?'前日最大量 ':'前日高量 ')+typ+' '+fp(bd.lo)+'–'+fp(bd.hi)+'（'+(bd.main?100:Math.min(99,Math.round(bd.ratio*100)))+'%）';
         const col = '#fb923c';
         ctx.font='bold 9px sans-serif';
         const w=ctx.measureText(txt).width+8, th=13;
