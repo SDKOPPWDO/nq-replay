@@ -2402,7 +2402,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
     view.forEach((b,i)=>{if((startIdx+i)%timeStep===0)ctx.fillText(b.ts,X(i),H-3);});
   };
   // 60K 開盤時段改用淺黃反白顯示（見上方），這裡一律畫一般時間標籤，不再畫21:00虛線
-  drawStepLabels();
+  // 底下固定的時間刻度不畫了（看時間用十字線）
 
   // 🛡 保本單：畫一條黃色虛線在「成本＋2點」
   if(tradeSystemOn && typeof getActiveTrade==='function'){
@@ -2516,10 +2516,12 @@ function drawCrossOnChart(cvId,bi){
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
   ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
   ctx.fillText(_pr.toFixed(_dec),W-P.r+4,closeY+4);
-  const tlW=36,tlH=14,tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx));
-  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
-  ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-  ctx.fillText(bar.ts,tlX,H-P.b+10);
+  // 十字線的時間：字放大 4 倍（36px），貼著圖的最下緣
+  ctx.font='bold 36px sans-serif';
+  const tlW=Math.ceil(ctx.measureText(bar.ts).width)+20, tlH=44, tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx)), tlY=H-tlH-2;
+  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,tlY,tlW,tlH);
+  ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(bar.ts,tlX,tlY+tlH/2+1);ctx.textBaseline='alphabetic';
 }
 
 // Cross sync using idx
