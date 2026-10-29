@@ -2522,7 +2522,32 @@ function drawCrossOnChart(cvId,bi){
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,tlY,tlW,tlH);
   ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText(bar.ts,tlX,tlY+tlH/2+1);ctx.textBaseline='alphabetic';
+  // 📏 量測：左鍵按住上下拉，顯示這段漲跌幾點
+  if(ptMeasure && cvId==='cv_'+ptMeasure.tf && crossMouse && crossMouse.tf===ptMeasure.tf){
+    const t=MKT.tick||0.25, p0=ptMeasure.p0;
+    const p1=Math.round((L.lo+(1-(crossMouse.y-P.t)/L.cH)*L.rng)/t)*t, d=p1-p0;
+    const x1=ptMeasure.x0, y1=Y(p0), x2=crossMouse.x, y2=Y(p1), up=d>0, col=d>0?UP:(d<0?DN:'#e5e7eb');
+    ctx.save();
+    ctx.fillStyle=up?'rgba(239,68,68,0.12)':'rgba(34,197,94,0.12)';
+    ctx.fillRect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1)||1,Math.abs(y2-y1)||1);
+    ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y1); ctx.moveTo(x1,y2); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const ah=7, dir=y2<y1?-1:1;   // 箭頭
+    if(Math.abs(y2-y1)>10){ ctx.fillStyle=col; ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-5,y2-dir*ah); ctx.lineTo(x2+5,y2-dir*ah); ctx.closePath(); ctx.fill(); }
+    const txt=(d>0?'+':(d<0?'-':''))+' '+Math.abs(d).toFixed(t<1?2:0).replace(/\.00$/,'')+' PT';
+    ctx.font='bold 18px sans-serif';
+    const tw=ctx.measureText(txt).width+16, th=28;
+    let lx=x2+12, ly=y2+(dir<0?-th-6:6);
+    if(lx+tw>W-P.r) lx=x2-tw-12; ly=Math.max(P.t,Math.min(H-P.b-th,ly));
+    ctx.fillStyle='rgba(13,13,15,0.9)'; ctx.fillRect(lx,ly,tw,th);
+    ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.strokeRect(lx+0.5,ly+0.5,tw-1,th-1);
+    ctx.fillStyle=col; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(txt,lx+8,ly+th/2+1); ctx.textBaseline='alphabetic';
+    ctx.restore();
+  }
 }
+let ptMeasure=null;   // {tf, x0, p0}
+window.addEventListener('mouseup',e=>{ if(!ptMeasure || e.button!==0) return; ptMeasure=null; const c=window._lastCross; if(c && crossMouse) handleCross(c[0],c[1],c[2]); });
 
 // Cross sync using idx
 function syncCrossFromIdx(globalIdx){
@@ -2583,10 +2608,12 @@ function updateChdrPrice(tf, bar){
 let crossMouse=null;
 function handleCross(tf,xFrac,yPx){
   crossMouse=(yPx==null)?null:{tf:tf,y:yPx};
+  window._lastCross=[tf,xFrac,yPx];
   const main=document.getElementById('cv_'+tf);
   if(!main||!main._layout) return;
   const{W,view,X}=main._layout;
   const mx=xFrac*W;
+  if(crossMouse) crossMouse.x=mx;
   let bi=0,bd=1e9;
   view.forEach((_,i)=>{const d=Math.abs(X(i)-mx);if(d<bd){bd=d;bi=i;}});
   const bar=view[bi];if(!bar) return;
@@ -2654,6 +2681,17 @@ function attachEvents(wrap,tf){
   wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width,e.clientY-r.top);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
   wrap.addEventListener('wheel',e=>{ e.preventDefault(); zoomTF(tf, e.deltaY<0?1:-1); },{passive:false});
+  // 📏 沒開模擬單時：左鍵按住上下拉＝量這段漲跌幾點，放開就消失
+  wrap.addEventListener('mousedown',e=>{
+    if(e.button!==0 || zoneMode || tradeSystemOn || (typeof snPick!=='undefined' && snPick)) return;
+    const cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
+    const L=cv._layout, r=wrap.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*L.W, my=e.clientY-r.top;
+    if(my<L.P.t || my>L.H-L.P.b) return;
+    e.preventDefault();
+    const t=MKT.tick||0.25;
+    ptMeasure={tf, x0:mx, p0:Math.round((L.lo+(1-(my-L.P.t)/L.cH)*L.rng)/t)*t};
+    handleCross(tf,(e.clientX-r.left)/r.width,my);
+  });
   // 📌 左鍵點一下：在十字線那條水平線跳出買／賣掛單
   wrap.addEventListener('click',e=>{
     if(e.button!==0 || zoneMode || !tradeSystemOn || (typeof snPick!=='undefined' && snPick)) return;
