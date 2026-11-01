@@ -341,6 +341,16 @@ canvas.cross{pointer-events:none;}
 .mkov-cal-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:9px;color:var(--t3);}
 .mkov-cal-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px;}
 .mkov-info{flex:1;min-height:0;overflow-y:auto;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;}
+.mkov-side{display:flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:6px 8px;}
+.mkov-side span{font-size:11px;color:var(--t3);font-weight:700;margin-right:2px;}
+.mkov-side button{flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.mkov-side button.on{background:#334155;border-color:#94a3b8;color:#fff;}
+.mkov-side button.long.on{background:var(--up);border-color:var(--up);} .mkov-side button.short.on{background:var(--dn);border-color:var(--dn);}
+.mkov-pnl{border:1.5px solid;border-radius:10px;padding:10px 12px;background:rgba(0,0,0,.2);}
+.mkov-pnl-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+.mkov-pnl-row span{font-size:13px;color:var(--t3);font-weight:800;}
+.mkov-pnl-row b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;}
+.mkov-pnl-sub{margin-top:4px;font-size:10.5px;color:var(--t3);text-align:right;}
 .mkov-trade-row{display:flex;align-items:center;gap:6px;padding:6px;border-radius:6px;font-size:10px;cursor:pointer;color:var(--t2);}
 .mkov-trade-row:hover{background:rgba(255,255,255,.06);}
 .mkov-trade-row b{color:#fff;}
@@ -4737,10 +4747,28 @@ function weekdayZh(d){ return ['日','一','二','三','四','五','六'][new Da
 
 // ================= 🌐 總體行情回顧 =================
 let mkovDay = null, mkovMonth = null, mkovTFs = null;
-function mkovTradesOf(d){
+// 多／空篩選：'all' 兩者、'long' 只看多單、'short' 只看空單（圖上記號、日曆、左邊損益都跟著篩）
+let mkovSide = (function(){ try{ const v=localStorage.getItem('mkovSide'); return ['all','long','short'].includes(v)?v:'all'; }catch(e){ return 'all'; } })();
+function mkovSideOk(t){ return mkovSide==='all' || t.dir===mkovSide; }
+function mkovTradesOf(d, ignoreSide){
   const out=[];
-  _allClosedTradesCache.forEach((t,i)=>{ if(t.date===d) out.push({t,i}); });
+  _allClosedTradesCache.forEach((t,i)=>{ if(t.date===d && (ignoreSide || mkovSideOk(t))) out.push({t,i}); });
   return out.sort((a,b)=>a.t.entryIdx-b.t.entryIdx);
+}
+function mkovPts(t){ return t.dir==='long' ? (t.exitPrice-t.entryPrice) : (t.entryPrice-t.exitPrice); }   // 每口幾點（跟下單面板的 Pt 一樣）
+function mkovSetSide(v){
+  mkovSide=v; try{ localStorage.setItem('mkovSide',v); }catch(e){}
+  document.querySelectorAll('#mkovSide button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+  // 這天沒有選的那種單 → 自動跳到最近一個有的日子
+  if(v!=='all' && !mkovTradesOf(mkovDay).length){
+    const ds=[...new Set(_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date))].sort();
+    if(ds.length){ const t=ds.filter(x=>x<=mkovDay).pop()||ds[0]; mkovSelectDay(t); return; }
+  }
+  renderMkovCalendar(); renderMkovInfo(); mkovSelectDay(mkovDay);
+}
+function mkovSideHtml(){
+  const b=(v,l)=>`<button data-v="${v}" class="${v}${mkovSide===v?' on':''}" onclick="mkovSetSide('${v}')">${l}</button>`;
+  return `<div class="mkov-side" id="mkovSide"><span>篩選</span>${b('all','多＋空')}${b('long','只看多單')}${b('short','只看空單')}</div>`;
 }
 const mkovChart = new DayChart({
   prefix:'mkov', wrapId:'mkovCanvasMulti',
@@ -4760,7 +4788,7 @@ function buildMktOverviewPage(){
   const page=document.getElementById('pageMktOverview');
   if(!DAYS.length){ page.innerHTML='<div class="tresult-empty">尚無行情資料</div>'; return; }
   if(!mkovDay || !DATA[mkovDay]){
-    const td=_allClosedTradesCache.map(t=>t.date).sort();
+    const td=_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date).sort();
     mkovDay = td.length ? td[td.length-1] : DAYS[DAYS.length-1];
   }
   mkovMonth = mkovDay.slice(0,7);
@@ -4769,6 +4797,7 @@ function buildMktOverviewPage(){
     <div class="mkov-layout">
       <div class="mkov-left">
         ${versionMiniHtml()}
+        ${mkovSideHtml()}
         <div class="mkov-cal" id="mkovCal"></div>
         <div class="mkov-info" id="mkovInfo"></div>
       </div>
@@ -4811,15 +4840,22 @@ function syncDayLayoutHeight(sel, after){
   });
 }
 function renderMkovCalendar(){
-  const pnl={}; _allClosedTradesCache.forEach(t=>{ pnl[t.date]=(pnl[t.date]||0)+t.pnl; });
+  const pnl={}; _allClosedTradesCache.forEach(t=>{ if(mkovSideOk(t)) pnl[t.date]=(pnl[t.date]||0)+t.pnl; });
+  const sideTxt=mkovSide==='long'?'多單':(mkovSide==='short'?'空單':'交易');
   renderMiniCalendar('mkovCal', mkovMonth, mkovDay, 'mkovSelectDay', 'mkovStepMonth', ds=>{
     const ck=mkClsOfDay(ds)?'<span class="cls-ic" title="已分類">🏷</span>':'';
-    if(pnl[ds]!==undefined) return {cls:pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'), tip:`${ds} 有交易 ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`, html:'<span class="dot"></span>'+ck};
-    return {cls:'notrade', tip:`${ds} 沒有交易`, html:'<span class="dot"></span>'+ck};
-  }, `<span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span><span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span><span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒交易</span>`);
+    if(pnl[ds]!==undefined) return {cls:pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'), tip:`${ds} 有${sideTxt} ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`, html:'<span class="dot"></span>'+ck};
+    return {cls:'notrade', tip:`${ds} 沒有${sideTxt}`, html:'<span class="dot"></span>'+ck};
+  }, `<span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span><span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span><span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒${sideTxt}</span>`);
 }
 function mkovStepMonth(dir){ mkovMonth=stepMonthStr(mkovMonth,dir); renderMkovCalendar(); }
-function mkovStepDay(dir){ const j=DAYS.indexOf(mkovDay)+dir; if(j>=0 && j<DAYS.length) mkovSelectDay(DAYS[j]); }
+function mkovStepDay(dir){
+  if(mkovSide!=='all'){   // 只看多單／空單時：跳到上一個／下一個有那種單的日子
+    const ds=[...new Set(_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date))].sort();
+    const t=dir>0 ? ds.find(x=>x>mkovDay) : ds.filter(x=>x<mkovDay).pop();
+    if(t) mkovSelectDay(t); return;
+  }
+  const j=DAYS.indexOf(mkovDay)+dir; if(j>=0 && j<DAYS.length) mkovSelectDay(DAYS[j]); }
 function mkovSelectDay(d){
   if(!DATA[d]) return;
   let reopen=false;
@@ -4830,7 +4866,8 @@ function mkovSelectDay(d){
   const i=DAYS.indexOf(d), hdr=document.getElementById('mkovHdr');
   if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_VIEW_LABEL}</span>`;
   const p=document.getElementById('mkovPrev'), n=document.getElementById('mkovNext');
-  if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1;
+  if(mkovSide!=='all'){ const ds=_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date); if(p) p.disabled=!ds.some(x=>x<d); if(n) n.disabled=!ds.some(x=>x>d); }
+  else { if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1; }
   mkovChart.renderAll();
 }
 function dayMarketStatsHtml(d){
@@ -4847,24 +4884,32 @@ function dayMarketStatsHtml(d){
 }
 function renderMkovInfo(){
   const el=document.getElementById('mkovInfo'); if(!el) return;
-  const d=mkovDay, items=mkovTradesOf(d);
-  let tr;
+  const d=mkovDay, items=mkovTradesOf(d), allN=mkovTradesOf(d,true).length;
+  const sideTxt=mkovSide==='long'?'多單':(mkovSide==='short'?'空單':'');
+  const UPC='#ef4444', DNC='#22c55e', col=v=>v>0?UPC:(v<0?DNC:'#e5e7eb'), sg=v=>v>0?'+':(v<0?'-':'');
+  let h;
   if(!items.length){
-    tr=`<div class="treplay-day-summary-title">🎯 當日交易</div>
+    h=`<div class="treplay-day-summary-title">💰 當日損益${sideTxt?`（${sideTxt}）`:''}</div>
       <div style="font-size:11px;color:#facc15;background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.25);border-radius:8px;padding:10px;line-height:1.6;">
-        這天沒有進場。<br><span style="color:var(--t2)">看看整天的走勢：是沒有出現訊號，還是訊號出現了但沒做？</span></div>`;
+        這天沒有${sideTxt||'進場'}。${allN?`<br><span style="color:var(--t2)">（這天有 ${allN} 筆${mkovSide==='long'?'空單':'多單'}，被篩選掉了）</span>`:'<br><span style="color:var(--t2)">看看整天的走勢：是沒有出現訊號，還是訊號出現了但沒做？</span>'}</div>`;
   } else {
-    const tot=items.reduce((a,x)=>a+x.t.pnl,0);
-    tr=`<div class="treplay-day-summary-title">🎯 當日交易 ${items.length} 筆 ・ <span style="color:${tot>=0?'#22c55e':'#ef4444'}">${tot>=0?'+':''}$${tot.toFixed(0)}</span></div>
+    const tot=items.reduce((a,x)=>a+x.t.pnl,0), pts=items.reduce((a,x)=>a+mkovPts(x.t),0);
+    const w=items.filter(x=>x.t.pnl>0).length;
+    h=`<div class="treplay-day-summary-title">💰 當日損益${sideTxt?`（${sideTxt}）`:''}</div>
+      <div class="mkov-pnl" style="border-color:rgba(250,204,21,.6)">
+        <div class="mkov-pnl-row"><span>$</span><b style="color:#facc15">${sg(tot)}${Math.abs(tot).toFixed(0)}</b></div>
+        <div class="mkov-pnl-sub">${items.length} 筆・贏 ${w} 筆・輸 ${items.length-w} 筆</div>
+      </div>
+      <div class="treplay-day-summary-title" style="margin-top:12px;">🎯 當日交易 ${items.length} 筆</div>
       ${items.map(({t,i})=>`
         <div class="mkov-trade-row" onclick="mkovChart.focusIdx(${t.entryIdx})" title="放大到這筆">
           <span style="color:var(--t3);width:20px;">#${i+1}</span>
           <span class="tresult-dir-tag ${t.dir}">${t.dir==='long'?'多':'空'}</span>
           <span><b>${t.entryTime}</b> → ${t.exitTime}</span>
-          <span style="margin-left:auto;font-weight:800;color:${t.pnl>=0?'#22c55e':'#ef4444'}">${t.pnl>=0?'+':''}${t.pnl.toFixed(0)}</span>
+          <span style="margin-left:auto;font-weight:800;color:${col(t.pnl)}">${sg(t.pnl)}${Math.abs(t.pnl).toFixed(0)}</span>
         </div>`).join('')}`;
   }
-  el.innerHTML=dayMarketStatsHtml(d)+tr;
+  el.innerHTML=h;
 }
 function toggleMkovTF(tf){
   mkovTFs=toggleTFList(mkovTFs, tf);
@@ -10272,7 +10317,7 @@ function mkClsRender(){
   document.querySelectorAll('.mkov-canvas-body').forEach(el=>el.classList.toggle('placing', !!(mkCls&&mkCls.tool)));
   const p=document.getElementById('mkovCls'); if(!p) return;
   if(!mkCls){ p.innerHTML=''; return; }
-  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d), tot=items.reduce((a,x)=>a+x.t.pnl,0);
+  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d,true), tot=items.reduce((a,x)=>a+x.t.pnl,0);
   const tb=(t,lbl)=>`<button class="mkc-tool${mkCls.tool===t?' on':''}" onclick="mkClsTool('${t}')">${lbl}</button>`;
   p.innerHTML=`
     <div class="mkc-h"><b>🏷 分類 ${d.slice(5).replace('-','/')}（${weekdayZh(d)}）的行情</b><button class="mkc-x" onclick="mkClsClose()">✕</button></div>
@@ -10298,7 +10343,7 @@ function mkClsRender(){
 }
 function mkClsSave(){
   if(!mkCls) return;
-  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d);
+  const r=mkCls.rec, d=r.day, items=mkovTradesOf(d,true);
   const nt=document.getElementById('mkcNote'); if(nt) r.note=nt.value.trim();
   const fs=document.getElementById('mkcFolder'); if(fs) r.folder=fs.value;
   const b5=dayWindowBars(d, mkTf5()), last=b5[b5.length-1];
