@@ -4391,11 +4391,27 @@ function dayViewBars(d, tf){
   ds.forEach(x=>((DATA[x]&&DATA[x][tf])||[]).forEach(b=>{ if(b.idx>=lo && b.idx<=w.hi) map.set(b.idx,b); }));
   return (_dayWinCache[key]=[...map.values()].sort((a,b)=>a.idx-b.idx));
 }
-DayChart.prototype.bars=function(tf){ return dayViewBars(this.o.getDay(), tf); };
+// 按「小」可以往前多看：最多 12 個交易日（預設畫面還是上面那個範圍）
+const DAY_EXT_DAYS = 12;
+function dayViewBarsAll(d, tf){
+  const key='all|'+d+'|'+tf;
+  if(_dayWinCache[key]) return _dayWinCache[key];
+  const i=DAYS.indexOf(d), w=dayWindowOf(d), def=dayViewBars(d, tf);
+  if(i<=0 || w.lo===null || !def.length) return (_dayWinCache[key]=def);
+  let lo=def[0].idx; const ds=[];
+  for(let j=Math.max(0,i-DAY_EXT_DAYS);j<=i;j++){ ds.push(DAYS[j]); if(j>i-DAY_EXT_DAYS){ const pw=dayWindowOf(DAYS[j]); if(pw.lo!==null) lo=Math.min(lo,pw.lo); } }
+  const map=new Map();
+  // 每天的資料檔最前面幾百根，均線還在暖機（數值不準）→ 已經有別天的版本就不要蓋掉
+  ds.forEach(x=>((DATA[x]&&DATA[x][tf])||[]).forEach((b,k)=>{ if(b.idx>=lo && b.idx<=w.hi && (k>=300 || !map.has(b.idx))) map.set(b.idx,b); }));
+  def.forEach(b=>{ if(!map.has(b.idx)) map.set(b.idx,b); });
+  return (_dayWinCache[key]=[...map.values()].sort((a,b)=>a.idx-b.idx));
+}
+DayChart.prototype.bars=function(tf){ return dayViewBarsAll(this.o.getDay(), tf); };
+DayChart.prototype.defN=function(tf){ return Math.min(this.bars(tf).length, dayViewBars(this.o.getDay(), tf).length); };   // 預設要顯示幾根
 DayChart.prototype.getView=function(tf){
   const bars=this.bars(tf);
   let v=this.view[tf];
-  if(!v) v={n:bars.length, end:bars.length-1};
+  if(!v) v={n:this.defN(tf), end:bars.length-1};
   v.n=Math.max(Math.min(20,bars.length), Math.min(bars.length, Math.round(v.n)));
   v.end=Math.max(v.n-1, Math.min(bars.length-1, Math.round(v.end)));
   this.view[tf]=v; return v;
@@ -4414,7 +4430,7 @@ DayChart.prototype.focusIdx=function(idx){
   this.o.getTFs().forEach(tf=>{
     const bars=this.bars(tf), pos=dayFindPos(bars, idx, tf);
     if(pos<0) return;
-    const n=Math.min(bars.length, tf==='60k'?bars.length:Math.max(40, Math.round(bars.length/3)));
+    const dn=this.defN(tf), n=Math.min(bars.length, tf==='60k'?dn:Math.max(40, Math.round(dn/3)));
     this.view[tf]={n, end:pos+Math.round(n/2)};
     this.render(tf);
   });
@@ -4490,10 +4506,11 @@ DayChart.prototype.render=function(tf){
     ctx.fillStyle='#999';ctx.font='11px monospace';ctx.textAlign='left';ctx.fillText(price.toFixed(1),W-Pd.r+4,y+3);
   }
   // 60K 帶了前幾天：每一天的起點畫分隔線＋日期，當天底色稍亮
+  const _segLo=segment.length?segment[0].idx:0;
   if(tf==='60k'){
     const i=DAYS.indexOf(day);
-    for(let j=Math.max(0,i-DAY60_PREV);j<=i;j++){
-      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null) continue;
+    for(let j=Math.max(0,i-DAY_EXT_DAYS);j<=i;j++){
+      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null || dw.lo<_segLo) continue;
       let p=-1; for(let k=0;k<segment.length;k++){ if((segment[k].idx_end||segment[k].idx)>=dw.lo){ p=k; break; } }
       if(p<0) continue;
       const x=X2(p)-cw/2;
@@ -4506,8 +4523,10 @@ DayChart.prototype.render=function(tf){
   }
   if(tf!=='60k'){   // 昨天＋今天：每一天的起點畫分隔線＋日期
     const i=DAYS.indexOf(day);
-    for(let j=Math.max(0,i-DAY_VIEW_PREV);j<=i;j++){
-      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null) continue;
+    let _firstLbl=true;
+    for(let j=Math.max(0,i-DAY_EXT_DAYS);j<=i;j++){
+      const dw=dayWindowOf(DAYS[j]); if(dw.lo===null || dw.hi<_segLo) continue;
+      if(dw.lo<_segLo && !_firstLbl) continue; _firstLbl=false;
       let p=-1; for(let k=0;k<segment.length;k++){ if((segment[k].idx_end||segment[k].idx)>=dw.lo){ p=k; break; } }
       if(p<0) continue;
       const x=X2(p)-cw/2;
@@ -4517,7 +4536,8 @@ DayChart.prototype.render=function(tf){
         ctx.setLineDash([]);
       }
       ctx.fillStyle=j===i?'rgba(100,180,255,0.95)':'#8a8a99'; ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
-      ctx.fillText(DAYS[j].slice(5).replace('-','/')+'（'+weekdayZh(DAYS[j])+'）'+(j===i?' 今天':' 前一天'), Math.max(Pd.l+70,x+4), Pd.t-8);
+      const _crowd=segment.length>this.defN(tf)*1.6;   // 按「小」看很多天時，標籤縮短避免重疊
+      ctx.fillText(DAYS[j].slice(5).replace('-','/')+(_crowd?(j===i?' 今天':''):'（'+weekdayZh(DAYS[j])+'）'+(j===i?' 今天':(j===i-1?' 前一天':''))), Math.max(Pd.l+(_crowd?4:70),x+4), Pd.t-8);
     }
   }
   drawIndicators(ctx, canvas._layout, tf, 'back');
