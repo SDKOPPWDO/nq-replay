@@ -10485,6 +10485,12 @@ function snMkPane(ctx, s, tf, x0, y0, w, h, mini){
     }
   }
   if(tf!=='60k') (s.marks||[]).forEach(m=>{ if(m.tf!=='60k') return; const r=mk60Range(s.day,m.idx); if(r) mkShade(ctx, bars, X, cw, r, y0+P.t, y0+h-P.b); });
+  // 指標（跟主畫面、總體行情回顧共用設定）
+  const _last=bars[n-1];
+  const IL=mini?null:{P, W:w, H:h, segment:bars, view:bars, cw, startPos:0, X:i=>P.l+cw*(i+0.5), Y:p=>P.t+(h-P.t-P.b)*(1-(p-lo)/rg),
+    lo, hi, rng:rg, cH:h-P.t-P.b, cap:(_last.idx_end||_last.idx), capPx:_last.c, day:s.day};
+  const _ind=layer=>{ if(!IL) return; ctx.save(); ctx.translate(x0,y0); try{ drawIndicators(ctx, IL, tf, layer); }catch(e){} ctx.restore(); };
+  _ind('back');
   const bw=Math.max(1,Math.min(cw*0.7,12));
   bars.forEach((b,i)=>{ const x=Math.round(X(i))+.5, col=b.c>=b.o?UP:DN;
     ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,Y(b.h)); ctx.lineTo(x,Y(b.l)); ctx.stroke();
@@ -10492,6 +10498,7 @@ function snMkPane(ctx, s, tf, x0, y0, w, h, mini){
   ['m5','m10','m20','m60'].forEach((k,mi)=>{ const ma=maConfig[mi]; if(!ma||!ma.on) return;
     ctx.strokeStyle=ma.c; ctx.lineWidth=mini?1:(mi===3?1.8:1.2); ctx.beginPath(); let st=false;
     bars.forEach((b,i)=>{ const v=b[k]; if(v==null) return; st?ctx.lineTo(X(i),Y(v)):(ctx.moveTo(X(i),Y(v)),st=true); }); ctx.stroke(); });
+  _ind('top');
   const nm=mkNums(s.marks||[]);
   (s.marks||[]).forEach((m,k)=>{ if(tf!=='60k' && m.tf==='60k') return; const pos=dayFindPos(bars,m.idx,tf); if(pos<0) return; mkDrawMark(ctx,m,X(pos),Y(m.price),mini?0.6:1,nm[k]); });
   ctx.fillStyle='rgba(255,255,255,.85)'; ctx.font=`bold ${mini?9:12}px sans-serif`; ctx.textAlign='left'; ctx.fillText(tfDisp(tf), x0+4, y0+(mini?10:14));
@@ -10518,8 +10525,17 @@ function snDrawMk(cv, s, opt){
   ctx.save();
   ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
   ctx.beginPath(); ctx.moveTo(sx,top); ctx.lineTo(sx,bot); ctx.moveTo(L.x0+L.P.l,cy); ctx.lineTo(L.x0+L.w-L.P.r,cy); ctx.stroke();
-  if(O){ const j=dayFindPos(O.bars,b.idx,O.tf); if(j>=0){ const ox=Math.round(O.X(j))+.5; ctx.strokeStyle='rgba(250,204,21,0.45)'; ctx.beginPath(); ctx.moveTo(ox,O.y0+O.P.t); ctx.lineTo(ox,O.y0+O.h-O.P.b); ctx.stroke(); } }
+  let oPr=null;
+  if(O){ const j=dayFindPos(O.bars,b.idx,O.tf); if(j>=0){ const ox=Math.round(O.X(j))+.5, ot=O.y0+O.P.t, ob=O.y0+O.h-O.P.b, oy=O.Y(pr);
+    ctx.strokeStyle='rgba(250,204,21,0.55)'; ctx.beginPath(); ctx.moveTo(ox,ot); ctx.lineTo(ox,ob);
+    if(oy>=ot && oy<=ob){ ctx.moveTo(O.x0+O.P.l,oy); ctx.lineTo(O.x0+O.w-O.P.r,oy); oPr=oy; }   // 同一個價位的水平線
+    ctx.stroke();
+    const ob2=O.bars[j], ol=snDateOfIdx(ob2.idx,true)+' '+ob2.ts; ctx.setLineDash([]); ctx.font='bold 10px sans-serif';
+    const otw=ctx.measureText(ol).width+12, otx=Math.max(O.x0+O.P.l+otw/2,Math.min(O.x0+O.w-O.P.r-otw/2,ox));
+    ctx.fillStyle='rgba(250,204,21,0.95)'; ctx.fillRect(otx-otw/2,ob,otw,16); ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText(ol,otx,ob+12); } }
   ctx.setLineDash([]);
+  if(O && oPr!=null){ const orx=O.x0+O.w-O.P.r+1; ctx.fillStyle='rgba(250,204,21,0.95)'; ctx.fillRect(orx,oPr-9,O.P.r-3,18);
+    ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(dec),orx+3,oPr+4); }
   const rx=L.x0+L.w-L.P.r+1; ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(rx,cy-9,L.P.r-3,18);
   ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(dec),rx+3,cy+4);
   const lbl=snDateOfIdx(b.idx,true)+' '+b.ts; ctx.font='bold 10px sans-serif'; const tw=ctx.measureText(lbl).width+12, tx=Math.max(L.x0+L.P.l+tw/2,Math.min(L.x0+L.w-L.P.r-tw/2,sx));
