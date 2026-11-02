@@ -1365,6 +1365,13 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
 .ord-apply{width:100%;padding:6px 0;border-radius:6px;border:1px solid #f97316;background:rgba(249,115,22,.15);color:#fdba74;font:inherit;font-size:11px;font-weight:800;cursor:pointer;}
 .ord-note{margin-top:8px;font-size:10.5px;color:var(--t3);line-height:1.5;}
 .rg-wrap{width:100%;}
+.rg-side{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.rg-side span{font-size:12px;color:var(--t3);font-weight:800;margin-right:2px;}
+.rg-side button{padding:6px 14px;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;}
+.rg-side button i{font-style:normal;font-weight:600;opacity:.75;font-size:11px;margin-left:2px;}
+.rg-side button.on{background:#334155;border-color:#94a3b8;color:#fff;}
+.rg-side button.long.on{background:var(--up);border-color:var(--up);} .rg-side button.short.on{background:var(--dn);border-color:var(--dn);}
+.rg-side em{font-style:normal;font-size:12px;color:var(--t3);margin-left:6px;} .rg-side em b.up{color:#f87171;} .rg-side em b.dn{color:#4ade80;}
 .rg-tiles{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin-bottom:10px;}
 .rg-tile{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 11px;cursor:pointer;min-width:0;}
 .rg-tile:hover{border-color:#facc15;}
@@ -4035,7 +4042,9 @@ function buildRankingPage(){
     return {t, i, pnl:t.pnl, per:t.pnl/q,
       mfe:Math.max(0,t.mfe||0)/(q*PTV), mae:Math.abs(Math.min(0,t.mae||0))/(q*PTV),
       ex:t.dir==='long'?(t.exitPrice-t.entryPrice):(t.entryPrice-t.exitPrice),
-      hold:Math.max(1,(t.exitIdx-t.entryIdx)*MU), key:t.date+' '+t.entryTime}; });
+      hold:Math.max(1,(t.exitIdx-t.entryIdx)*MU), key:t.date+' '+t.entryTime}; }).filter(o=>rgSide==='all'||o.t.dir===rgSide);   // 多／空篩選（i 保留原本編號，點了才跳得到對的那筆）
+  const sideBar = rgSideHtml(T.length);
+  if(!T.length){ page.innerHTML = `<div class="rg-wrap">${sideBar}<div class="tresult-empty">這段期間沒有${rgSide==='long'?'多單':'空單'}</div></div>`; _RG.T=null; return; }
   T.forEach(o=>{ o.ratio = o.mfe/Math.max(o.mae,1); });
   const chrono = T.slice().sort((a,b)=>a.key.localeCompare(b.key));
 
@@ -4080,6 +4089,7 @@ function buildRankingPage(){
   const S=_RG.sort, M=_RG.mode;
   const sb=(k,l)=>`<button class="${S===k?'on':''}" onclick="rgSort(this,'${k}')">${l}</button>`;
   page.innerHTML = `<div class="rg-wrap">
+    ${sideBar}
     <div class="rg-tiles">${tiles}</div>
     <div class="rg-row rg-r1">
       <div class="rk-box"><div class="rk-h">💰 每一筆損益排行（左＝最賺、右＝最賠；點一下跳到那筆）
@@ -4102,6 +4112,15 @@ function buildRankingPage(){
     </div>
   </div>`;
   requestAnimationFrame(rgDrawAll);
+}
+// 排行榜：只看多單／只看空單／多＋空（記住上次選的）
+let rgSide = (function(){ try{ const v=localStorage.getItem('rgSide'); return ['all','long','short'].includes(v)?v:'all'; }catch(e){ return 'all'; } })();
+function rgSetSide(v){ rgSide=v; try{ localStorage.setItem('rgSide',v); }catch(e){} buildRankingPage(); }
+function rgSideHtml(n){
+  const all=_allClosedTradesCache, nL=all.filter(t=>t.dir==='long').length, nS=all.length-nL;
+  const b=(v,l,c)=>`<button data-v="${v}" class="${v}${rgSide===v?' on':''}" onclick="rgSetSide('${v}')">${l} <i>${c}</i></button>`;
+  return `<div class="rg-side"><span>篩選</span>${b('all','多＋空',all.length)}${b('long','只看多單',nL)}${b('short','只看空單',nS)}
+    <em>${rgSide==='all'?'排行榜裡的所有圖表都算全部的單':`排行榜裡的所有圖表都只算<b class="${rgSide==='long'?'up':'dn'}">${rgSide==='long'?'多單':'空單'}</b>（${n} 筆）；每天損益＝當天${rgSide==='long'?'多單':'空單'}的損益`}</em></div>`;
 }
 function rgSort(btn,k){ _RG.sort=k; btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn)); rgDrawBf(); rgDrawSc(); }
 function rgMode(btn,k){ _RG.mode=k; btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn)); rgDrawPnl(); }
@@ -4563,19 +4582,20 @@ DayChart.prototype.render=function(tf){
       if(below){
         const tip=Y2(b.l)+GAP+off;              // 箭頭尖端（朝上指向K棒）
         ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,tip);ctx.lineTo(x-AW,tip+AH);ctx.lineTo(x+AW,tip+AH);ctx.closePath();ctx.fill();
-        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();}
+        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();} else {ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();}   // 白框：跟K棒分得出來
         ctx.fillStyle=vColor||'#fff';bigTxt(ctx,txt,x,tip+AH+14);
         ey=tip+AH/2;
       } else {
         const tip=Y2(b.h)-GAP-off;              // 箭頭尖端（朝下指向K棒）
         ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x,tip);ctx.lineTo(x-AW,tip-AH);ctx.lineTo(x+AW,tip-AH);ctx.closePath();ctx.fill();
-        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();}
+        if(vColor){ctx.strokeStyle=ring;ctx.lineWidth=1.6;ctx.stroke();} else {ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();}   // 白框：跟K棒分得出來
         ctx.fillStyle=vColor||'#fff';bigTxt(ctx,txt,x,tip-AH-5);
         ey=tip-AH/2;
       }
       if(l.price!=null){
         ctx.strokeStyle=vColor||(l.type==='entry'?(t.dir==='long'?UP:DN):'#a855f7');ctx.lineWidth=1.5;
         const hw=Math.min(Math.max(cw*0.45,5),12);
+        if(!vColor){ const sc=ctx.strokeStyle; ctx.strokeStyle='#fff';ctx.lineWidth=4.5;ctx.beginPath();ctx.moveTo(x-hw-1.5,Y2(l.price));ctx.lineTo(x+hw+1.5,Y2(l.price));ctx.stroke(); ctx.strokeStyle=sc;ctx.lineWidth=1.5; }
         ctx.beginPath();ctx.moveTo(x-hw,Y2(l.price));ctx.lineTo(x+hw,Y2(l.price));ctx.stroke();
       }
       hits.push({x,y:ey,m,l});
