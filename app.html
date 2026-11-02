@@ -6466,6 +6466,45 @@ function buildEffCard(dirLabel, stats, color, chartHTML){
   const pnlColor = totalPnl >= 0 ? 'var(--up)' : 'var(--dn)';
 
   // Build equity curve SVG
+// 每月損益直方圖（SVG，寬度自動填滿）
+function monthlyPnlSVG(trades){
+  const m={};
+  (trades||[]).forEach(t=>{ const k=(t.date||'').slice(0,7); if(!k) return; const o=m[k]||(m[k]={pnl:0,n:0,w:0}); o.pnl+=t.pnl; o.n++; if(t.pnl>0) o.w++; });
+  let ks=Object.keys(m).sort();
+  if(!ks.length) return '<div style="font-size:11px;color:var(--t3);padding:10px;">沒有交易</div>';
+  // 中間沒交易的月份也補上（顯示 0）
+  const all=[]; let [y,mo]=ks[0].split('-').map(Number); const last=ks[ks.length-1];
+  while(true){ const k=`${y}-${String(mo).padStart(2,'0')}`; all.push(k); if(k>=last||all.length>240) break; mo++; if(mo>12){mo=1;y++;} }
+  ks=all;
+  const W=1000, H=230, P={l:64,r:14,t:26,b:44};
+  const vals=ks.map(k=>m[k]?m[k].pnl:0), hi0=Math.max(0,...vals), lo0=Math.min(0,...vals), sp=(hi0-lo0)||1;
+  const hi=hi0+sp*0.12, lo=lo0-(lo0<0?sp*0.12:0);
+  const Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
+  // 刻度
+  const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw||1))), st=[1,2,2.5,5,10].map(x=>x*mag).find(x=>x>=raw)||mag*10;
+  let g='';
+  for(let v=Math.ceil(lo/st)*st; v<=hi+1e-9; v+=st){ const yy=Y(v).toFixed(1);
+    g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${yy}" y2="${yy}" stroke="rgba(255,255,255,${Math.abs(v)<1e-9?.35:.07})"/><text x="${P.l-6}" y="${(+yy+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9ca3af">${v<0?'-':''}$${Math.abs(v).toFixed(0)}</text>`; }
+  const cw=(W-P.l-P.r)/ks.length, bw=Math.min(56, cw*0.66), y0=Y(0);
+  const lblEvery=Math.max(1, Math.ceil(ks.length/24));
+  ks.forEach((k,i)=>{
+    const o=m[k], v=o?o.pnl:0, cx=P.l+cw*(i+0.5), yv=Y(v), col=v>0?UP:(v<0?DN:'#6b7280');
+    const tip=o?`${k}｜${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}｜${o.n} 筆・勝率 ${(o.w/o.n*100).toFixed(0)}%`:`${k}｜沒有交易`;
+    g+=`<g><title>${tip}</title><rect x="${(cx-cw/2).toFixed(1)}" y="${P.t}" width="${cw.toFixed(1)}" height="${H-P.t-P.b}" fill="transparent"/>`;
+    if(o) g+=`<rect x="${(cx-bw/2).toFixed(1)}" y="${Math.min(yv,y0).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1.5,Math.abs(yv-y0)).toFixed(1)}" rx="3" fill="${col}" fill-opacity="0.9"/>`;
+    if(o && ks.length<=36) g+=`<text x="${cx.toFixed(1)}" y="${(v>=0?yv-6:yv+14).toFixed(1)}" text-anchor="middle" font-size="${ks.length>18?10:12}" font-weight="800" fill="${col}">${v>=0?'+':'-'}$${Math.abs(v).toFixed(0)}</text>`;
+    if(i%lblEvery===0){
+      const [yy,mm]=k.split('-');
+      g+=`<text x="${cx.toFixed(1)}" y="${H-P.b+16}" text-anchor="middle" font-size="11.5" fill="#e5e7eb" font-weight="700">${(i===0||mm==='01')?yy+'/':''}${+mm}月</text>`;
+      if(o && ks.length<=24) g+=`<text x="${cx.toFixed(1)}" y="${H-P.b+31}" text-anchor="middle" font-size="10" fill="#9ca3af">${o.n} 筆</text>`;
+    }
+    g+='</g>';
+  });
+  const tot=vals.reduce((a,b)=>a+b,0), pos=ks.filter(k=>m[k]&&m[k].pnl>0).length, neg=ks.filter(k=>m[k]&&m[k].pnl<0).length;
+  return `<div style="font-size:11px;color:var(--t3);margin:-2px 0 4px;">共 ${ks.filter(k=>m[k]).length} 個月有交易・<span style="color:${UP}">賺 ${pos} 個月</span>・<span style="color:${DN}">賠 ${neg} 個月</span>・平均每月 <b style="color:${tot>=0?UP:DN}">${tot>=0?'+':'-'}$${Math.abs(tot/Math.max(1,ks.filter(k=>m[k]).length)).toFixed(0)}</b></div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-height:300px;display:block;">${g}</svg>`;
+}
+
 // 共用函數：給定一組累積損益曲線數值，產生SVG圖
 // 產生平滑曲線路徑（Catmull-Rom 近似，視覺更柔順）
 function smoothPath(points){
@@ -6806,6 +6845,11 @@ const shortSVG = buildEquityCurveSVG(shortCurve, '#22c55e', shortTradesSorted.ma
       <div class="tresult-stat"><div class="tresult-stat-lbl">最大回撤<br><span style="font-size:7.5px;color:var(--t3);font-weight:400;">(已實現)</span></div><div class="tresult-stat-val" style="color:#f59e0b">$${mdd.toFixed(0)}</div></div>
       <div class="tresult-stat" style="border-color:rgba(245,158,11,0.3);"><div class="tresult-stat-lbl">最大回撤<br><span style="font-size:7.5px;color:#f59e0b;font-weight:600;">(含影線/未實現)</span></div><div class="tresult-stat-val" style="color:#f59e0b">$${overallUnrealizedMDD.toFixed(0)}</div></div>
       <div class="tresult-stat"><div class="tresult-stat-lbl">單筆期望值</div><div class="tresult-stat-val" style="color:${expectancy>=0?'var(--up)':'var(--dn)'}">${fmtMoney(expectancy)}</div></div>
+    </div>
+
+    <div class="tresult-section">
+      <div class="tresult-section-title">📅 每月損益<span style="font-size:9px;color:var(--t3);font-weight:400;margin-left:6px;">(已實現損益・紅＝賺、綠＝賠)</span></div>
+      ${monthlyPnlSVG(trades)}
     </div>
 
     <div class="tresult-section">
