@@ -2528,6 +2528,16 @@ function drawChart(id,bars,cursor,timeStep,pan){
   drawZonesTop(ctx, cv._layout);
 }
 
+// ✛ K 線十字線共用樣式（改顏色／粗細／價格字級都在這裡）
+const XH_COLOR='#22d3ee', XH_WIDTH=2, XH_DASH=[7,4], XH_ALT_COLOR='#facc15';
+function xhStyle(ctx,color){ ctx.strokeStyle=color||XH_COLOR; ctx.lineWidth=XH_WIDTH; ctx.setLineDash(XH_DASH); }
+// 右邊的價格：20px（原 10px 的 2 倍）。靠右貼齊，比價格軸寬時往左蓋到圖上，上下不超出圖
+function xhPriceTag(ctx,txt,right,y,top,bot,bg){
+  const h=28; ctx.setLineDash([]); ctx.font='bold 20px monospace';
+  const w=Math.ceil(ctx.measureText(txt).width)+10, x=right-w-1, ty=Math.max(top,Math.min(bot-h,y-h/2));
+  ctx.fillStyle=bg||'rgba(255,255,255,0.95)'; ctx.fillRect(x,ty,w,h);
+  ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(txt,x+5,ty+h/2+1); ctx.textBaseline='alphabetic';
+}
 function drawCrossOnChart(cvId,bi){
   const cv=document.getElementById(cvId+'_cross'),main=document.getElementById(cvId);
   if(!cv||!main||!main._layout) return;
@@ -2545,14 +2555,12 @@ function drawCrossOnChart(cvId,bi){
   const _pr=_hasP?Math.round(crossMouse.price/_tick)*_tick:(bar?bar.c:null);
   const closeY=_mouse?crossMouse.y:(_pr!=null?Y(_pr):-1);
   const _showH=_pr!=null && closeY>=P.t && closeY<=H-P.b;
-  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  xhStyle(ctx);
   if(bar){ ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke(); }
   if(_showH){ ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke(); }
   ctx.setLineDash([]);
   if(_showH){
-    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
-    ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
-    ctx.fillText(_pr.toFixed(_dec),W-P.r+4,closeY+4);
+    xhPriceTag(ctx,_pr.toFixed(_dec),W,closeY,0,H);
   }
   if(!bar) return;
   // 十字線的時間：字放大 4 倍（36px），貼著圖的最下緣
@@ -4718,12 +4726,11 @@ DayChart.prototype.crossAt=function(idx, price){
     if(pos<0||pos>=L.segment.length) return;
     const bar=L.segment[pos], sx=L.X(pos), {W,H}=L, Pd=L.P;
     const pr = price!=null ? price : bar.c, cy=L.Y(pr), showH = cy>=Pd.t && cy<=H-Pd.b;   // 水平線跟著滑鼠的高度
-    ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    xhStyle(ctx);
     ctx.beginPath();ctx.moveTo(sx,Pd.t);ctx.lineTo(sx,H-Pd.b);ctx.stroke();
     if(showH){ ctx.beginPath();ctx.moveTo(Pd.l,cy);ctx.lineTo(W-Pd.r,cy);ctx.stroke(); }
     ctx.setLineDash([]);
-    if(showH){ ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-Pd.r+1,cy-9,Pd.r-3,18);
-      ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';ctx.fillText(pr.toFixed((MKT.tick||1)<1?2:0),W-Pd.r+4,cy+4); }
+    if(showH) xhPriceTag(ctx,pr.toFixed((MKT.tick||1)<1?2:0),W,cy,0,H);
     const tlW=36,tlX=Math.max(tlW/2+Pd.l,Math.min(W-Pd.r-tlW/2,sx));
     ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-Pd.b,tlW,14);
     ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(bar.ts,tlX,H-Pd.b+10);
@@ -5770,13 +5777,11 @@ function drawReplayCross(tf, bi){
   const {P,W,H,segment,X,Y} = L;
   if(bi<0 || bi>=segment.length) return;
   const bar = segment[bi], sx = X(bi), closeY = Y(bar.c);
-  ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  xhStyle(ctx);
   ctx.beginPath(); ctx.moveTo(sx,P.t); ctx.lineTo(sx,H-P.b); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(P.l,closeY); ctx.lineTo(W-P.r,closeY); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
-  ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left';
-  ctx.fillText(bar.c.toFixed(1),W-P.r+4,closeY+4);
+  xhPriceTag(ctx,bar.c.toFixed(1),W,closeY,0,H);
   const tlW=36, tlH=14, tlX=Math.max(tlW/2+P.l, Math.min(W-P.r-tlW/2, sx));
   ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
   ctx.fillStyle='#000'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
@@ -9269,13 +9274,11 @@ function drawSmktCross(tf,bi){
   const {P,W,H,segment,X,Y}=L;
   if(bi<0||bi>=segment.length) return;
   const bar=segment[bi],sx=X(bi),closeY=Y(bar.c);
-  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  xhStyle(ctx);
   ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke();
   ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
-  ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
-  ctx.fillText(bar.c.toFixed(1),W-P.r+4,closeY+4);
+  xhPriceTag(ctx,bar.c.toFixed(1),W,closeY,0,H);
   const tlW=36,tlH=14,tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx));
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,H-P.b,tlW,tlH);
   ctx.fillStyle='#000';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
@@ -9956,10 +9959,10 @@ function snDrawChart(cv, s, opt){
     const i=Math.max(0,Math.min(n-1,Math.round((opt.cross.x-P.l)/CS-0.5))), sx=Math.round(X(i))+.5;
     hb=bars[i]; hi2=i;
     const cy=Math.max(P.t,Math.min(H-P.b,opt.cross.y)), tick=MKT.tick||0.25, pr=Math.round((lo+(1-(cy-P.t)/cH)*rg)/tick)*tick;
-    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.setLineDash([4,4]);
+    xhStyle(ctx);
     ctx.beginPath(); ctx.moveTo(sx,P.t); ctx.lineTo(sx,H-P.b); ctx.moveTo(P.l,cy); ctx.lineTo(W-P.r,cy); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(W-P.r+1,cy-9,P.r-3,18);
-    ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(tick<1?2:0),W-P.r+4,cy+4);
+    xhPriceTag(ctx,pr.toFixed(tick<1?2:0),W,cy,0,H);
+    ctx.font='bold 10px sans-serif';
     const lbl=dates[i]+' '+hb.ts, tw=ctx.measureText(lbl).width+12, tx=Math.max(P.l+tw/2,Math.min(W-P.r-tw/2,sx));
     ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tx-tw/2,H-P.b,tw,16);
     ctx.fillStyle='#000'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.fillText(lbl,tx,H-P.b+12);
@@ -10590,21 +10593,19 @@ function snDrawMk(cv, s, opt){
   const top=L.y0+L.P.t, bot=L.y0+L.h-L.P.b, cy=Math.max(top,Math.min(bot,c.y)), tick=MKT.tick||0.25;
   const pr=Math.round((L.hi-(cy-top)/(bot-top)*L.rg)/tick)*tick, dec=tick<1?2:0;
   ctx.save();
-  ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  xhStyle(ctx);
   ctx.beginPath(); ctx.moveTo(sx,top); ctx.lineTo(sx,bot); ctx.moveTo(L.x0+L.P.l,cy); ctx.lineTo(L.x0+L.w-L.P.r,cy); ctx.stroke();
   let oPr=null;
   if(O){ const j=dayFindPos(O.bars,b.idx,O.tf); if(j>=0){ const ox=Math.round(O.X(j))+.5, ot=O.y0+O.P.t, ob=O.y0+O.h-O.P.b, oy=O.Y(pr);
-    ctx.strokeStyle='rgba(250,204,21,0.55)'; ctx.beginPath(); ctx.moveTo(ox,ot); ctx.lineTo(ox,ob);
+    ctx.strokeStyle=XH_ALT_COLOR; ctx.beginPath(); ctx.moveTo(ox,ot); ctx.lineTo(ox,ob);
     if(oy>=ot && oy<=ob){ ctx.moveTo(O.x0+O.P.l,oy); ctx.lineTo(O.x0+O.w-O.P.r,oy); oPr=oy; }   // 同一個價位的水平線
     ctx.stroke();
     const ob2=O.bars[j], ol=snDateOfIdx(ob2.idx,true)+' '+ob2.ts; ctx.setLineDash([]); ctx.font='bold 10px sans-serif';
     const otw=ctx.measureText(ol).width+12, otx=Math.max(O.x0+O.P.l+otw/2,Math.min(O.x0+O.w-O.P.r-otw/2,ox));
     ctx.fillStyle='rgba(250,204,21,0.95)'; ctx.fillRect(otx-otw/2,ob,otw,16); ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText(ol,otx,ob+12); } }
   ctx.setLineDash([]);
-  if(O && oPr!=null){ const orx=O.x0+O.w-O.P.r+1; ctx.fillStyle='rgba(250,204,21,0.95)'; ctx.fillRect(orx,oPr-9,O.P.r-3,18);
-    ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(dec),orx+3,oPr+4); }
-  const rx=L.x0+L.w-L.P.r+1; ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(rx,cy-9,L.P.r-3,18);
-  ctx.fillStyle='#000'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(pr.toFixed(dec),rx+3,cy+4);
+  if(O && oPr!=null) xhPriceTag(ctx,pr.toFixed(dec),O.x0+O.w,oPr,O.y0,O.y0+O.h,'rgba(250,204,21,0.95)');
+  xhPriceTag(ctx,pr.toFixed(dec),L.x0+L.w,cy,L.y0,L.y0+L.h);
   const lbl=snDateOfIdx(b.idx,true)+' '+b.ts; ctx.font='bold 10px sans-serif'; const tw=ctx.measureText(lbl).width+12, tx=Math.max(L.x0+L.P.l+tw/2,Math.min(L.x0+L.w-L.P.r-tw/2,sx));
   ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillRect(tx-tw/2,bot,tw,16); ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.fillText(lbl,tx,bot+12);
   ctx.restore();
