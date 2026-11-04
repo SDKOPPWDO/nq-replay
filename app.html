@@ -2421,7 +2421,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   // current price tag
   if(panC===0){
     const last=view[view.length-1],ly=Y(last.c);
-    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    xhStyle(ctx);ctx.lineWidth=XH_PRICE_WIDTH;
     ctx.beginPath();ctx.moveTo(P.l,ly);ctx.lineTo(W-P.r,ly);ctx.stroke();ctx.setLineDash([]);
     const pc=last.c>=last.o?UP:DN;
     ctx.fillStyle=pc;ctx.fillRect(W-P.r+1,ly-9,P.r-3,18);
@@ -2529,7 +2529,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
 }
 
 // ✛ K 線十字線共用樣式（改顏色／粗細／價格字級都在這裡）
-const XH_COLOR='#ffffff', XH_WIDTH=1.5, XH_DASH=[7,4], XH_ALT_COLOR='#facc15', XH_AXIS_W=86;   // XH_AXIS_W：右側價格軸寬，K 棒不會畫進來，價格標籤就擋不到
+const XH_COLOR='#ffffff', XH_WIDTH=1.5, XH_DASH=[7,4], XH_ALT_COLOR='#facc15', XH_AXIS_W=86, XH_PRICE_WIDTH=1;   // XH_AXIS_W：右側價格軸寬，K 棒不會畫進來，價格標籤就擋不到
 function xhStyle(ctx,color){ ctx.strokeStyle=color||XH_COLOR; ctx.lineWidth=XH_WIDTH; ctx.setLineDash(XH_DASH); }
 // 右邊的價格：15px（原 10px 的 1.5 倍）。靠右貼齊、放在預留的價格軸內，上下不超出圖
 function xhPriceTag(ctx,txt,right,y,top,bot,bg){
@@ -3219,7 +3219,7 @@ function drawNdxChart(id,bars,cursor,pan){
   });
   // 現價標籤
   const last=view[view.length-1],ly=Y(last.c);
-  ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  xhStyle(ctx);ctx.lineWidth=XH_PRICE_WIDTH;
   ctx.beginPath();ctx.moveTo(P.l,ly);ctx.lineTo(W-P.r,ly);ctx.stroke();ctx.setLineDash([]);
   const pc=last.c>=last.o?UP:DN;
   ctx.fillStyle=pc;ctx.fillRect(W-P.r+1,ly-9,P.r-3,18);
@@ -9950,7 +9950,7 @@ function snDrawChart(cv, s, opt){
   const last=bars[n-1];
   if(end===len-1){
     const ly=Y(last.c);
-    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(P.l,ly); ctx.lineTo(W-P.r,ly); ctx.stroke(); ctx.setLineDash([]);
+    xhStyle(ctx); ctx.lineWidth=XH_PRICE_WIDTH; ctx.beginPath(); ctx.moveTo(P.l,ly); ctx.lineTo(W-P.r,ly); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle=last.c>=last.o?UP:DN; ctx.fillRect(W-P.r+1,ly-9,P.r-3,18);
     ctx.fillStyle='#fff'; ctx.font='bold 10px monospace'; ctx.textAlign='left'; ctx.fillText(last.c.toFixed((MKT.tick||1)<1?2:0),W-P.r+4,ly+4);
   }
