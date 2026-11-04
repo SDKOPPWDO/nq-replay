@@ -2529,7 +2529,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
 }
 
 // ✛ K 線十字線共用樣式（改顏色／粗細／價格字級都在這裡）
-const XH_COLOR='#22d3ee', XH_WIDTH=2, XH_DASH=[7,4], XH_ALT_COLOR='#facc15', XH_AXIS_W=86;   // XH_AXIS_W：右側價格軸寬，K 棒不會畫進來，價格標籤就擋不到
+const XH_COLOR='#ffffff', XH_WIDTH=1.5, XH_DASH=[7,4], XH_ALT_COLOR='#facc15', XH_AXIS_W=86;   // XH_AXIS_W：右側價格軸寬，K 棒不會畫進來，價格標籤就擋不到
 function xhStyle(ctx,color){ ctx.strokeStyle=color||XH_COLOR; ctx.lineWidth=XH_WIDTH; ctx.setLineDash(XH_DASH); }
 // 右邊的價格：15px（原 10px 的 1.5 倍）。靠右貼齊、放在預留的價格軸內，上下不超出圖
 function xhPriceTag(ctx,txt,right,y,top,bot,bg){
