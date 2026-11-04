@@ -1798,7 +1798,6 @@ const MKT_ALL = {
     rthDesc:'框出美股正規盤（夏令 21:30–04:00／冬令 22:30–05:00，台北時間）的走勢。方框上緣＝當日高點、下緣＝當日低點，高低點虛線一路延伸到隔天開盤前。只用目前播放到的K棒計算，不會看到未來。',
     vbName:'前日最大量帶（全天）',
     vbDesc:'把前一天一整天（台北 06:00～隔天 05:00，美東 18:00～17:00 全部時段）每根 1 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子，畫在今天：從今天開盤一路延伸到收盤（播放到哪就畫到哪）。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。',
-    histBars:0,          // NQ 一天就有 1380 根1分K，不用往前帶
     daySepTs:null,
     vbWholeDay:true,     // 最大量帶：用前一天全天（06:00～隔天 05:00）的量，畫在今天
     ptValue:2, commission:1, // MNQ $2/點；手續費每口來回 $1
@@ -1823,7 +1822,6 @@ const MKT_ALL = {
     rthDesc:'框出台指日盤（08:45–13:45）的走勢。方框上緣＝日盤高點、下緣＝日盤低點，高低點虛線一路延伸到隔天日盤開盤前（含夜盤）。只用目前播放到的K棒計算，不會看到未來。',
     vbName:'前日高量帶（日盤＋夜盤）',
     vbDesc:'把前一天 08:45～隔日 05:00（日盤＋夜盤）每根 5 分K 當成一條「最低～最高」的帶子，厚度＝成交量。所有帶子疊起來，重疊量達到最大量指定 % 以上的價格區間畫成帶子，畫在隔天：從 08:45 開盤一路延伸到 04:55 收盤。沒有框線，量越大底色越不透明；標籤顯示該帶子是最大量的幾 %。',
-    histBars:1380,       // 5分K 圖往前帶幾根前幾天的K棒（約6天，跟 NQ 一天的1分K根數一樣）
     daySepTs:'08:45',    // 每天 08:45 畫分日虛線
     vbWholeDay:true,     // 最大量帶：用前一天 08:45～隔日 04:55 全部K棒的量，畫在隔天
     ptValue:50, commission:100, // 小台 50 元/點；手續費＋期交稅每口來回約 100 元（可自行修改）
@@ -1864,7 +1862,7 @@ const TF_LABELS=MKT.tfLabels;
 const TF_STEP=MKT.tfStep;
 const TF_UNIT={'5k':5,'15k':15,'60k':60};
 
-let dayOff=0; // 今天第一根K棒在 mode1kBars 裡的位置（台指前面會帶前幾天的K棒；NQ 為 0）
+let dayOff=0; // 今天第一根K棒在 mode1kBars 裡的位置（前面接著完整歷史）
 function dayStartIdx(){ return mode1kBars.length ? mode1kBars[Math.min(dayOff,mode1kBars.length-1)].idx : 0; }
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
@@ -1943,9 +1941,34 @@ async function loadData(){
   if(remoteVersion) localStorage.setItem('nq_data_version', remoteVersion);
 }
 
+// ===== 連續K棒：把每天的資料窗合併成一條完整走勢（只合併一次，之後各日共用）=====
+let TX_RAW_TF=null, CONT_TF={};
+function contSeries(tf){
+  if(CONT_TF[tf]) return CONT_TF[tf];
+  let out=[];
+  if(tf!=='1k' && TX_RAW_TF && TX_RAW_TF[tf]) out=TX_RAW_TF[tf];
+  else{
+    let last=-Infinity;
+    DAYS.forEach(d=>{
+      const a=(DATA[d]||{})[tf]||[];
+      for(let i=0;i<a.length;i++) if(a[i].idx>last){ out.push(a[i]); last=a[i].idx; }
+    });
+  }
+  return CONT_TF[tf]=out;
+}
+// 第一個 idx 大於 x 的位置（陣列依 idx 由小到大）
+function barsUpperBound(bars,x){
+  let lo=0,hi=bars.length;
+  while(lo<hi){ const m=(lo+hi)>>1; if(bars[m].idx<=x) lo=m+1; else hi=m; }
+  return lo;
+}
+// 全域 idx 落在哪一根（取 idx 不大於它的最後一根；都比它大時回傳 -1）
+function barPosAtIdx(bars,x){ return barsUpperBound(bars,x)-1; }
+
 // 台指資料是精簡格式：每日只存當日5分K，15/30/60分K整段存一份，
 // 這裡組回跟 NQ 一樣的 DATA[日期][格局] 結構（大格局取到當日收盤為止的最近 N 根）
 function buildTxData(P){
+  TX_RAW_TF=P.tf||{};
   const out={}, days=Object.keys(P.days).sort(), ptr={}, win=P.win||{};
   const tfs=Object.keys(P.tf||{});
   tfs.forEach(tf=>ptr[tf]=0);
@@ -2011,35 +2034,34 @@ function getLive(baseAll,cur1Bars,cur1Idx,unit){
   if(!baseAll.length||!cur1Bars.length) return baseAll;
   const cb=cur1Bars[cur1Idx];
   const cbIdx=cb.idx;
-  let ci=-1;
-  for(let i=0;i<baseAll.length;i++){
-    const b=baseAll[i];
-    if(b.idx<=cbIdx && cbIdx<=b.idx_end){ci=i;break;}
-    if(b.idx>cbIdx){ci=Math.max(0,i-1);break;}
-  }
-  if(ci<0) ci=baseAll.length-1;
+  const ci=Math.max(0,barPosAtIdx(baseAll,cbIdx));
   const bucket=baseAll[ci];
-  const win=cur1Bars.slice(0,cur1Idx+1).filter(b=>b.idx>=bucket.idx&&b.idx<=bucket.idx_end);
-  if(!win.length) return baseAll.slice(0,ci);
-  const liveClose=win[win.length-1].c;
-  const lb={
-    ts:bucket.ts,idx:bucket.idx,idx_end:bucket.idx_end,
-    o:win[0].o,h:Math.max(...win.map(b=>b.h)),
-    l:Math.min(...win.map(b=>b.l)),c:liveClose,
-  };
-  // 即時重算 MA
+  // 只往回掃這根大K棒內的 1K，不掃整段歷史
+  let o=null,h=-Infinity,l=Infinity,liveClose=null;
+  for(let i=Math.max(0,barsUpperBound(cur1Bars,bucket.idx-1));i<=cur1Idx;i++){
+    const b=cur1Bars[i];
+    if(b.idx>bucket.idx_end) break;
+    if(o===null) o=b.o;
+    if(b.h>h) h=b.h;
+    if(b.l<l) l=b.l;
+    liveClose=b.c;
+  }
   const prev=baseAll.slice(0,ci);
-  const closes=[...prev.map(b=>b.c),liveClose];
-  const n=closes.length;
+  if(o===null) return prev;
+  const lb={ts:bucket.ts,idx:bucket.idx,idx_end:bucket.idx_end,o,h,l,c:liveClose};
+  // 即時重算 MA
+  const n=prev.length+1;
   const periods=[5,10,20,60];
   const keys=['m5','m10','m20','m60'];
   periods.forEach((p,mi)=>{
     if(n>=p){
-      const sum=closes.slice(n-p).reduce((a,v)=>a+v,0);
+      let sum=liveClose;
+      for(let i=prev.length-p+1;i<prev.length;i++) sum+=prev[i].c;
       lb[keys[mi]]=Math.round(sum/p*1000)/1000;
     }
   });
-  return [...prev,lb];
+  prev.push(lb);
+  return prev;
 }
 
 function findOpenIdx(bars,dateStr){
@@ -2062,23 +2084,15 @@ function loadDay(day, startAt){
   if(!DAYS_SET.has(day)) return;
   currentDay=day;
   const d=DATA[day]||{};
-  // 最小格局：今天的K棒，前面再接前幾天的K棒（只有台指，讓圖一打開就看得到之前的行情）
-  let base1k=d['1k']||[];
+  // 所有格局都接上完整歷史，只切到今天收盤為止（看不到未來），可以一路往回拉
+  const today1k=d['1k']||[];
+  allBars={'1k':[],'5k':[],'15k':[],'60k':[]};
   dayOff=0;
-  if(MKT.histBars>0 && base1k.length){
-    const pre=[]; let di=DAYS.indexOf(day)-1;
-    while(di>=0 && pre.length<MKT.histBars){
-      const pb=(DATA[DAYS[di]]||{})['1k']||[];
-      if(pb.length && pb[pb.length-1].idx!==base1k[0].idx-1-pre.reduce((a,x)=>a+x.length,0)) break; // 不連續就停
-      pre.unshift(pb); di--;
-      if(pre.reduce((a,x)=>a+x.length,0)>=MKT.histBars) break;
-    }
-    let flat=[].concat(...pre);
-    if(flat.length>MKT.histBars) flat=flat.slice(flat.length-MKT.histBars);
-    dayOff=flat.length;
-    base1k=flat.concat(base1k);
+  if(today1k.length){
+    const c1=contSeries('1k'), lastIdx=today1k[today1k.length-1].idx;
+    dayOff=barsUpperBound(c1,today1k[0].idx-1);
+    Object.keys(allBars).forEach(tf=>{ const c=contSeries(tf); allBars[tf]=c.slice(0,barsUpperBound(c,lastIdx)); });
   }
-  allBars={'1k':base1k,'5k':d['5k']||[],'15k':d['15k']||[],'60k':d['60k']||[]};
   mode1kBars=allBars['1k'];
   // NDX 改為全域連續bucket，不再逐日切；繪圖時依當前idx決定顯示到哪一根
   cur1=0; // will be set after mode check
@@ -2161,6 +2175,8 @@ function renderAll(){
     if(el&&bars[cursor]) el.textContent='#'+(cursor+1)+'/'+bars.length;
     // 更新每個格局自己的漲跌幅與上下影線點數（該K棒開盤到收盤的變化）
     if(bars[cursor]) updateChdrPrice(tf, bars[cursor]);
+    const lb=document.getElementById('latest_'+tf);
+    if(lb) lb.style.display=(panOffset[tf]||0)>0?'':'none';
   });
   updateInfoBar(hoverBar||mode1kBars[cur1]);
 }
@@ -2299,7 +2315,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   // Anchor: rightmost bar at fixed X position
   const rightAnchorX=W-P.r-PADDING_BARS*CS-CW2/2;
   const X=i=>rightAnchorX-(view.length-1-i)*CS;
-  cv._layout={P,W,H,lo,hi,rng,startIdx,endIdx,view,vis,Y,X,cH,timeStep,pan:panC,CS};
+  cv._layout={P,W,H,lo,hi,rng,startIdx,endIdx,view,vis,Y,X,cH,timeStep,pan:panC,CS,mxC};
 
   // grid
   for(let i=0;i<=4;i++){
@@ -2519,20 +2535,26 @@ function drawCrossOnChart(cvId,bi){
   cv.width=main.width;cv.height=main.height;cv.style.width=main.style.width;cv.style.height=main.style.height;
   const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,L.W,L.H);
   const{P,W,H,view,X,Y}=L;
-  if(bi<0||bi>=view.length) return;
-  const bar=view[bi],sx=X(bi);
-  // 滑鼠所在的那張圖：橫線跟著滑鼠高度、標出滑鼠位置的價格；其他格局維持標收盤價
-  const _mouse=(crossMouse && cvId==='cv_'+crossMouse.tf && crossMouse.y>=P.t && crossMouse.y<=H-P.b);
-  const closeY=_mouse?crossMouse.y:Y(bar.c);
-  const _tick=MKT.tick||0.25, _pr=_mouse?Math.round((L.lo+(1-(crossMouse.y-P.t)/L.cH)*L.rng)/_tick)*_tick:bar.c;
-  const _dec=_tick<1?2:0;
+  const bar=(bi>=0&&bi<view.length)?view[bi]:null;   // 這個時間不在畫面內時，只畫水平線
+  if(!bar && !(crossMouse && crossMouse.price!=null)) return;
+  const sx=bar?X(bi):0;
+  // 所有格局的水平線都畫在滑鼠所在的同一個價位；超出這張圖的價格範圍就不畫
+  const _mouse=(crossMouse && cvId==='cv_'+crossMouse.tf && crossMouse.price!=null);
+  const _hasP=(crossMouse && crossMouse.price!=null);
+  const _tick=MKT.tick||0.25, _dec=_tick<1?2:0;
+  const _pr=_hasP?Math.round(crossMouse.price/_tick)*_tick:(bar?bar.c:null);
+  const closeY=_mouse?crossMouse.y:(_pr!=null?Y(_pr):-1);
+  const _showH=_pr!=null && closeY>=P.t && closeY<=H-P.b;
   ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke();
+  if(bar){ ctx.beginPath();ctx.moveTo(sx,P.t);ctx.lineTo(sx,H-P.b);ctx.stroke(); }
+  if(_showH){ ctx.beginPath();ctx.moveTo(P.l,closeY);ctx.lineTo(W-P.r,closeY);ctx.stroke(); }
   ctx.setLineDash([]);
-  ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
-  ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
-  ctx.fillText(_pr.toFixed(_dec),W-P.r+4,closeY+4);
+  if(_showH){
+    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(W-P.r+1,closeY-9,P.r-3,18);
+    ctx.fillStyle='#000';ctx.font='bold 10px monospace';ctx.textAlign='left';
+    ctx.fillText(_pr.toFixed(_dec),W-P.r+4,closeY+4);
+  }
+  if(!bar) return;
   // 十字線的時間：字放大 4 倍（36px），貼著圖的最下緣
   ctx.font='bold 36px sans-serif';
   const tlW=Math.ceil(ctx.measureText(bar.ts).width)+20, tlH=44, tlX=Math.max(tlW/2+P.l,Math.min(W-P.r-tlW/2,sx)), tlY=H-tlH-2;
@@ -2577,7 +2599,7 @@ function syncCrossFromIdx(globalIdx){
   if(main0&&main0._layout){
     const{startIdx,view}=main0._layout;
     const ri=i1k-startIdx;
-    if(ri>=0&&ri<view.length) drawCrossOnChart('cv_1k',ri);
+    drawCrossOnChart('cv_1k',(ri>=0&&ri<view.length)?ri:-1);
   }
 
   // sync to 5K/15K: find bar where idx <= globalIdx <= idx_end
@@ -2586,7 +2608,9 @@ function syncCrossFromIdx(globalIdx){
     if(!main||!main._layout) return;
     const{view}=main._layout;
     let best=view.length-1;
-    for(let i=0;i<view.length;i++){
+    const _vEnd=view.length?(view[view.length-1].idx_end||view[view.length-1].idx):-1;
+    if(!view.length || globalIdx<view[0].idx || globalIdx>_vEnd) best=-1;   // 不在畫面內：不畫直線
+    else for(let i=0;i<view.length;i++){
       const b=view[i];
       const bEnd=b.idx_end||b.idx;
       if(b.idx<=globalIdx&&globalIdx<=bEnd){best=i;break;}
@@ -2628,7 +2652,9 @@ function handleCross(tf,xFrac,yPx){
   window._lastCross=[tf,xFrac,yPx];
   const main=document.getElementById('cv_'+tf);
   if(!main||!main._layout) return;
-  const{W,view,X}=main._layout;
+  const{W,view,X,P:_P,H:_H,lo:_lo,cH:_cH,rng:_rng}=main._layout;
+  // 滑鼠所在價位：其他格局的水平線都用這個價
+  if(crossMouse) crossMouse.price=(yPx>=_P.t&&yPx<=_H-_P.b)?_lo+(1-(yPx-_P.t)/_cH)*_rng:null;
   const mx=xFrac*W;
   if(crossMouse) crossMouse.x=mx;
   let bi=0,bd=1e9;
@@ -2641,22 +2667,55 @@ function handleCross(tf,xFrac,yPx){
   selectedTFs.forEach(otherTf=>{
     const m=document.getElementById('cv_'+otherTf);
     if(!m||!m._layout) return;
-    const{view:v}=m._layout;
-    // find which bar in this tf's view corresponds to current crosshair position
     let targetBar=null;
     if(otherTf===tf){
       targetBar=bar;
     } else {
-      // find bar whose idx range contains bar.idx
-      for(let i=0;i<v.length;i++){
-        const b=v[i];
-        const bEnd=b.idx_end||b.idx;
-        if(b.idx<=bar.idx&&bar.idx<=bEnd){targetBar=b;break;}
-      }
-      if(!targetBar) targetBar=v[v.length-1];
+      // 不限畫面內，直接從完整走勢找這個時間的K棒
+      const list=getBarsForTF(otherTf);
+      targetBar=list[Math.max(0,barPosAtIdx(list,bar.idx))];
     }
     if(targetBar) updateChdrPrice(otherTf, targetBar);
   });
+}
+
+// 點某根K棒：其他格局跳到同一個時間段（看不到未來：只會落在已播放的範圍內）
+function syncChartsToBar(srcTf, bar){
+  if(!bar) return;
+  const srcUnit=TF_UNITS_MAP[srcTf]||1;
+  const mid=Math.floor((bar.idx+(bar.idx_end||bar.idx))/2);
+  selectedTFs.forEach(tf=>{
+    if(tf===srcTf) return;
+    const main=document.getElementById('cv_'+tf);
+    const L=main&&main._layout; if(!L) return;
+    const bars=tf==='1k'?mode1kBars.slice(0,cur1+1):getBarsForTF(tf);
+    if(!bars.length) return;
+    const pos=Math.max(0,barPosAtIdx(bars,mid));
+    // 比來源大的格局：這個時間已經在畫面內就不動
+    if((TF_UNITS_MAP[tf]||1)>srcUnit && pos>=L.startIdx && pos<=L.endIdx) return;
+    const endPos=Math.min(bars.length-1,pos+Math.floor(L.mxC/2));
+    panOffset[tf]=bars.length-1-endPos;
+  });
+  renderAll();
+  const c=window._lastCross; if(c) handleCross(c[0],c[1],c[2]);
+}
+function clickedBar(tf,e){
+  const cv=document.getElementById('cv_'+tf), wrap=document.getElementById('wrap_'+tf);
+  if(!cv||!cv._layout||!wrap) return null;
+  const L=cv._layout, r=wrap.getBoundingClientRect(), my=e.clientY-r.top;
+  if(my<L.P.t || my>L.H-L.P.b) return null;
+  return L.view[nqPointFromLayout(L,(e.clientX-r.left)/r.width*L.W,my).bi]||null;
+}
+function panToLatest(){
+  selectedTFs.forEach(tf=>{panOffset[tf]=0;});
+  if(mode1kBars.length) renderAll();
+}
+// 跨日：往前退到昨天最後一根／往後進到隔天第一根
+function crossDay(dir){
+  const L=dayNavList(), i=L.indexOf(currentDay), j=i+dir;
+  if(i<0 || j<0 || j>=L.length) return false;
+  loadDay(L[j], dir>0?'first':'last');
+  return true;
 }
 
 function clearAllCross(){
@@ -2686,7 +2745,7 @@ function attachEvents(wrap,tf){
   let rDrag=false,startX=0,startPan=0;
   wrap.addEventListener('contextmenu',e=>e.preventDefault());
   wrap.addEventListener('mousedown',e=>{if(e.button===2 && !zoneMode){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
-  window.addEventListener('mousemove',e=>{if(!rDrag)return;panOffset[tf]=Math.max(0,startPan+Math.round((e.clientX-startX)/((6+2)*(zoomLevel[tf]||1))));renderAll();});
+  window.addEventListener('mousemove',e=>{if(!rDrag)return;const _c=document.getElementById('cv_'+tf),_cs=(_c&&_c._layout&&_c._layout.CS)||8,_max=(_c&&_c._layout)?_c._layout.vis.length-1:Infinity;panOffset[tf]=Math.max(0,Math.min(_max,startPan+Math.round((e.clientX-startX)/_cs)));renderAll();});
   window.addEventListener('mouseup',e=>{if(e.button===2&&rDrag){rDrag=false;wrap.style.cursor='crosshair';}});
   let tStartX=0,tStartPan=0,tTwo=false;
   wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){tTwo=true;tStartX=(e.touches[0].clientX+e.touches[1].clientX)/2;tStartPan=panOffset[tf]||0;}},{passive:true});
@@ -2708,6 +2767,19 @@ function attachEvents(wrap,tf){
     const t=MKT.tick||0.25;
     ptMeasure={tf, x0:mx, p0:Math.round((L.lo+(1-(my-L.P.t)/L.cH)*L.rng)/t)*t};
     handleCross(tf,(e.clientX-r.left)/r.width,my);
+  });
+  // 🔗 左鍵點一下（沒開模擬單）／雙擊（開模擬單時，單擊是掛單）：其他格局同步到這個時間段
+  let syncDownX=null,syncDownY=null;
+  wrap.addEventListener('mousedown',e=>{ if(e.button===0){ syncDownX=e.clientX; syncDownY=e.clientY; } });
+  wrap.addEventListener('click',e=>{
+    if(e.button!==0 || zoneMode || tradeSystemOn || (typeof snPick!=='undefined' && snPick)) return;
+    if(syncDownX!==null && Math.abs(e.clientX-syncDownX)+Math.abs(e.clientY-syncDownY)>4) return; // 拉量測，不算點擊
+    syncChartsToBar(tf, clickedBar(tf,e));
+  });
+  wrap.addEventListener('dblclick',e=>{
+    if(zoneMode || !tradeSystemOn || (typeof snPick!=='undefined' && snPick)) return;
+    ordQuickClose();
+    syncChartsToBar(tf, clickedBar(tf,e));
   });
   // 📌 左鍵點一下：在十字線那條水平線跳出買／賣掛單
   wrap.addEventListener('click',e=>{
@@ -2849,8 +2921,8 @@ function toggleTF(tf,btn){
 
 function updateInfoBar(b){
   if(!b) return;
-  document.getElementById('pbar').style.width=mode1kBars.length?((cur1+1)/mode1kBars.length*100).toFixed(1)+'%':'0%';
-  document.getElementById('poslbl').textContent=mode1kBars.length?`${cur1+1}/${mode1kBars.length}`:'—';
+  document.getElementById('pbar').style.width=mode1kBars.length?((cur1-dayOff+1)/(mode1kBars.length-dayOff)*100).toFixed(1)+'%':'0%';
+  document.getElementById('poslbl').textContent=mode1kBars.length?`${cur1-dayOff+1}/${mode1kBars.length-dayOff}`:'—';
 }
 
 function buildCfgRow(){
@@ -2963,6 +3035,7 @@ function nqPanelInner(tf){
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
+          <button class="zoom-btn" id="latest_${tf}" style="display:none;width:auto;padding:0 6px;" onclick="panToLatest()" title="所有格局回到目前播放位置（End 鍵）">⇥ 最新</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
           <span class="chdr-r" id="hdr_${tf}"></span>
         </div>
@@ -2990,6 +3063,7 @@ function ndxPanelInner(){
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
+          <button class="zoom-btn" id="latest_${tf}" style="display:none;width:auto;padding:0 6px;" onclick="panToLatest()" title="所有格局回到目前播放位置（End 鍵）">⇥ 最新</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
           <span class="chdr-r" id="hdr_${tf}"></span>
         </div>
@@ -3176,19 +3250,12 @@ function moveNext(n){
     const bars=allBars[tf];
     // find current bucket index in bars that contains cur1's idx
     const curIdxVal=mode1kBars[cur1].idx;
-    let bucketPos=bars.findIndex(b=>b.idx<=curIdxVal && curIdxVal<=(b.idx_end||b.idx));
-    if(bucketPos<0) bucketPos=0;
+    const bucketPos=Math.max(0,barPosAtIdx(bars,curIdxVal));
     const targetBucketPos=Math.min(bucketPos+n, bars.length-1);
     const targetBucket=bars[targetBucketPos];
     // move cur1 to the LAST 1K bar within that bucket (so it's fully closed)
     const targetIdxEnd=targetBucket.idx_end||targetBucket.idx;
-    let newCur1=mode1kBars.findIndex(b=>b.idx===targetIdxEnd);
-    if(newCur1<0){
-      // fallback: find closest bar with idx<=targetIdxEnd
-      for(let i=mode1kBars.length-1;i>=0;i--){
-        if(mode1kBars[i].idx<=targetIdxEnd){newCur1=i;break;}
-      }
-    }
+    const newCur1=barPosAtIdx(mode1kBars,targetIdxEnd);
     cur1=Math.min(Math.max(newCur1,0),mode1kBars.length-1);
   }
   if(cur1===prevCur1){   // 已到當日最後一根 → 接續播放到下一天（從該日第一根開始，不套用起始模式）
@@ -3206,22 +3273,17 @@ function movePrev(n){
   } else {
     const bars=allBars[tf];
     const curIdxVal=mode1kBars[cur1].idx;
-    let bucketPos=bars.findIndex(b=>b.idx<=curIdxVal && curIdxVal<=(b.idx_end||b.idx));
-    if(bucketPos<0) bucketPos=0;
+    const bucketPos=Math.max(0,barPosAtIdx(bars,curIdxVal));
     const targetBucketPos=Math.max(bucketPos-n, 0);
     const targetBucket=bars[targetBucketPos];
     const targetIdxEnd=targetBucket.idx_end||targetBucket.idx;
-    let newCur1=mode1kBars.findIndex(b=>b.idx===targetIdxEnd);
-    if(newCur1<0){
-      for(let i=mode1kBars.length-1;i>=0;i--){
-        if(mode1kBars[i].idx<=targetIdxEnd){newCur1=i;break;}
-      }
-    }
+    const newCur1=barPosAtIdx(mode1kBars,targetIdxEnd);
     cur1=Math.min(Math.max(newCur1,0),mode1kBars.length-1);
   }
-  if(cur1===prevCur1){   // 已到當日第一根 → 回到前一天最後一根
-    const L=dayNavList(); const i=L.indexOf(currentDay);
-    if(i>0){ loadDay(L[i-1],'last'); return; }
+  if(cur1<dayOff || cur1===prevCur1){   // 退到今天之前 → 回到前一天最後一根
+    if(prevCur1>dayOff){ cur1=dayOff; }
+    else if(crossDay(-1)) return;
+    else cur1=prevCur1;
   }
   hoverBar=null;renderAll();
 }
@@ -3243,30 +3305,34 @@ function stepPlayback(dir){
   const minTF=currentMinTF();
   if(minTF==='1k' || !allBars[minTF] || !allBars[minTF].length){
     const nc=cur1+dir;
-    if(nc>=0 && nc<=mode1kBars.length-1){ cur1=nc; hoverBar=null; renderAll(); }
+    if(nc<dayOff || nc>mode1kBars.length-1){ crossDay(dir); return; }
+    cur1=nc; hoverBar=null; renderAll();
     return;
   }
   const base=allBars[minTF];
-  const day0=mode1kBars[0].idx;
+  const day0=dayStartIdx();
   const curG=mode1kBars[cur1].idx;
   let targetG=null;
   if(dir>0){
     // 下一根：第一個收盤邊界嚴格大於目前位置的K棒
-    for(let i=0;i<base.length;i++){
+    const p=Math.max(0,barPosAtIdx(base,curG));
+    for(let i=p;i<base.length;i++){
       const bEnd=base[i].idx_end||base[i].idx;
       if(bEnd>curG){ targetG=bEnd; break; }
     }
+    if(targetG===null){ crossDay(1); return; }
   }else{
     // 前一根：最後一個收盤邊界嚴格小於目前位置的K棒
-    for(let i=base.length-1;i>=0;i--){
+    for(let i=barPosAtIdx(base,curG);i>=0;i--){
       const bEnd=base[i].idx_end||base[i].idx;
       if(bEnd<curG){ targetG=bEnd; break; }
     }
-    // 已經在第一根之前 → 退到當天最開頭
-    if(targetG===null && curG>day0) targetG=day0;
+    if(targetG===null || targetG<day0){
+      if(curG>day0) targetG=day0;          // 先退到當天最開頭
+      else { crossDay(-1); return; }       // 已在當天最開頭 → 昨天最後一根
+    }
   }
-  if(targetG===null) return; // 已到最末/最前，不動
-  let nc=Math.max(0, Math.min(targetG-day0, mode1kBars.length-1));
+  let nc=Math.max(dayOff, Math.min(barPosAtIdx(mode1kBars,targetG), mode1kBars.length-1));
   if(nc!==cur1){ cur1=nc; hoverBar=null; renderAll(); }
 }
 document.addEventListener('keydown',e=>{
@@ -3278,6 +3344,7 @@ document.addEventListener('keydown',e=>{
   if(document.getElementById('snLibOv').classList.contains('show') || document.getElementById('snModal').classList.contains('show')) return;
   if(isNextDayKey(e)){ e.preventDefault(); goNextDay(); return; }
   if(isPrevDayKey(e)){ e.preventDefault(); goPrevDay(); return; }
+  if(e.key==='End'){ e.preventDefault(); panToLatest(); return; }
   if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); stepPlayback(1); }
   else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPlayback(-1); }
   else if(e.key==='ArrowUp'){ e.preventDefault(); if(tradeSystemOn && typeof tradeAction==='function') tradeAction('buy'); }
@@ -3774,7 +3841,7 @@ function ordCheck(){
   const curIdx=mode1kBars[cur1].idx, minA=Math.min(...os.map(o=>o.armedIdx));
   if(curIdx<=minA) return;
   let changed=false, msgs=[];
-  for(const b of mode1kBars){
+  for(const b of mode1kBars.slice(Math.max(0,barPosAtIdx(mode1kBars,minA)),cur1+1)){
     if(b.idx<=minA) continue; if(b.idx>curIdx) break;
     let list=dayOrders[currentDay]||[];
     // 先處理出場單（停損排在停利前面），再處理進場單
@@ -3930,7 +3997,7 @@ function checkBreakevenFill(){
   const be=active.be, curIdx=mode1kBars[cur1].idx;
   if(curIdx<=be.armedIdx) return;
   const pc=posAvgCost(); if(!pc){ delete active.be; return; }
-  for(const b of mode1kBars){
+  for(const b of mode1kBars.slice(Math.max(0,barPosAtIdx(mode1kBars,be.armedIdx)),cur1+1)){
     if(b.idx<=be.armedIdx) continue;
     if(b.idx>curIdx) break;
     let hit=false;
