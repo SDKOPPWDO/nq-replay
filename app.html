@@ -2298,7 +2298,7 @@ function drawChart(id,bars,cursor,timeStep,pan){
   ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
   const vis=bars.slice(0,cursor+1);
   if(!vis.length) return;
-  const P={t:10,r:62,b:22,l:2};
+  const P={t:10,r:XH_AXIS_W,b:22,l:2};
   const cW2=W-P.l-P.r,cH=H-P.t-P.b;
   const mxC=Math.floor(cW2/CS)-PADDING_BARS;
   const panC=Math.max(0,Math.min(pan,vis.length-1));
@@ -2529,11 +2529,11 @@ function drawChart(id,bars,cursor,timeStep,pan){
 }
 
 // ✛ K 線十字線共用樣式（改顏色／粗細／價格字級都在這裡）
-const XH_COLOR='#22d3ee', XH_WIDTH=2, XH_DASH=[7,4], XH_ALT_COLOR='#facc15';
+const XH_COLOR='#22d3ee', XH_WIDTH=2, XH_DASH=[7,4], XH_ALT_COLOR='#facc15', XH_AXIS_W=86;   // XH_AXIS_W：右側價格軸寬，K 棒不會畫進來，價格標籤就擋不到
 function xhStyle(ctx,color){ ctx.strokeStyle=color||XH_COLOR; ctx.lineWidth=XH_WIDTH; ctx.setLineDash(XH_DASH); }
-// 右邊的價格：20px（原 10px 的 2 倍）。靠右貼齊，比價格軸寬時往左蓋到圖上，上下不超出圖
+// 右邊的價格：15px（原 10px 的 1.5 倍）。靠右貼齊、放在預留的價格軸內，上下不超出圖
 function xhPriceTag(ctx,txt,right,y,top,bot,bg){
-  const h=28; ctx.setLineDash([]); ctx.font='bold 20px monospace';
+  const h=22; ctx.setLineDash([]); ctx.font='bold 15px monospace';
   const w=Math.ceil(ctx.measureText(txt).width)+10, x=right-w-1, ty=Math.max(top,Math.min(bot-h,y-h/2));
   ctx.fillStyle=bg||'rgba(255,255,255,0.95)'; ctx.fillRect(x,ty,w,h);
   ctx.fillStyle='#000'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(txt,x+5,ty+h/2+1); ctx.textBaseline='alphabetic';
@@ -3176,7 +3176,7 @@ function drawNdxChart(id,bars,cursor,pan){
   ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
   const vis=bars.slice(0,cursor+1);
   if(!vis.length) return;
-  const P={t:10,r:62,b:22,l:2};
+  const P={t:10,r:XH_AXIS_W,b:22,l:2};
   const cW2=W-P.l-P.r,cH=H-P.t-P.b;
   const mxC=Math.floor(cW2/CS)-PADDING_BARS;
   const panC=Math.max(0,Math.min(pan,vis.length-1));
@@ -4562,7 +4562,7 @@ DayChart.prototype.render=function(tf){
   const umk=this.o.getUserMarks?(this.o.getUserMarks()||[]):[];   // 總體行情回顧：自己加的箭頭／文字
   const rows=this.o.rows?this.o.rows():[];      // 版本對比：底部每個版本一條持倉時間帶
   const stripH=rows.length?(rows.length*9+6):0;
-  const Pd={t:30,r:60,b:24+stripH,l:4};
+  const Pd={t:30,r:XH_AXIS_W,b:24+stripH,l:4};
   const cw=(W-Pd.l-Pd.r)/segment.length;
   const allP=segment.flatMap(b=>[b.h,b.l]);
   umk.forEach(m=>{ if(tf!=='60k' && m.tf==='60k') return; const p=dayFindPos(bars,m.idx,tf); if(p>=startPos && p<=v.end) allP.push(m.price); });
@@ -5962,7 +5962,7 @@ function renderReplayChartOnCanvas(canvasId, t, tf){
   ctx.scale(dpr,dpr);
   ctx.fillStyle = '#0d0d0f'; ctx.fillRect(0,0,W,H);
 
-  const P = {t:30, r:60, b:24, l:4};
+  const P = {t:30, r:XH_AXIS_W, b:24, l:4};
   const cw = (W-P.l-P.r)/segment.length;
   const allP = segment.flatMap(b=>[b.h,b.l]);
   let lo=Math.min(...allP), hi=Math.max(...allP);
@@ -9164,7 +9164,7 @@ function renderSmktChartOnCanvas(canvasId, date, note, tf){
   ctx.scale(dpr,dpr);
   ctx.fillStyle='#0d0d0f';ctx.fillRect(0,0,W,H);
 
-  const P={t:16,r:60,b:24,l:4};
+  const P={t:16,r:XH_AXIS_W,b:24,l:4};
   const cw=(W-P.l-P.r)/segment.length;
   const allP=segment.flatMap(b=>[b.h,b.l]);
   let lo=Math.min(...allP),hi=Math.max(...allP);
@@ -9892,7 +9892,7 @@ function snDrawChart(cv, s, opt){
   const n=mini?w24:Math.max(8,Math.min(len,Math.round(opt.n||w24)));
   const end=mini?len-1:Math.max(n-1,Math.min(len-1,opt.end==null?len-1:opt.end));
   const start=end-n+1, bars=series.slice(start,end+1);
-  const P=mini?{t:4,r:4,b:4,l:4}:{t:22,r:66,b:24,l:6};
+  const P=mini?{t:4,r:4,b:4,l:4}:{t:22,r:XH_AXIS_W,b:24,l:6};
   const cW=W-P.l-P.r, cH=H-P.t-P.b;
   const CS=cW/(n+(mini?0.5:2)), bw=Math.max(1,Math.min(CS*0.7,18));
   const X=i=>P.l+CS*(i+0.5);
@@ -10534,7 +10534,7 @@ function snMkPane(ctx, s, tf, x0, y0, w, h, mini){
   ctx.save(); ctx.beginPath(); ctx.rect(x0,y0,w,h); ctx.clip();
   ctx.fillStyle='#0d0d0f'; ctx.fillRect(x0,y0,w,h);
   if(!bars.length){ ctx.fillStyle='#71717a'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText('沒有 '+tfDisp(tf)+' 資料',x0+w/2,y0+h/2); ctx.restore(); return null; }
-  const P=mini?{t:12,r:3,b:3,l:3}:{t:24,r:54,b:20,l:4};
+  const P=mini?{t:12,r:3,b:3,l:3}:{t:24,r:XH_AXIS_W,b:20,l:4};
   const n=bars.length, cw=(w-P.l-P.r)/n, X=i=>x0+P.l+cw*(i+0.5);
   let lo=Infinity, hi=-Infinity; bars.forEach(b=>{ if(b.l<lo) lo=b.l; if(b.h>hi) hi=b.h; });
   const pad=(hi-lo)*0.12||1; lo-=pad; hi+=pad; const rg=hi-lo||1;
