@@ -1356,6 +1356,42 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
 .mkov-canvas-body.placing{cursor:crosshair;} .mkov-canvas-body.mdrag{cursor:grabbing;}
 .mkov-cal-d{position:relative;} .mkov-cal-d .cls-ic{position:absolute;top:0;right:1px;font-size:8px;line-height:1;}
 .sn-tip-cls{font-size:11.5px;line-height:1.55;color:var(--t2);background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.3);border-radius:8px;padding:8px 10px;} .sn-tip-cls b{color:#facc15;}
+/* 🗂 總體行情回顧：分類篩選 */
+.mkov-left{overflow-y:auto;}
+.mkov-info{min-height:140px;}
+.mkov-cf{flex-shrink:0;background:var(--bg2);border:1px solid rgba(167,139,250,.45);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;}
+.mkov-cf-h{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;font-size:12px;color:#ddd6fe;}
+.mkov-cf-sum{font-size:10.5px;color:var(--t2);margin-left:auto;} .mkov-cf-sum b{color:#c4b5fd;}
+.mkov-cf-arr{font-size:10px;color:var(--t3);transition:transform .15s;}
+.mkov-cf.closed .mkov-cf-arr{transform:rotate(-90deg);}
+.mkov-cf.closed .mkov-cf-body{display:none;}
+.mkov-cf-body{display:flex;flex-direction:column;gap:5px;}
+.mkov-cf-row{display:flex;gap:4px;align-items:center;}
+.mkov-cf-q{flex:1;min-width:0;padding:4px 7px!important;font-size:11px!important;}
+.mkov-cf-mini{flex-shrink:0;padding:4px 6px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font:inherit;font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.mkov-cf-mini:hover{color:#fff;border-color:var(--t3);}
+.mkov-cf-lb{font-size:10px;color:var(--t3);font-weight:800;margin-top:1px;}
+.mkov-cf-chips{gap:4px!important;}
+.mkov-cf-chips .sn-chip{font-size:10.5px;padding:3px 7px;}
+.mkov-cf-list{max-height:210px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-top:2px;}
+.mkov-cf-none{font-size:10.5px;color:var(--t3);line-height:1.55;padding:4px 2px;} .mkov-cf-none b{color:#c4b5fd;}
+.mkov-cf-it{border:1px solid var(--b1);background:var(--bg3);border-radius:7px;padding:5px 7px;cursor:pointer;display:flex;flex-direction:column;gap:3px;}
+.mkov-cf-it:hover{border-color:var(--b2);background:rgba(255,255,255,.06);}
+.mkov-cf-it.on{border-color:#a78bfa;background:rgba(124,58,237,.18);}
+.mkov-cf-it-h{display:flex;gap:4px;align-items:center;font-size:11px;color:#fff;} .mkov-cf-it-h span{font-size:10px;}
+.mkov-cf-it-n{font-size:10.5px;color:var(--t2);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.sn-tag.hit{background:#7c3aed;border-color:#7c3aed;color:#fff;}
+.mkov-cal-d.cf-out{opacity:.25;}
+.mkov-cal-d.cf-in:not(.sel){box-shadow:0 0 0 1.5px #a78bfa inset;}
+.mkov-dcls{border:1px solid rgba(250,204,21,.35);background:rgba(250,204,21,.05);border-radius:8px;padding:8px;margin-bottom:10px;display:flex;flex-direction:column;gap:5px;}
+.mkov-dcls.none{flex-direction:row;align-items:center;justify-content:space-between;font-size:11px;color:var(--t2);border-color:var(--b1);background:transparent;padding:6px 8px;}
+.mkov-dcls-h{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:#facc15;}
+.mkov-dcls button{padding:3px 8px;border-radius:6px;border:1px solid rgba(250,204,21,.5);background:transparent;color:#facc15;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.mkov-dcls button:hover{background:rgba(250,204,21,.15);}
+.mkov-dcls-0{font-size:10px;color:var(--t3);}
+.mkov-dcls-n{font-size:11px;color:var(--t1,#e5e7eb);line-height:1.5;white-space:pre-wrap;max-height:110px;overflow-y:auto;}
+.mkov-dcls-n b{display:inline-block;font-size:9.5px;color:#111;border-radius:3px;padding:0 4px;margin-right:5px;vertical-align:1px;}
+.mkov-dcls-n b.n60{background:#93c5fd;} .mkov-dcls-n b.n5{background:#fde68a;}
 @media(max-width:1200px){ .mkov-layout.cls-open{grid-template-columns:200px minmax(0,1fr) 270px;} }
 @media(max-width:820px){ .mkov-layout.cls-open{grid-template-columns:1fr;} }
 .ord-quick{position:fixed;z-index:960;display:none;align-items:center;gap:5px;background:rgba(22,22,27,.97);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:5px 6px;box-shadow:0 10px 30px rgba(0,0,0,.6);font-size:12px;color:#e5e7eb;}
@@ -1448,7 +1484,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
     <span class="app-title"><span class="mkt-switch" title="切換商品：NQ／台指（兩邊各自保留進度、筆記、交易紀錄）"><button data-m="nq" onclick="switchMarket('nq')">NQ</button><button data-m="tx" onclick="switchMarket('tx')">台指</button></span><span id="appTitleTxt">複盤</span></span>
     <button class="day-btn" onclick="openMktOverview()" title="打開 🌐 總體行情回顧（看目前這一天）" style="font-size:12px;padding:0 8px;width:auto;">🌐 總體行情回顧</button>
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側行情分類面板" style="font-size:12px;padding:0 8px;width:auto;">🗂 面板</button>
-    <button class="day-btn" onclick="snOpenLib()" title="依分類／資料夾整理截下來的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
+    <button class="day-btn" onclick="openMktOverviewCf()" title="打開 🌐 總體行情回顧，用資料夾／分類篩選你分類過的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類或資料夾：選好後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
     <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="多個格局（例如 5K＋60K）要上下排還是左右排" style="font-size:12px;padding:0 8px;width:auto;">⬍ 上下</button>
@@ -5057,6 +5093,7 @@ function buildMktOverviewPage(){
       <div class="mkov-left">
         ${versionMiniHtml()}
         ${mkovSideHtml()}
+        ${mkovCfHtml()}
         <div class="mkov-cal" id="mkovCal"></div>
         <div class="mkov-info" id="mkovInfo"></div>
       </div>
@@ -5085,6 +5122,7 @@ function buildMktOverviewPage(){
   if(mkCls) document.querySelector('.mkov-layout').classList.add('cls-open');
   mkovChart.buildCanvases();
   updateIndicatorBtn();
+  mkovCfRender();
   mkovSelectDay(mkovDay);
   if(mkCls) mkClsRender(); else mkClsBtn();
   syncDayLayoutHeight('.mkov-layout', ()=>mkovChart.renderAll());
@@ -5101,14 +5139,20 @@ function syncDayLayoutHeight(sel, after){
 function renderMkovCalendar(){
   const pnl={}; _allClosedTradesCache.forEach(t=>{ if(mkovSideOk(t)) pnl[t.date]=(pnl[t.date]||0)+t.pnl; });
   const sideTxt=mkovSide==='long'?'多單':(mkovSide==='short'?'空單':'交易');
+  const cfSet=mkovCfActive()?new Set(mkovCfDays()):null, cfc=ds=>cfSet?(cfSet.has(ds)?' cf-in':' cf-out'):'';
   renderMiniCalendar('mkovCal', mkovMonth, mkovDay, 'mkovSelectDay', 'mkovStepMonth', ds=>{
     const ck=mkClsOfDay(ds)?'<span class="cls-ic" title="已分類">🏷</span>':'';
-    if(pnl[ds]!==undefined) return {cls:pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'), tip:`${ds} 有${sideTxt} ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}`, html:'<span class="dot"></span>'+ck};
-    return {cls:'notrade', tip:`${ds} 沒有${sideTxt}`, html:'<span class="dot"></span>'+ck};
-  }, `<span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span><span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span><span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒${sideTxt}</span>`);
+    const cft=cfSet&&cfSet.has(ds)?'・符合分類篩選':'';
+    if(pnl[ds]!==undefined) return {cls:(pnl[ds]>0?'win':(pnl[ds]<0?'loss':'flat'))+cfc(ds), tip:`${ds} 有${sideTxt} ${pnl[ds]>=0?'+':''}$${pnl[ds].toFixed(0)}${cft}`, html:'<span class="dot"></span>'+ck};
+    return {cls:'notrade'+cfc(ds), tip:`${ds} 沒有${sideTxt}${cft}`, html:'<span class="dot"></span>'+ck};
+  }, (cfSet?'<span><i style="background:transparent;border:1px solid #a78bfa"></i>符合分類篩選</span>':'')+`<span><i style="background:rgba(239,68,68,.5)"></i>當日賺</span><span><i style="background:rgba(34,197,94,.5)"></i>當日賠</span><span><i style="background:var(--bg3);border:1px solid var(--b2)"></i>沒${sideTxt}</span>`);
 }
 function mkovStepMonth(dir){ mkovMonth=stepMonthStr(mkovMonth,dir); renderMkovCalendar(); }
 function mkovStepDay(dir){
+  if(mkovCfActive()){   // 有分類篩選：只在符合的日子之間跳
+    const ds=mkovCfDays(), t=dir>0 ? ds.find(x=>x>mkovDay) : ds.filter(x=>x<mkovDay).pop();
+    if(t) mkovSelectDay(t); else snToast(dir>0?'已經是篩選結果的最後一天':'已經是篩選結果的第一天'); return;
+  }
   if(mkovSide!=='all'){   // 只看多單／空單時：跳到上一個／下一個有那種單的日子
     const ds=[...new Set(_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date))].sort();
     const t=dir>0 ? ds.find(x=>x>mkovDay) : ds.filter(x=>x<mkovDay).pop();
@@ -5121,12 +5165,10 @@ function mkovSelectDay(d){
   if(mkCls && mkCls.rec.day!==d){ if(mkCls.dirty && confirm(`${mkCls.rec.day} 的分類還沒存，要先存起來嗎？`)) mkClsSave(); mkCls=null; reopen=true; }
   mkovDay=d; mkovMonth=d.slice(0,7); mkovChart.resetAll();
   if(reopen) mkClsOpen(); else mkClsBtn();
-  renderMkovCalendar(); renderMkovInfo();
+  renderMkovCalendar(); renderMkovInfo(); mkovCfRenderList();
   const i=DAYS.indexOf(d), hdr=document.getElementById('mkovHdr');
   if(hdr) hdr.innerHTML=`📅 ${d}（${weekdayZh(d)}）<span style="font-size:10px;color:var(--t3);font-weight:600;margin-left:6px;">${DAY_VIEW_LABEL}</span>`;
-  const p=document.getElementById('mkovPrev'), n=document.getElementById('mkovNext');
-  if(mkovSide!=='all'){ const ds=_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date); if(p) p.disabled=!ds.some(x=>x<d); if(n) n.disabled=!ds.some(x=>x>d); }
-  else { if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1; }
+  mkovUpdNav(d);
   mkovChart.renderAll();
 }
 function dayMarketStatsHtml(d){
@@ -5168,7 +5210,7 @@ function renderMkovInfo(){
           <span style="margin-left:auto;font-weight:800;color:${col(t.pnl)}">${sg(t.pnl)}${Math.abs(t.pnl).toFixed(0)}</span>
         </div>`).join('')}`;
   }
-  el.innerHTML=h;
+  el.innerHTML=mkovDayClsHtml(d)+h;
 }
 function toggleMkovTF(tf){
   mkovTFs=toggleTFList(mkovTFs, tf);
@@ -10325,7 +10367,7 @@ function snRenderTagChips(box, arr, onChange){
     box.appendChild(c);
   });
   const add=document.createElement('button'); add.type='button'; add.className='sn-chip add'; add.textContent='＋ 新分類';
-  add.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(!SN.tags.includes(v)){ SN.tags.push(v); snSaveCfg(); } if(!arr.includes(v)) arr.push(v); snRenderTagChips(box,arr,onChange); if(onChange) onChange(); if(snIsLibOpen()) snRenderFilters(); };
+  add.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(!SN.tags.includes(v)){ SN.tags.push(v); snSaveCfg(); } if(!arr.includes(v)) arr.push(v); snRenderTagChips(box,arr,onChange); if(onChange) onChange(); if(snIsLibOpen()) snRenderFilters(); mkovCfRefresh(); };
   box.appendChild(add);
 }
 function snFillFolderSel(sel, val){
@@ -10383,36 +10425,26 @@ function snRenderFilters(){
   const fl=document.getElementById('snFolders'); fl.innerHTML='';
   [['__all','全部'],['','未放資料夾'],...SN.folders.map(f=>[f,'📁 '+f])].forEach(([v,n])=>{
     const cnt=v==='__all'?SN.snaps.length:SN.snaps.filter(s=>(s.folder||'')===v).length;
-    const edit=(v&&v!=='__all')?(a=>{
-      if(a==='ren'){ const nn=(prompt('資料夾新名稱',v)||'').trim(); if(!nn||nn===v) return; if(SN.folders.includes(nn)){ snToast('已經有這個資料夾'); return; }
-        SN.folders[SN.folders.indexOf(v)]=nn; SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=nn; snDbPut(s); } }); if(snLibFolder===v) snLibFolder=nn; snSaveCfg(); snRenderLib(); }
-      if(a==='del'){ if(!confirm('刪除資料夾「'+v+'」？裡面的 '+cnt+' 張截圖不會刪掉，會移到「未放資料夾」。')) return;
-        SN.folders=SN.folders.filter(x=>x!==v); SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=''; snDbPut(s); } }); if(snLibFolder===v) snLibFolder='__all'; snSaveCfg(); snRenderLib(); }
-    }):null;
+    const edit=(v&&v!=='__all')?(a=>{ if(a==='ren') snFolderRename(v); if(a==='del') snFolderDelete(v); }):null;
     const c=snFilterChip(n,cnt,snLibFolder===v,()=>{ snLibFolder=v; snRenderLib(); },edit);
     if(v!=='__all'){
       c.addEventListener('dragover',e=>{ e.preventDefault(); c.classList.add('drop'); });
       c.addEventListener('dragleave',()=>c.classList.remove('drop'));
-      c.addEventListener('drop',e=>{ e.preventDefault(); c.classList.remove('drop'); const s=SN.snaps.find(x=>x.id===e.dataTransfer.getData('text/plain')); if(s){ s.folder=v; snDbPut(s); snRenderLib(); snToast(v?('已移到「'+v+'」'):'已移出資料夾'); } });
+      c.addEventListener('drop',e=>{ e.preventDefault(); c.classList.remove('drop'); const s=SN.snaps.find(x=>x.id===e.dataTransfer.getData('text/plain')); if(s){ s.folder=v; snDbPut(s); snRenderLib(); mkovCfRefresh(); snToast(v?('已移到「'+v+'」'):'已移出資料夾'); } });
     }
     fl.appendChild(c);
   });
   const af=document.createElement('button'); af.className='sn-chip add'; af.textContent='＋ 資料夾';
-  af.onclick=()=>{ const v=(prompt('新資料夾名稱')||'').trim(); if(!v) return; if(SN.folders.includes(v)){ snToast('已經有這個資料夾'); return; } SN.folders.push(v); snSaveCfg(); snRenderLib(); if(snDraft) snFillFolderSel(document.getElementById('snFolder'), snDraft.folder); };
+  af.onclick=()=>{ const v=(prompt('新資料夾名稱')||'').trim(); if(!v) return; if(SN.folders.includes(v)){ snToast('已經有這個資料夾'); return; } SN.folders.push(v); snSaveCfg(); snRenderLib(); mkovCfRefresh(); if(snDraft) snFillFolderSel(document.getElementById('snFolder'), snDraft.folder); };
   fl.appendChild(af);
   const tf=document.getElementById('snTagFilter'); tf.innerHTML='';
   tf.appendChild(snFilterChip('全部',SN.snaps.length,!snLibTag,()=>{ snLibTag=''; snRenderLib(); },null));
   SN.tags.forEach(t=>{
     const cnt=SN.snaps.filter(s=>(s.tags||[]).includes(t)).length;
-    tf.appendChild(snFilterChip(t,cnt,snLibTag===t,()=>{ snLibTag=(snLibTag===t?'':t); snRenderLib(); },a=>{
-      if(a==='ren'){ const nn=(prompt('分類新名稱',t)||'').trim(); if(!nn||nn===t) return; if(SN.tags.includes(nn)){ snToast('已經有這個分類'); return; }
-        SN.tags[SN.tags.indexOf(t)]=nn; SN.snaps.forEach(s=>{ const i=(s.tags||[]).indexOf(t); if(i>=0){ s.tags[i]=nn; snDbPut(s); } }); if(snLibTag===t) snLibTag=nn; snSaveCfg(); snRenderLib(); }
-      if(a==='del'){ if(!confirm('刪除分類「'+t+'」？截圖不會刪掉，只是拿掉這個分類。')) return;
-        SN.tags=SN.tags.filter(x=>x!==t); SN.snaps.forEach(s=>{ if((s.tags||[]).includes(t)){ s.tags=s.tags.filter(x=>x!==t); snDbPut(s); } }); if(snLibTag===t) snLibTag=''; snSaveCfg(); snRenderLib(); }
-    }));
+    tf.appendChild(snFilterChip(t,cnt,snLibTag===t,()=>{ snLibTag=(snLibTag===t?'':t); snRenderLib(); },a=>{ if(a==='ren') snTagRename(t); if(a==='del') snTagDelete(t); }));
   });
   const at=document.createElement('button'); at.className='sn-chip add'; at.textContent='＋ 分類';
-  at.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(SN.tags.includes(v)){ snToast('已經有這個分類'); return; } SN.tags.push(v); snSaveCfg(); snRenderLib(); if(snDraft) snRenderTagChips(document.getElementById('snTags'), snDraft.tags); };
+  at.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(SN.tags.includes(v)){ snToast('已經有這個分類'); return; } SN.tags.push(v); snSaveCfg(); snRenderLib(); mkovCfRefresh(); if(snDraft) snRenderTagChips(document.getElementById('snTags'), snDraft.tags); };
   tf.appendChild(at);
 }
 function snRenderLib(){
@@ -10649,7 +10681,7 @@ function mkClsOpen(){
   mkCls.rec.marks=mkCls.rec.marks||[]; mkCls.rec.boxes=mkCls.rec.boxes||[]; mkCls.rec.tags=mkCls.rec.tags||[];
   [mkCls.n60, mkCls.n5]=mkSplitNote(mkCls.rec.note);
   const lay=document.querySelector('.mkov-layout'); if(lay) lay.classList.add('cls-open');
-  mkClsRender(); setTimeout(()=>mkovChart.renderAll(),0);
+  mkClsRender(); renderMkovInfo(); setTimeout(()=>mkovChart.renderAll(),0);
 }
 function mkClsClose(force){
   if(!force && mkCls && mkCls.dirty && confirm('這天的分類還沒存，要先存起來嗎？')) mkClsSave();
@@ -10657,7 +10689,7 @@ function mkClsClose(force){
   const lay=document.querySelector('.mkov-layout'); if(lay) lay.classList.remove('cls-open');
   const p=document.getElementById('mkovCls'); if(p) p.innerHTML='';
   document.querySelectorAll('.mkov-canvas-body').forEach(el=>el.classList.remove('placing'));
-  mkClsBtn(); setTimeout(()=>mkovChart.renderAll(),0);
+  mkClsBtn(); renderMkovInfo(); setTimeout(()=>mkovChart.renderAll(),0);
 }
 function mkClsBtn(){
   const b=document.getElementById('mkovClsBtn'); if(!b) return;
@@ -10775,6 +10807,7 @@ function mkClsSave(){
   mkClsRender();
   const el=document.getElementById('mkcSaved'); if(el){ el.textContent='✓ 已存到行情分類'+(r.folder?'「'+r.folder+'」':''); el.style.color='#22c55e'; }
   snToast('已存到行情分類');
+  mkovCfRefresh();
 }
 function mkClsDelete(){
   if(!mkCls || !mkCls.id) return;
@@ -10782,7 +10815,7 @@ function mkClsDelete(){
   if(b && !b.classList.contains('armed')){ b.classList.add('armed'); b.textContent='再按一次確定刪除'; return; }
   SN.snaps=SN.snaps.filter(x=>x.id!==mkCls.id); snDbDel(mkCls.id);
   try{ snRenderDay(); if(snIsLibOpen()) snRenderLib(); }catch(e){}
-  snToast('已刪除這天的分類'); mkClsClose(true);
+  snToast('已刪除這天的分類'); mkClsClose(true); mkovCfRefresh();
 }
 document.addEventListener('keydown', e=>{
   if(!mkCls) return; const tg=e.target, typing=tg && (tg.tagName==='TEXTAREA' || tg.tagName==='INPUT' || tg.tagName==='SELECT' || tg.isContentEditable);
@@ -10797,6 +10830,195 @@ function mkOpenFromLib(id){
   mkovDay=s.day; mkCls=null; switchTResultTab('mkov');
   setTimeout(()=>mkClsOpen(),60);
 }
+
+// ================= 🗂 總體行情回顧：用資料夾／分類篩選分類過的行情（原本 🗂 行情分類的篩選搬到這裡）=================
+// 選了資料夾／分類／搜尋之後：日曆只亮符合的日子、‹ › 和 ＋／－ 只在符合的日子之間跳、左邊列出全部符合的日子
+const MKOV_CF_KEY='mkovCf_'+MARKET;
+let mkovCf=(function(){
+  try{ const o=JSON.parse(localStorage.getItem(MKOV_CF_KEY)||'null');
+    if(o && typeof o==='object') return {folder:(o.folder==null?'__all':o.folder), tag:o.tag||'', q:o.q||'', open:o.open!==false}; }catch(e){}
+  return {folder:'__all', tag:'', q:'', open:true};
+})();
+function mkovCfSave(){ try{ localStorage.setItem(MKOV_CF_KEY, JSON.stringify(mkovCf)); }catch(e){} }
+function mkovCfActive(){ return mkovCf.folder!=='__all' || !!mkovCf.tag || !!String(mkovCf.q||'').trim(); }
+function mkovCfMatch(s){
+  const q=String(mkovCf.q||'').trim().toLowerCase();
+  return (mkovCf.folder==='__all' || (s.folder||'')===mkovCf.folder)
+      && (!mkovCf.tag || (s.tags||[]).includes(mkovCf.tag))
+      && (!q || String(s.note||'').toLowerCase().includes(q));
+}
+function mkovCfAllSnaps(){ return SN.snaps.filter(s=>DAYS_SET.has(s.day)); }
+function mkovCfSnaps(){
+  return mkovCfAllSnaps().filter(mkovCfMatch)
+    .sort((a,b)=>a.day<b.day?-1:(a.day>b.day?1:((a.kind==='mk'?-1:0)-(b.kind==='mk'?-1:0)||(a.capIdx||0)-(b.capIdx||0))));
+}
+function mkovCfDays(){ return [...new Set(mkovCfSnaps().map(s=>s.day))]; }
+function mkovCfHtml(){
+  return `<div class="mkov-cf${mkovCf.open?'':' closed'}" id="mkovCf">
+    <div class="mkov-cf-h" onclick="mkovCfToggleOpen()" title="展開／收合"><b>🗂 分類篩選</b><span class="mkov-cf-sum" id="mkovCfSum"></span><span class="mkov-cf-arr">▾</span></div>
+    <div class="mkov-cf-body">
+      <div class="mkov-cf-row">
+        <input class="sn-inp mkov-cf-q" id="mkovCfQ" placeholder="搜尋筆記…" value="${escapeHtml(mkovCf.q||'')}" oninput="mkovCfSetQ(this.value)" autocomplete="off">
+        <button class="mkov-cf-mini" onclick="mkovCfClear()" title="清除所有篩選">清除</button>
+        <button class="mkov-cf-mini" onclick="snOpenLib()" title="打開清單檢視（也包含主畫面 📷 截下來的圖）">📋 清單</button>
+      </div>
+      <div class="mkov-cf-lb">資料夾</div><div class="sn-chips mkov-cf-chips" id="mkovCfFolders"></div>
+      <div class="mkov-cf-lb">分類</div><div class="sn-chips mkov-cf-chips" id="mkovCfTags"></div>
+      <div class="mkov-cf-list" id="mkovCfList"></div>
+    </div>
+  </div>`;
+}
+function mkovCfToggleOpen(){
+  mkovCf.open=!mkovCf.open; mkovCfSave();
+  const el=document.getElementById('mkovCf'); if(el) el.classList.toggle('closed', !mkovCf.open);
+}
+function mkovCfRender(){ mkovCfRenderChips(); mkovCfRenderList(); }
+function mkovCfRenderChips(){
+  const fl=document.getElementById('mkovCfFolders'), tl=document.getElementById('mkovCfTags'); if(!fl||!tl) return;
+  const all=mkovCfAllSnaps();
+  if(mkovCf.folder!=='__all' && mkovCf.folder!=='' && !SN.folders.includes(mkovCf.folder)) mkovCf.folder='__all';
+  if(mkovCf.tag && !SN.tags.includes(mkovCf.tag)) mkovCf.tag='';
+  fl.innerHTML='';
+  [['__all','全部'],['','未放資料夾'],...SN.folders.map(f=>[f,'📁 '+f])].forEach(([v,n])=>{
+    const cnt=v==='__all'?all.length:all.filter(s=>(s.folder||'')===v).length;
+    const edit=(v && v!=='__all') ? (a=>{ if(a==='ren') snFolderRename(v); if(a==='del') snFolderDelete(v); }) : null;
+    fl.appendChild(snFilterChip(n, cnt, mkovCf.folder===v, ()=>{ mkovCf.folder=(mkovCf.folder===v && v!=='__all')?'__all':v; mkovCfApply(); }, edit));
+  });
+  const af=document.createElement('button'); af.type='button'; af.className='sn-chip add'; af.textContent='＋ 資料夾';
+  af.onclick=()=>{ const v=(prompt('新資料夾名稱')||'').trim(); if(!v) return; if(SN.folders.includes(v)){ snToast('已經有這個資料夾'); return; } SN.folders.push(v); snSaveCfg(); snCfgChanged(); };
+  fl.appendChild(af);
+  tl.innerHTML='';
+  tl.appendChild(snFilterChip('全部', all.length, !mkovCf.tag, ()=>{ mkovCf.tag=''; mkovCfApply(); }, null));
+  SN.tags.forEach(t=>{
+    const cnt=all.filter(s=>(s.tags||[]).includes(t)).length;
+    tl.appendChild(snFilterChip(t, cnt, mkovCf.tag===t, ()=>{ mkovCf.tag=(mkovCf.tag===t?'':t); mkovCfApply(); },
+      a=>{ if(a==='ren') snTagRename(t); if(a==='del') snTagDelete(t); }));
+  });
+  const at=document.createElement('button'); at.type='button'; at.className='sn-chip add'; at.textContent='＋ 分類';
+  at.onclick=()=>{ const v=(prompt('新分類名稱')||'').trim(); if(!v) return; if(SN.tags.includes(v)){ snToast('已經有這個分類'); return; } SN.tags.push(v); snSaveCfg(); snCfgChanged(); };
+  tl.appendChild(at);
+}
+function mkovCfNotePreview(s){
+  return String(s.note||'').replace(/【(60K|5K)】/g,' ').replace(/\s+/g,' ').trim();
+}
+function mkovCfRenderList(){
+  const box=document.getElementById('mkovCfList'), sum=document.getElementById('mkovCfSum'); if(!box) return;
+  const allDays=new Set(mkovCfAllSnaps().map(s=>s.day));
+  if(!mkovCfActive()){
+    if(sum) sum.textContent='';
+    box.innerHTML=`<div class="mkov-cf-none">點一個資料夾或分類，日曆和 ‹ › 就只會停在符合的日子。<br>目前分類過的日子：<b>${allDays.size}</b> 天</div>`;
+    return;
+  }
+  const list=mkovCfSnaps(), byDay=new Map();
+  list.forEach(s=>{ if(!byDay.has(s.day)) byDay.set(s.day, []); byDay.get(s.day).push(s); });
+  const days=[...byDay.keys()], pos=days.indexOf(mkovDay);
+  if(sum) sum.innerHTML=`<b>${days.length}</b> 天${pos>=0?`・第 ${pos+1} 天`:''}`;
+  if(!days.length){ box.innerHTML='<div class="mkov-cf-none">沒有符合篩選的行情</div>'; return; }
+  box.innerHTML=days.map(d=>{
+    const ss=byDay.get(d), mk=ss.find(s=>s.kind==='mk'), s=mk||ss[0];
+    const tags=[...new Set(ss.flatMap(x=>x.tags||[]))], folders=[...new Set(ss.map(x=>x.folder).filter(Boolean))];
+    const nt=mkovCfNotePreview(s);
+    return `<div class="mkov-cf-it${d===mkovDay?' on':''}" data-d="${d}" onclick="mkovSelectDay('${d}')">
+      <div class="mkov-cf-it-h"><b>${d.slice(2).replace(/-/g,'/')}（${weekdayZh(d)}）</b>${mk?'<span title="在總體行情回顧分類過（5K＋60K）">🏷</span>':''}${ss.some(x=>x.kind!=='mk')?'<span title="主畫面截圖">📷</span>':''}</div>
+      <div class="sn-li-m">${folders.map(f=>'<span class="sn-ftag">📁 '+escapeHtml(f)+'</span>').join('')}${tags.map(t=>'<span class="sn-tag'+(t===mkovCf.tag?' hit':'')+'">'+escapeHtml(t)+'</span>').join('')}</div>
+      ${nt?`<div class="mkov-cf-it-n">${escapeHtml(nt)}</div>`:''}
+    </div>`;
+  }).join('');
+  const on=box.querySelector('.mkov-cf-it.on');
+  if(on){ const bt=box.getBoundingClientRect(), ot=on.getBoundingClientRect(); if(ot.top<bt.top || ot.bottom>bt.bottom) box.scrollTop+=ot.top-bt.top-6; }
+}
+function mkovCfSetQ(v){ mkovCf.q=v; clearTimeout(mkovCfSetQ._t); mkovCfSetQ._t=setTimeout(()=>mkovCfApply(true),180); }
+function mkovCfClear(){ mkovCf.folder='__all'; mkovCf.tag=''; mkovCf.q=''; const q=document.getElementById('mkovCfQ'); if(q) q.value=''; mkovCfApply(); }
+// 篩選改了：這天不符合 → 自動跳到最近一個符合的日子
+function mkovCfApply(fromTyping){
+  mkovCfSave();
+  if(mkovCfActive()){
+    const ds=mkovCfDays();
+    if(ds.length && !ds.includes(mkovDay)){ const t=ds.filter(x=>x<=mkovDay).pop()||ds[0]; mkovCfRenderChips(); mkovSelectDay(t); return; }
+    if(!ds.length && !fromTyping) snToast('沒有符合篩選的行情');
+  }
+  mkovCfRefresh();
+}
+function mkovUpdNav(d){
+  const p=document.getElementById('mkovPrev'), n=document.getElementById('mkovNext'), i=DAYS.indexOf(d);
+  if(mkovCfActive()){ const ds=mkovCfDays(); if(p) p.disabled=!ds.some(x=>x<d); if(n) n.disabled=!ds.some(x=>x>d); }
+  else if(mkovSide!=='all'){ const ds=_allClosedTradesCache.filter(mkovSideOk).map(t=>t.date); if(p) p.disabled=!ds.some(x=>x<d); if(n) n.disabled=!ds.some(x=>x>d); }
+  else { if(p) p.disabled=i<=0; if(n) n.disabled=i>=DAYS.length-1; }
+}
+// 分類資料有變（存檔、刪除、同步、改名…）→ 總體行情回顧的篩選／日曆／左邊資訊跟著更新（不重畫 K 線）
+function mkovCfRefresh(){
+  if(!document.getElementById('mkovCf') || !mkovDay) return;
+  try{ mkovCfRender(); renderMkovCalendar(); renderMkovInfo(); mkovUpdNav(mkovDay); }catch(e){}
+}
+// 資料夾／分類改了（名稱、新增、刪除）→ 所有地方一起更新
+function snCfgChanged(){
+  mkovCfSave();
+  try{ if(snIsLibOpen()) snRenderLib(); }catch(e){}
+  try{ snRenderDay(); }catch(e){}
+  try{ if(mkCls) mkClsRender(); }catch(e){}
+  mkovCfRefresh();
+}
+function snFolderRename(v){
+  const nn=(prompt('資料夾新名稱',v)||'').trim(); if(!nn||nn===v) return;
+  if(SN.folders.includes(nn)){ snToast('已經有這個資料夾'); return; }
+  SN.folders[SN.folders.indexOf(v)]=nn;
+  SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=nn; snDbPut(s); } });
+  if(snLibFolder===v) snLibFolder=nn; if(mkovCf.folder===v) mkovCf.folder=nn; if(mkCls && mkCls.rec.folder===v) mkCls.rec.folder=nn;
+  snSaveCfg(); snCfgChanged();
+}
+function snFolderDelete(v){
+  const cnt=SN.snaps.filter(s=>(s.folder||'')===v).length;
+  if(!confirm('刪除資料夾「'+v+'」？裡面的 '+cnt+' 筆分類不會刪掉，會移到「未放資料夾」。')) return;
+  SN.folders=SN.folders.filter(x=>x!==v);
+  SN.snaps.forEach(s=>{ if(s.folder===v){ s.folder=''; snDbPut(s); } });
+  if(snLibFolder===v) snLibFolder='__all'; if(mkovCf.folder===v) mkovCf.folder='__all'; if(mkCls && mkCls.rec.folder===v) mkCls.rec.folder='';
+  snSaveCfg(); snCfgChanged();
+}
+function snTagRename(t){
+  const nn=(prompt('分類新名稱',t)||'').trim(); if(!nn||nn===t) return;
+  if(SN.tags.includes(nn)){ snToast('已經有這個分類'); return; }
+  SN.tags[SN.tags.indexOf(t)]=nn;
+  SN.snaps.forEach(s=>{ const i=(s.tags||[]).indexOf(t); if(i>=0){ s.tags[i]=nn; snDbPut(s); } });
+  if(snLibTag===t) snLibTag=nn; if(mkovCf.tag===t) mkovCf.tag=nn;
+  if(mkCls){ const i=mkCls.rec.tags.indexOf(t); if(i>=0) mkCls.rec.tags[i]=nn; }
+  snSaveCfg(); snCfgChanged();
+}
+function snTagDelete(t){
+  if(!confirm('刪除分類「'+t+'」？行情不會刪掉，只是拿掉這個分類。')) return;
+  SN.tags=SN.tags.filter(x=>x!==t);
+  SN.snaps.forEach(s=>{ if((s.tags||[]).includes(t)){ s.tags=s.tags.filter(x=>x!==t); snDbPut(s); } });
+  if(snLibTag===t) snLibTag=''; if(mkovCf.tag===t) mkovCf.tag='';
+  if(mkCls) mkCls.rec.tags=mkCls.rec.tags.filter(x=>x!==t);
+  snSaveCfg(); snCfgChanged();
+}
+// 左邊資訊最上面：這天的分類（右邊編輯面板打開時就不重複顯示）
+function mkovDayClsHtml(d){
+  if(mkCls && mkCls.rec.day===d) return '';
+  const s=mkClsOfDay(d), others=SN.snaps.filter(x=>x.day===d && x.kind!=='mk');
+  let h='';
+  if(s){
+    const [a,b]=mkSplitNote(s.note);
+    h+=`<div class="mkov-dcls">
+      <div class="mkov-dcls-h"><b>🏷 這天的分類</b><button onclick="mkClsOpen()">✎ 編輯</button></div>
+      <div class="sn-li-m">${s.folder?'<span class="sn-ftag">📁 '+escapeHtml(s.folder)+'</span>':''}${(s.tags||[]).map(t=>'<span class="sn-tag">'+escapeHtml(t)+'</span>').join('')||'<span class="mkov-dcls-0">（沒選分類）</span>'}</div>
+      ${a?`<div class="mkov-dcls-n"><b class="n60">60K</b>${escapeHtml(a)}</div>`:''}${b?`<div class="mkov-dcls-n"><b class="n5">5K</b>${escapeHtml(b)}</div>`:''}
+    </div>`;
+  } else {
+    h+=`<div class="mkov-dcls none"><span>這天還沒分類</span><button onclick="mkClsOpen()">🏷 分類這天</button></div>`;
+  }
+  if(others.length) h+=`<div class="mkov-dcls none"><span>📷 這天另有 ${others.length} 張主畫面截圖</span><button onclick="snOpenLib('${others[0].id}')">打開</button></div>`;
+  return h;
+}
+// 上方「🗂 分類」按鈕：打開總體行情回顧並展開分類篩選
+function openMktOverviewCf(){
+  mkovCf.open=true; mkovCfSave();
+  openMktOverview();
+  setTimeout(()=>{ const el=document.getElementById('mkovCf'); if(el){ el.classList.remove('closed'); el.scrollIntoView({block:'nearest'}); } },50);
+}
+// 分類資料有任何變動（含 GitHub 同步拉下來）都會呼叫 snRenderDay → 順便更新總體行情回顧
+const _mkovOrigSnRenderDay=snRenderDay;
+snRenderDay=function(){ _mkovOrigSnRenderDay.apply(this,arguments); mkovCfRefresh(); };
+
 
 // ---- 分類頁：5K＋60K 畫在同一張圖（左 5K、右 60K）----
 function snMkPane(ctx, s, tf, x0, y0, w, h, mini){
