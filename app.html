@@ -2955,7 +2955,9 @@ function attachEvents(wrap,tf){
       }
     } else if(zoneDraft && movedPx>4){
       if(zoneDraft.kind==='line'){
-        zoneList.push({kind:'line', idxA:Math.min(zoneDraft.idxA,zoneDraft.idxB), idxB:Math.max(zoneDraft.idxA,zoneDraft.idxB), p:zoneDraft.p, d:currentDay, id:wdNewId()});
+        let A=Math.min(zoneDraft.idxA,zoneDraft.idxB), B=Math.max(zoneDraft.idxA,zoneDraft.idxB);
+        if(zNewKind==='wline'){ const w=wdUsSessionAt(zoneDraft.idxA); if(w){ A=w.lo; B=w.hi; } }   // 白線：自動從美股開盤延伸到隔天美股開盤前一根
+        zoneList.push({kind:'line', idxA:A, idxB:B, p:zoneDraft.p, d:currentDay, id:wdNewId()});
       } else {
         let A=zoneDraft.idxA, B=zoneDraft.idxB, lo=zoneDraft.pLo, hi=zoneDraft.pHi;
         if(!(hi>lo)){
@@ -4534,6 +4536,33 @@ function dayWindow1k(d){
   const head = pd ? _dayPart(pd, (ts,cr)=>cr && ts>=DAY_WIN_FROM) : [];                 // 前一盤的清晨尾段
   const body = _dayPart(d, (ts,cr)=> cr ? ts<DAY_WIN_TO : ts>=DAY_WIN_FROM);              // 當天到隔天 03:30
   return (_dayWinCache[key]=head.concat(body));
+}
+// 白線自動長度：從「畫線位置所屬的美股開盤」那根，延伸到「下一次美股開盤」的前一根
+// NQ：美股開盤＝MKT.openTW（夏 21:30／冬 22:30）；台指：美股開盤＝MKT.am8TW（夜盤中）
+function wdUsOpenTW(d){ return MKT.id==='tx' ? MKT.am8TW(d) : MKT.openTW(d); }
+function wdUsSessionAt(idx){
+  const i=DAYS.indexOf(currentDay); if(i<0) return null;
+  const seen=new Map(), opens=new Set();
+  for(let j=Math.max(0,i-5); j<=Math.min(DAYS.length-1,i+3); j++){
+    const d=DAYS[j], tw=wdUsOpenTW(d);
+    ((DATA[d]&&DATA[d]['1k'])||[]).forEach(b=>{ seen.set(b.idx,b); if(b.ts===tw) opens.add(b.idx); });
+  }
+  const bars=[...seen.values()].sort((x,y)=>x.idx-y.idx);
+  const os=[...opens].sort((x,y)=>x-y);
+  let k=-1; for(let n=0;n<os.length;n++){ if(os[n]<=idx) k=n; else break; }
+  if(k<0) return null;   // 畫在第一個美股開盤之前：維持原本拉的長度
+  const lo=os[k];
+  let hi;
+  if(k+1<os.length){
+    const nx=os[k+1];
+    let prev=null; for(const b of bars){ if(b.idx>=nx) break; prev=b; }
+    hi = prev ? (prev.idx_end||prev.idx) : nx-1;
+  } else {
+    // 還沒有下一天的資料：用前一段美股開盤的間隔推算長度
+    if(k<1) return null;
+    hi = lo + (os[k]-os[k-1]) - 1;
+  }
+  return hi>lo ? {lo, hi} : null;
 }
 function dayWindowOf(d){
   const k='w:'+d; if(_dayWinCache[k]) return _dayWinCache[k];
