@@ -1852,7 +1852,8 @@ const MKT_ALL = {
     openTW:d=>_isDST(d)?'21:30':'22:30',
     preOpenTW:d=>_isDST(d)?'16:00':'17:00',
     am8TW:d=>'08:00',
-    startLabels:{open:'開盤', preopen:'盤前', am8:'早上8點'},
+    noonTW:d=>'12:00',
+    startLabels:{open:'開盤', preopen:'盤前', am8:'早上8點', noon:'中午12點'},
     arrows:d=>[{ts:_isDST(d)?'16:00':'17:00', label:'盤前', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'開盤', color:'#ffffff'}],
     hl60:d=>_isDST(d)?{s:'21:00',e:'03:00'}:{s:'22:00',e:'04:00'},
     rthOpenTW:d=>_isDST(d)?'21:30':'22:30', rthLen:390, tick:0.25,
@@ -1876,7 +1877,8 @@ const MKT_ALL = {
     openTW:d=>'08:45',                 // 日盤開盤
     preOpenTW:d=>'15:00',              // 夜盤開盤（交易日從前一天 15:00 夜盤開始）
     am8TW:d=>_isDST(d)?'21:30':'22:30',// 美股開盤（夜盤中）
-    startLabels:{open:'日盤開盤', preopen:'夜盤開盤', am8:'美股開盤'},   // 一天都收在隔日 04:55
+    noonTW:d=>'12:00',                 // 中午12點（日盤中）
+    startLabels:{open:'日盤開盤', preopen:'夜盤開盤', am8:'美股開盤', noon:'中午12點'},   // 一天都收在隔日 04:55
     arrows:d=>[{ts:'15:00', label:'夜盤', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'美開', color:'#a78bfa'},{ts:'08:45', label:'開盤', color:'#ffffff'}],
     hl60:d=>({s:'08:45',e:'12:45'}),   // 60K 日盤時段淺黃底
     rthOpenTW:d=>'08:45', rthLen:60, tick:1,   // 日盤 08:45–13:45 = 60 根 5分K
@@ -1928,7 +1930,7 @@ let dayOff=0; // 今天第一根K棒在 mode1kBars 裡的位置（前面接著�
 function dayStartIdx(){ return mode1kBars.length ? mode1kBars[Math.min(dayOff,mode1kBars.length-1)].idx : 0; }
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
-let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8') s='am8'; return ['open','preopen','am8'].includes(s)?s:'open'; })(); // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am8'=早上8點(09:55)
+let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8') s='am8'; return ['open','preopen','am8','noon'].includes(s)?s:'open'; })(); // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am8'=早上8點(09:55)
 let wboxMode=false, wlineMode=false; // 白色方框／白色水平線模式（左邊工具列按鈕）
 let zoneList=[], zoneMode=false, zoneDraft=null, zoneDragging=false, zoneActiveTf=null; // 使用者手畫的灰色方框（時間+價格），純記憶體、關掉即消失
 let panOffset={};
@@ -3488,10 +3490,26 @@ function findAm8Idx(bars){
   return best>=0?best:dayOff;
 }
 
+// 中午12點起始（固定台北12:00；取最接近當日開頭的那根再往前一根）
+function findNoonIdx(bars){
+  const todayStartIdx = dayStartIdx();
+  const ts = MKT.noonTW(currentDay);
+  let best=-1, bestDiff=Infinity;
+  bars.forEach((b,i)=>{
+    if(b.ts===ts && b.idx>=todayStartIdx){
+      const diff=Math.abs(b.idx-todayStartIdx);
+      if(diff<bestDiff){ bestDiff=diff; best=i; }
+    }
+  });
+  if(best>0) best=best-1;
+  return best>=0?best:dayOff;
+}
+
 function getModeStartIdx() {
   if(!mode1kBars.length) return 0;
   if(startMode==='preopen') return findPreOpenIdx(mode1kBars, currentDay); // 盤前時段（5K約15:55 / 冬令16:55）
   if(startMode==='am8')    return findAm8Idx(mode1kBars);                // 早上8點（5K約07:55）
+  if(startMode==='noon')   return findNoonIdx(mode1kBars);               // 中午12點（5K約11:55）
   return findOpenIdx(mode1kBars, currentDay);                             // 開盤前一根（5K約21:25 / 冬令22:25）
 }
 
@@ -3543,9 +3561,9 @@ function wdMergeIn(list){   // 匯入用：只補回目前沒有的
 (function wdLoad(){ try{ const t=JSON.parse(localStorage.getItem(WD_KEY)||'null'); if(Array.isArray(t)) wdReplace(t); }catch(e){} })();
 function clearZones(){ zoneList=[]; zoneDraft=null; if(mode1kBars.length) renderAll(); }
 
-// 切換「復盤起始時段」：開盤 → 盤前 → 早上8點 → 開盤（循環）
+// 切換「復盤起始時段」：開盤 → 盤前 → 早上8點 → 中午12點 → 開盤（循環）
 function toggleStartMode(){
-  startMode = (startMode==='open') ? 'preopen' : (startMode==='preopen' ? 'am8' : 'open');
+  startMode = (startMode==='open') ? 'preopen' : (startMode==='preopen' ? 'am8' : (startMode==='am8' ? 'noon' : 'open'));
   localStorage.setItem('nq_start_mode', startMode);
   const btn=document.getElementById('btnStartMode');
   if(btn) btn.textContent = '起始：'+startModeLabel();
@@ -11478,7 +11496,7 @@ function snrMerge(remote){
   if(ch.has('s')||ch.has('f')){ try{ saveStoryStorage(); if(typeof renderStoryTimeline==='function') renderStoryTimeline(); if(mode1kBars.length) renderAll(); }catch(e){} }
   if(ch.has('p')){ try{
     indicatorOn=JSON.parse(localStorage.getItem('nqIndicatorsOn')||'{}')||{}; indicatorOpts=JSON.parse(localStorage.getItem('nqIndicatorOpts')||'{}')||{};
-    const sm=localStorage.getItem('nq_start_mode'); if(['open','preopen','am8'].includes(sm)) startMode=sm;
+    const sm=localStorage.getItem('nq_start_mode'); if(['open','preopen','am8','noon'].includes(sm)) startMode=sm;
     if(mode1kBars.length) renderAll(); }catch(e){} }
   snrLast=snrStr(snrCollect());   // 套用進來的不算本機修改
   snsSave();
