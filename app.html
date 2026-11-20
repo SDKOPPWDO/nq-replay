@@ -9593,6 +9593,24 @@ const INDICATORS = [
     note:()=> dataHasVolume() ? '' : '目前 data.bin 沒有成交量欄位，暫時以「停留時間」計算（每根 1 分K 算 1）。在資料的每根K棒加上 v（成交量）後，會自動改用成交量。',
     back:(ctx,L,tf)=>drawVolBand(ctx,L,tf,'back'),
     top:(ctx,L,tf)=>drawVolBand(ctx,L,tf,'top')
+  },
+  {
+    id:'sessBox',
+    name:'亞盤／歐盤／美盤',
+    desc:'把每天的亞盤、歐盤、美盤各自框起來（方框上緣＝該時段高點、下緣＝低點）。'+(MKT.id==='tx'
+      ? '台北時間：亞盤＝日盤 08:45–13:45；歐盤＝15:00–美股開盤；美盤＝美股開盤（夏令 21:30／冬令 22:30）–05:00。'
+      : '台北時間：亞盤＝夏令 06:00–15:00／冬令 07:00–16:00；歐盤＝夏令 15:00–21:30／冬令 16:00–22:30；美盤＝夏令 21:30–05:00／冬令 22:30–06:00。')
+      +'只用目前播放到的K棒計算，不會看到未來。',
+    opts:[
+      {key:'asia', label:'顯示亞盤（紫）', def:true},
+      {key:'eu', label:'顯示歐盤（藍）', def:true},
+      {key:'us', label:'顯示美盤（橘）', def:true},
+      {key:'fill', label:'方框底色濃度（0＝透明，越大越深）', type:'number', def:3, min:0, max:40, step:1},
+      {key:'border', label:'框線濃度（0＝不畫框線，越大越深）', type:'number', def:25, min:0, max:100, step:1},
+      {key:'labels', label:'顯示時段名稱', def:true}
+    ],
+    back:(ctx,L,tf)=>drawSessBox(ctx,L,tf,'back'),
+    top:(ctx,L,tf)=>drawSessBox(ctx,L,tf,'top')
   }
   // 之後的新指標加在這裡
 ];
@@ -9811,6 +9829,90 @@ function drawRthRange(ctx, L, tf, layer){
       tag('高 '+s.hi.toFixed(2), xLineR, yH, '#4ade80', true);
       tag('低 '+s.lo.toFixed(2), xLineR, yL, '#f87171', false);
     }
+  }
+  ctx.restore();
+}
+
+// ---------- 指標③：亞盤／歐盤／美盤方框 ----------
+const SESS_DEF = [
+  {key:'asia', name:'亞盤', rgb:'167,139,250'},
+  {key:'eu',   name:'歐盤', rgb:'56,189,248'},
+  {key:'us',   name:'美盤', rgb:'245,158,11'}
+];
+// 各時段（台北時間，分鐘）[開始, 結束)，可跨午夜
+function sessWindows(day){
+  const dst=_isDST(day), m=(h,mi)=>h*60+mi;
+  if(MKT.id==='tx'){
+    const us = dst ? m(21,30) : m(22,30);
+    return {asia:[m(8,45),m(13,45)], eu:[m(15,0),us], us:[us,m(5,0)]};
+  }
+  return dst
+    ? {asia:[m(6,0),m(15,0)],  eu:[m(15,0),m(21,30)], us:[m(21,30),m(5,0)]}
+    : {asia:[m(7,0),m(16,0)],  eu:[m(16,0),m(22,30)], us:[m(22,30),m(6,0)]};
+}
+const _sessCache = {};
+// 一天裡每段連續時段：[{key, bars:[...]}]
+function sessRunsFor(day){
+  if(day in _sessCache) return _sessCache[day];
+  const bars = DATA[day] && DATA[day]['1k'];
+  const runs = [];
+  if(bars && bars.length){
+    const W = sessWindows(day);
+    const inW = (t,w)=> w[0]<w[1] ? (t>=w[0]&&t<w[1]) : (t>=w[0]||t<w[1]);
+    let run=null;
+    for(const b of bars){
+      const p=String(b.ts||'').split(':'); const t=(+p[0])*60+(+p[1]);
+      let k=null;
+      if(isFinite(t)) for(const sd of SESS_DEF){ if(inW(t,W[sd.key])){ k=sd.key; break; } }
+      if(!k){ run=null; continue; }
+      if(run && run.key===k) run.bars.push(b);
+      else { run={key:k, bars:[b]}; runs.push(run); }
+    }
+  }
+  _sessCache[day]=runs;
+  return runs;
+}
+function drawSessBox(ctx, L, tf, layer){
+  const now=indNow(L);
+  if(!now || !DAYS.length) return;
+  const cap=now.cap, view=L.view;
+  const vFirst=view[0].idx, vLast=(view[view.length-1].idx_end||view[view.length-1].idx);
+  const plotL=L.P.l, plotR=L.W-L.P.r, plotT=L.P.t, plotB=L.H-L.P.b;
+  const half = view.length>1 ? Math.abs(L.X(1)-L.X(0))/2 : 3;
+  const di=DAYS.indexOf(now.day);
+  if(di<0) return;
+  const num=(k,d,mx)=>{ const v=indOpt('sessBox',k); const n=+(v==null||v===''?d:v); return Math.max(0,Math.min(mx,isFinite(n)?n:d))/100; };
+  const fA=num('fill',3,40), bA=num('border',25,100);
+  const showLbl=!!indOpt('sessBox','labels');
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(plotL,plotT,plotR-plotL,plotB-plotT); ctx.clip();
+  for(let j=di; j>=0 && j>di-400; j--){
+    const runs=sessRunsFor(DAYS[j]);
+    if(!runs.length) continue;
+    const lastBar=runs[runs.length-1].bars; 
+    if(lastBar[lastBar.length-1].idx<vFirst) break;   // 這天以前都在畫面左邊外面
+    runs.forEach(r=>{
+      if(!indOpt('sessBox',r.key)) return;
+      const sIdx=r.bars[0].idx;
+      if(sIdx>cap || sIdx>vLast) return;
+      let hi=-Infinity, lo=Infinity, eIdx=sIdx;
+      for(const b of r.bars){ if(b.idx>cap) break; if(b.h>hi) hi=b.h; if(b.l<lo) lo=b.l; eIdx=b.idx; }
+      if(eIdx<vFirst || !isFinite(hi)) return;
+      const sd=SESS_DEF.find(x=>x.key===r.key);
+      const x1=xForIdxOnLayout(L,sIdx)-(sIdx>=vFirst?half:0);
+      const x2=xForIdxOnLayout(L,eIdx)+(eIdx<=vLast?half:0);
+      const yH=L.Y(hi), yL=L.Y(lo);
+      const w=Math.max(1,x2-x1), h=Math.max(1,yL-yH);
+      if(layer==='back'){
+        if(fA>0){ ctx.fillStyle='rgba('+sd.rgb+','+fA.toFixed(3)+')'; ctx.fillRect(x1,yH,w,h); }
+        if(bA>0){ ctx.strokeStyle='rgba('+sd.rgb+','+bA.toFixed(3)+')'; ctx.lineWidth=1; ctx.strokeRect(x1+0.5,yH+0.5,Math.max(1,w-1),Math.max(1,h-1)); }
+      } else if(showLbl && w>24){
+        ctx.font='bold 9px sans-serif'; ctx.textAlign='left';
+        ctx.fillStyle='rgba('+sd.rgb+','+Math.max(0.45,Math.min(0.85,bA+0.4)).toFixed(3)+')';
+        ctx.fillText(sd.name, Math.max(x1,plotL)+3, Math.max(yH,plotT)-3>plotT+8 ? yH-3 : yH+11);
+      }
+    });
   }
   ctx.restore();
 }
