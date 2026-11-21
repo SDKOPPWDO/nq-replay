@@ -941,6 +941,17 @@ body.sn-picking .cwrap{cursor:col-resize!important;}
 body.tf-lr .charts-col{flex-direction:row;}
 body.tf-lr .charts-col > .ccol{border-bottom:none;border-right:1px solid var(--b1);min-width:0;}
 body.tf-lr .charts-col > .ccol:last-child{border-right:none;}
+/* 格局之間的分隔線（可拖曳） */
+.charts-col > .tf-split{flex:0 0 7px;background:var(--b1);cursor:row-resize;position:relative;z-index:2;touch-action:none;transition:background .12s;}
+.charts-col > .tf-split::after{content:'';position:absolute;left:50%;top:50%;width:36px;height:3px;margin:-1.5px 0 0 -18px;border-radius:2px;background:rgba(255,255,255,.28);}
+.charts-col > .tf-split:hover,.charts-col > .tf-split.on{background:#3b82f6;}
+body.tf-lr .charts-col > .tf-split{cursor:col-resize;}
+body.tf-lr .charts-col > .tf-split::after{width:3px;height:36px;margin:-18px 0 0 -1.5px;}
+.charts-col > .ccol{border-bottom:none!important;border-right:none!important;}
+body.tf-splitting-tb, body.tf-splitting-tb *{cursor:row-resize!important;user-select:none;}
+body.tf-splitting-lr, body.tf-splitting-lr *{cursor:col-resize!important;user-select:none;}
+/* 👁 觀看模式：圖可以直接左鍵拉 */
+body.view-mode #chartsCol .cwrap{cursor:grab;}
 body.tf-lr .treplay-canvas-multi{flex-direction:row;}
 body.tf-lr .treplay-canvas-multi > .treplay-canvas-wrap{min-width:0;}
 
@@ -1486,7 +1497,8 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
     <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側行情分類面板" style="font-size:12px;padding:0 8px;width:auto;">🗂 面板</button>
     <button class="day-btn" onclick="openMktOverviewCf()" title="打開 🌐 總體行情回顧，用資料夾／分類篩選你分類過的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類或資料夾：選好後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
-    <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）" style="font-size:12px;padding:0 8px;width:auto;">起始：開盤</button>
+    <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：藍框最後一根 → 黃框最後一根 → 紅框最後一根" style="font-size:12px;padding:0 8px;width:auto;">起始：藍框最後一根</button>
+    <button class="day-btn" id="btnViewMode" onclick="toggleViewMode()" title="觀看模式：所有有資料的範圍都能用滑鼠左右拉著看（不受「看不到未來」限制）；點日期會直接跳到那天。觀看模式下不能播放、不能下模擬單" style="font-size:12px;padding:0 8px;width:auto;">👁 觀看：關</button>
     <button class="day-btn tflay-btn" onclick="toggleTfLayout()" title="多個格局（例如 5K＋60K）要上下排還是左右排" style="font-size:12px;padding:0 8px;width:auto;">⬍ 上下</button>
     <button class="day-btn ind-trigger" id="btnIndicators" onclick="toggleIndicatorMenu(this)" title="開啟指標選單" style="font-size:12px;padding:0 8px;width:auto;">📐 指標</button>
     <div class="day-nav">
@@ -1855,7 +1867,7 @@ const MKT_ALL = {
     noonTW:d=>'12:00',
     pm3TW:d=>'15:00',
     startLabels:{open:'開盤', preopen:'盤前', am8:'早上8點', noon:'中午12點', pm3:'下午3點'},
-    arrows:d=>[{ts:_isDST(d)?'16:00':'17:00', label:'盤前', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'開盤', color:'#ffffff'}],
+    arrows:d=>[{ts:_isDST(d)?'16:00':'17:00', label:'盤前', color:'#f5a623'}],   // 白色「開盤」箭頭已移除
     hl60:d=>_isDST(d)?{s:'21:00',e:'03:00'}:{s:'22:00',e:'04:00'},
     rthOpenTW:d=>_isDST(d)?'21:30':'22:30', rthLen:390, tick:0.25,
     rthName:'美股開盤區間',
@@ -1881,7 +1893,7 @@ const MKT_ALL = {
     noonTW:d=>'12:00',                 // 中午12點（日盤中）
     pm3TW:null,                        // 15:00 就是夜盤開盤，不另外列
     startLabels:{open:'日盤開盤', preopen:'夜盤開盤', am8:'美股開盤', noon:'中午12點'},   // 一天都收在隔日 04:55
-    arrows:d=>[{ts:'15:00', label:'夜盤', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'美開', color:'#a78bfa'},{ts:'08:45', label:'開盤', color:'#ffffff'}],
+    arrows:d=>[{ts:'15:00', label:'夜盤', color:'#f5a623'},{ts:_isDST(d)?'21:30':'22:30', label:'美開', color:'#a78bfa'}],   // 白色「開盤」箭頭已移除
     hl60:d=>({s:'08:45',e:'12:45'}),   // 60K 日盤時段淺黃底
     rthOpenTW:d=>'08:45', rthLen:60, tick:1,   // 日盤 08:45–13:45 = 60 根 5分K
     rthName:'日盤區間',
@@ -1932,7 +1944,11 @@ let dayOff=0; // 今天第一根K棒在 mode1kBars 裡的位置（前面接著�
 function dayStartIdx(){ return mode1kBars.length ? mode1kBars[Math.min(dayOff,mode1kBars.length-1)].idx : 0; }
 let DATA={},DAYS=[],DAYS_SET=new Set(),cur1=0,allBars={},mode1kBars=[],hoverBar=null,pickerIdx=-1,currentDay='';
 let NDXBUCKETS=[],ndxEnabled=true; // NDX 30分K比對：每個bucket內含5分子K，idx與NQ共用同一條全域分鐘時間軸
-let startMode = (()=>{ let s=localStorage.getItem('nq_start_mode'); if(s==='am8') s='am8'; return ['open','preopen','am8','noon','pm3'].includes(s)?s:'open'; })(); if(startMode==='pm3' && !MKT.pm3TW) startMode='open'; // 復盤起始：'open'=開盤前一根(21:25) / 'preopen'=盤前前一根(15:55) / 'am8'=早上8點(09:55)
+// 復盤起始：停在當天 藍框(亞盤)／黃框(歐盤)／紅框(美盤) 的最後一根
+const START_MODES=['asiaEnd','euEnd','usEnd'];
+const START_LABELS={asiaEnd:'藍框最後一根', euEnd:'黃框最後一根', usEnd:'紅框最後一根'};
+const START_SESS_KEY={asiaEnd:'asia', euEnd:'eu', usEnd:'us'};
+let startMode = (()=>{ const s=localStorage.getItem('nq_start_mode'); return START_MODES.includes(s)?s:'asiaEnd'; })();
 let wboxMode=false, wlineMode=false; // 白色方框／白色水平線模式（左邊工具列按鈕）
 let zoneList=[], zoneMode=false, zoneDraft=null, zoneDragging=false, zoneActiveTf=null; // 使用者手畫的灰色方框（時間+價格），純記憶體、關掉即消失
 let panOffset={};
@@ -2158,7 +2174,8 @@ function loadDay(day, startAt){
   if(today1k.length){
     const c1=contSeries('1k'), lastIdx=today1k[today1k.length-1].idx;
     dayOff=barsUpperBound(c1,today1k[0].idx-1);
-    Object.keys(allBars).forEach(tf=>{ const c=contSeries(tf); allBars[tf]=c.slice(0,barsUpperBound(c,lastIdx)); });
+    // 👁 觀看模式：接上全部資料（包含之後的日子）；一般模式只到今天收盤
+    Object.keys(allBars).forEach(tf=>{ const c=contSeries(tf); allBars[tf]=viewMode?c.slice():c.slice(0,barsUpperBound(c,lastIdx)); });
   }
   mode1kBars=allBars['1k'];
   // NDX 改為全域連續bucket，不再逐日切；繪圖時依當前idx決定顯示到哪一根
@@ -2166,6 +2183,7 @@ function loadDay(day, startAt){
   hoverBar=null;panOffset={};
   selectedTFs.forEach(tf=>{panOffset[tf]=0;});
   updateDateDisplay();buildUI();
+  if(viewMode){ cur1=Math.max(0,mode1kBars.length-1); renderAll(); viewPanToDay(day); return; }
   if(startAt==='first') cur1=dayOff;
   else if(startAt==='last') cur1=Math.max(0,mode1kBars.length-1);
   else cur1=getModeStartIdx();
@@ -2187,9 +2205,15 @@ function clsReplayDayList(){
   });
   return out.sort();
 }
+function viewJumpToDay(d){
+  currentDay=d;
+  const db=(DATA[d]||{})['1k']||[];
+  if(db.length) dayOff=Math.max(0,barsUpperBound(mode1kBars,db[0].idx-1));
+  updateDateDisplay(); viewSrcTf=null; viewPanToDay(d);
+}
 function dayNavList(){ return clsReplayActive ? clsReplayDayList() : DAYS; }
-function goPrevDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>0)loadDay(L[i-1]);}
-function goNextDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>=0&&i<L.length-1)loadDay(L[i+1]);}
+function goPrevDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>0){ if(viewMode&&mode1kBars.length) viewJumpToDay(L[i-1]); else loadDay(L[i-1]); }}
+function goNextDay(){const L=dayNavList();const i=L.indexOf(currentDay);if(i>=0&&i<L.length-1){ if(viewMode&&mode1kBars.length) viewJumpToDay(L[i+1]); else loadDay(L[i+1]); }}
 
 function toggleCal(){
   const popup=document.getElementById('calPopup');
@@ -2215,7 +2239,7 @@ function renderCal(){
     const el=document.createElement('div');el.textContent=d;
     let cls='cal-day';
     if(allowSet.has(ds)){cls+=' has-data';if(ds===currentDay)cls+=' selected';
-      el.addEventListener('click',()=>{loadDay(ds);document.getElementById('calPopup').classList.remove('show');});}
+      el.addEventListener('click',()=>{ if(viewMode && mode1kBars.length && DATA[ds]){ viewJumpToDay(ds); } else loadDay(ds); document.getElementById('calPopup').classList.remove('show');});}
     el.className=cls;grid.appendChild(el);
   }
 }
@@ -2246,6 +2270,65 @@ function renderAll(){
     if(lb) lb.style.display=(panOffset[tf]||0)>0?'':'none';
   });
   updateInfoBar(hoverBar||mode1kBars[cur1]);
+  if(viewMode) viewTrackDay();
+}
+
+// ============================================================
+// 👁 觀看模式：所有有資料的範圍都能用滑鼠拉著看；點日期瞬間跳到那天
+// ============================================================
+let viewMode=false, viewSrcTf=null;
+function toggleViewMode(){
+  viewMode=!viewMode;
+  document.body.classList.toggle('view-mode', viewMode);
+  const b=document.getElementById('btnViewMode');
+  if(b){ b.textContent='👁 觀看：'+(viewMode?'開':'關'); b.style.color=viewMode?'#38bdf8':''; b.style.fontWeight=viewMode?'700':''; b.style.borderColor=viewMode?'#38bdf8':''; }
+  if(viewMode && tradeSystemOn && typeof toggleTradeSystem==='function') toggleTradeSystem();   // 看得到未來，模擬單先關掉
+  if(currentDay) loadDay(currentDay);
+}
+// 這個 1K idx 屬於哪個交易日（DAYS 的 key）
+function viewDayOfIdx(idx){
+  const a=(typeof snDayStarts==='function')?snDayStarts():[]; if(!a.length) return null;
+  let lo=0,hi=a.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(a[m][0]<=idx) lo=m; else hi=m-1; }
+  return a[lo][1];
+}
+// 各格局都跳到這一天：一天比畫面短就置中，比畫面長就從當天第一根開始（左邊留一點空間）
+function viewPanToDay(day){
+  const db=(DATA[day]||{})['1k']||[]; if(!db.length) return;
+  const fIdx=db[0].idx, lIdx=db[db.length-1].idx;
+  selectedTFs.forEach(tf=>{
+    const cv=document.getElementById('cv_'+tf), L=cv&&cv._layout, mx=Math.max(10,L?L.mxC:100);
+    const bars=getBarsForTF(tf); if(!bars.length) return;
+    const p0=Math.max(0,barPosAtIdx(bars,fIdx)), p1=Math.max(p0,barPosAtIdx(bars,lIdx)), len=p1-p0+1;
+    const endPos = len<mx ? Math.round((p0+p1)/2+mx/2) : p0+Math.floor(mx*0.95);
+    panOffset[tf]=Math.max(0,bars.length-1-Math.min(bars.length-1,endPos));
+  });
+  renderAll();
+}
+// 拖曳某一個格局時，其他格局跟著對到同一個時間（畫面中間）
+function viewSyncOthers(srcTf){
+  const cv=document.getElementById('cv_'+srcTf), L=cv&&cv._layout; if(!L) return;
+  const bars=getBarsForTF(srcTf); if(!bars.length) return;
+  const endPos=Math.max(0,bars.length-1-(panOffset[srcTf]||0));
+  const c=bars[Math.max(0,endPos-Math.floor(L.mxC/2))]; if(!c) return;
+  viewSrcTf=srcTf;
+  selectedTFs.forEach(tf=>{
+    if(tf===srcTf) return;
+    const L2=(document.getElementById('cv_'+tf)||{})._layout; if(!L2) return;
+    const b2=getBarsForTF(tf); if(!b2.length) return;
+    const pos=Math.max(0,barPosAtIdx(b2,c.idx));
+    panOffset[tf]=Math.max(0,b2.length-1-Math.min(b2.length-1,pos+Math.floor(L2.mxC/2)));
+  });
+}
+// 上方日期跟著畫面中間那根K棒的日子走
+function viewTrackDay(){
+  const tf=(viewSrcTf && selectedTFs.includes(viewSrcTf))?viewSrcTf:selectedTFs[0];
+  const L=(document.getElementById('cv_'+tf)||{})._layout; if(!L||!L.view.length) return;
+  const d=viewDayOfIdx(L.view[Math.floor(L.view.length/2)].idx);
+  if(!d || d===currentDay || !DAYS_SET.has(d)) return;
+  currentDay=d;
+  const db=(DATA[d]||{})['1k']||[];
+  if(db.length) dayOff=Math.max(0,barsUpperBound(mode1kBars,db[0].idx-1));
+  updateDateDisplay();
 }
 
 // 由滑鼠位置換算成 (全域idx, 價格)（用該面板存下的座標對照）
@@ -2637,6 +2720,15 @@ function drawCrossOnChart(cvId,bi){
   ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(tlX-tlW/2,tlY,tlW,tlH);
   ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText(bar.ts,tlX,tlY+tlH/2+1);ctx.textBaseline='alphabetic';
+  // 十字線上方：日期＋星期（例：9/14(周一)），字是下方時間的 2/3（24px）
+  const _dl=xhDateLabel(bar.idx);
+  if(_dl){
+    ctx.font='bold 24px sans-serif';
+    const dW=Math.ceil(ctx.measureText(_dl).width)+14, dH=30, dX=Math.max(dW/2+P.l,Math.min(W-P.r-dW/2,sx)), dY=2;
+    ctx.fillStyle='rgba(255,255,255,0.95)';ctx.fillRect(dX-dW/2,dY,dW,dH);
+    ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(_dl,dX,dY+dH/2+1);ctx.textBaseline='alphabetic';
+  }
   // 📏 量測：左鍵按住上下拉，顯示這段漲跌幾點
   if(ptMeasure && cvId==='cv_'+ptMeasure.tf && crossMouse && crossMouse.tf===ptMeasure.tf){
     const t=MKT.tick||0.25, p0=ptMeasure.p0;
@@ -2788,6 +2880,7 @@ function panToLatest(){
 }
 // 跨日：往前退到昨天最後一根／往後進到隔天第一根
 function crossDay(dir){
+  if(viewMode) return false;
   const L=dayNavList(), i=L.indexOf(currentDay), j=i+dir;
   if(i<0 || j<0 || j>=L.length) return false;
   loadDay(L[j], dir>0?'first':'last');
@@ -2821,8 +2914,13 @@ function attachEvents(wrap,tf){
   let rDrag=false,startX=0,startPan=0;
   wrap.addEventListener('contextmenu',e=>e.preventDefault());
   wrap.addEventListener('mousedown',e=>{if(e.button===2){rDrag=true;startX=e.clientX;startPan=panOffset[tf]||0;wrap.style.cursor='ew-resize';}});
-  window.addEventListener('mousemove',e=>{if(!rDrag)return;const _c=document.getElementById('cv_'+tf),_cs=(_c&&_c._layout&&_c._layout.CS)||8,_max=(_c&&_c._layout)?_c._layout.vis.length-1:Infinity;panOffset[tf]=Math.max(0,Math.min(_max,startPan+Math.round((e.clientX-startX)/_cs)));renderAll();});
+  window.addEventListener('mousemove',e=>{if(!rDrag)return;const _c=document.getElementById('cv_'+tf),_cs=(_c&&_c._layout&&_c._layout.CS)||8,_max=(_c&&_c._layout)?_c._layout.vis.length-1:Infinity;panOffset[tf]=Math.max(0,Math.min(_max,startPan+Math.round((e.clientX-startX)/_cs)));if(viewMode)viewSyncOthers(tf);renderAll();});
   window.addEventListener('mouseup',e=>{if(e.button===2&&rDrag){rDrag=false;wrap.style.cursor='crosshair';}});
+  // 👁 觀看模式：左鍵按住左右拉＝移動圖表
+  let vDrag=null;
+  wrap.addEventListener('mousedown',e=>{ if(!viewMode||e.button!==0||zoneMode||(typeof snPick!=='undefined'&&snPick)) return; e.preventDefault(); vDrag={x:e.clientX,pan:panOffset[tf]||0}; wrap.style.cursor='grabbing'; });
+  window.addEventListener('mousemove',e=>{ if(!vDrag) return; const _c=document.getElementById('cv_'+tf),_cs=(_c&&_c._layout&&_c._layout.CS)||8,_max=(_c&&_c._layout)?_c._layout.vis.length-1:Infinity; panOffset[tf]=Math.max(0,Math.min(_max,vDrag.pan+Math.round((e.clientX-vDrag.x)/_cs))); viewSyncOthers(tf); renderAll(); });
+  window.addEventListener('mouseup',e=>{ if(vDrag && e.button===0){ vDrag=null; wrap.style.cursor='crosshair'; } });
   let tStartX=0,tStartPan=0,tTwo=false;
   wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){tTwo=true;tStartX=(e.touches[0].clientX+e.touches[1].clientX)/2;tStartPan=panOffset[tf]||0;}},{passive:true});
   wrap.addEventListener('touchmove',e=>{
@@ -2830,12 +2928,12 @@ function attachEvents(wrap,tf){
     else if(!tTwo&&e.touches.length===1){e.preventDefault();const t=e.touches[0],r=wrap.getBoundingClientRect();handleCross(tf,(t.clientX-r.left)/r.width,t.clientY-r.top);}
   },{passive:false});
   wrap.addEventListener('touchend',()=>{tTwo=false;wrap._panStart=null;clearAllCross();});
-  wrap.addEventListener('mousemove',e=>{if(rDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width,e.clientY-r.top);});
+  wrap.addEventListener('mousemove',e=>{if(rDrag||vDrag||zoneDragging||zoneMode)return;const r=wrap.getBoundingClientRect();handleCross(tf,(e.clientX-r.left)/r.width,e.clientY-r.top);});
   wrap.addEventListener('mouseleave',()=>clearAllCross());
   wrap.addEventListener('wheel',e=>{ e.preventDefault(); zoomTF(tf, e.deltaY<0?1:-1); },{passive:false});
   // 📏 沒開模擬單時：左鍵按住上下拉＝量這段漲跌幾點，放開就消失
   wrap.addEventListener('mousedown',e=>{
-    if(e.button!==0 || zoneMode || tradeSystemOn || (typeof snPick!=='undefined' && snPick)) return;
+    if(e.button!==0 || zoneMode || tradeSystemOn || viewMode || (typeof snPick!=='undefined' && snPick)) return;
     const cv=document.getElementById('cv_'+tf); if(!cv||!cv._layout) return;
     const L=cv._layout, r=wrap.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*L.W, my=e.clientY-r.top;
     if(my<L.P.t || my>L.H-L.P.b) return;
@@ -3117,7 +3215,6 @@ function nqPanelInner(tf){
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
           </span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
-          <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <span class="zoom-grp">
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
           <button class="zoom-btn" id="latest_${tf}" style="display:none;width:auto;padding:0 6px;" onclick="panToLatest()" title="所有格局回到目前播放位置（End 鍵）">⇥ 最新</button>
@@ -3152,7 +3249,6 @@ function ndxPanelInner(){
             <span class="chdr-wick-item dn"><span class="chdr-wick-lbl">下影</span><span class="chdr-wick-val" id="wickDn_${tf}">—</span></span>
           </span>
           <span class="chdr-time-item"><span class="chdr-time-lbl">時間</span><span class="chdr-time-val" id="ktimeVal_${tf}">—</span></span>
-          <span class="chdr-time-item"><span class="chdr-time-lbl">日期</span><span class="chdr-time-val" id="kdateVal_${tf}">—</span></span>
           <button class="zoom-btn" onclick="zoomTF('${tf}',-1)" title="顯示更多K棒">小</button>
           <button class="zoom-btn" id="latest_${tf}" style="display:none;width:auto;padding:0 6px;" onclick="panToLatest()" title="所有格局回到目前播放位置（End 鍵）">⇥ 最新</button>
           <button class="zoom-btn" onclick="zoomTF('${tf}',1)" title="顯示較少K棒">大</button>
@@ -3166,12 +3262,48 @@ function ndxPanelInner(){
 
 function buildUI(){
   const area=document.getElementById('chartsCol');area.innerHTML='';
-  [...selectedTFs].forEach((tf)=>{
-    const col=document.createElement('div');col.className='ccol';
+  const saved=tfSplitLoad();
+  [...selectedTFs].forEach((tf,i)=>{
+    if(i>0){ const sp=document.createElement('div'); sp.className='tf-split'; sp.title='拖曳調整兩個格局的大小（雙擊＝平分）'; area.appendChild(sp); tfSplitAttach(sp); }
+    const col=document.createElement('div');col.className='ccol';col.dataset.tf=tf;
+    if(saved && saved[tf]>0) col.style.flex=saved[tf]+' 1 0px';
     col.innerHTML=nqPanelInner(tf);area.appendChild(col);
     attachEvents(document.getElementById('wrap_'+tf),tf);
     panOffset[tf]=panOffset[tf]||0;
   });
+}
+// ↔ 格局之間的分隔線：上下排＝上下拉、左右排＝左右拉；比例依「打開的格局組合」記在這台電腦
+const TF_SPLIT_KEY='nqTfSplit';
+function tfSplitCombo(){ return selectedTFs.slice().sort().join('+'); }
+function tfSplitLoad(){ try{ return (JSON.parse(localStorage.getItem(TF_SPLIT_KEY)||'{}')||{})[tfSplitCombo()]||null; }catch(e){ return null; } }
+function tfSplitSave(area){
+  const w={}; area.querySelectorAll(':scope > .ccol').forEach(c=>{ const g=parseFloat(c.style.flexGrow); if(c.dataset.tf && g>0) w[c.dataset.tf]=+g.toFixed(4); });
+  try{ const all=JSON.parse(localStorage.getItem(TF_SPLIT_KEY)||'{}')||{}; all[tfSplitCombo()]=w; localStorage.setItem(TF_SPLIT_KEY, JSON.stringify(all)); }catch(e){}
+}
+function tfSplitAttach(sp){
+  let drag=null, raf=0;
+  const redraw=()=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; if(mode1kBars.length) renderAll(); }); };
+  sp.addEventListener('pointerdown',e=>{
+    if(e.button!==0) return;
+    const a=sp.previousElementSibling, b=sp.nextElementSibling; if(!a||!b) return;
+    e.preventDefault(); try{ sp.setPointerCapture(e.pointerId); }catch(_){}
+    const lr=tfLayoutIsLR(), area=sp.parentElement;
+    // 先把所有面板的 flex 換成目前的實際像素，拖曳時只動兩邊這兩個
+    area.querySelectorAll(':scope > .ccol').forEach(c=>{ const r=c.getBoundingClientRect(); c.style.flex=(lr?r.width:r.height)+' 1 0px'; });
+    const ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
+    drag={lr, a, b, start:lr?e.clientX:e.clientY, sa:lr?ra.width:ra.height, sb:lr?rb.width:rb.height};
+    sp.classList.add('on'); document.body.classList.add(lr?'tf-splitting-lr':'tf-splitting-tb');
+  });
+  sp.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    const MIN=80, tot=drag.sa+drag.sb;
+    let na=drag.sa+((drag.lr?e.clientX:e.clientY)-drag.start); na=Math.max(MIN,Math.min(tot-MIN,na));
+    drag.a.style.flex=na+' 1 0px'; drag.b.style.flex=(tot-na)+' 1 0px';
+    redraw();
+  });
+  const end=e=>{ if(!drag) return; try{ sp.releasePointerCapture(e.pointerId); }catch(_){} sp.classList.remove('on'); document.body.classList.remove('tf-splitting-lr','tf-splitting-tb'); drag=null; tfSplitSave(sp.parentElement); redraw(); };
+  sp.addEventListener('pointerup',end); sp.addEventListener('pointercancel',end);
+  sp.addEventListener('dblclick',()=>{ const area=sp.parentElement; area.querySelectorAll(':scope > .ccol').forEach(c=>c.style.flex=''); try{ const all=JSON.parse(localStorage.getItem(TF_SPLIT_KEY)||'{}')||{}; delete all[tfSplitCombo()]; localStorage.setItem(TF_SPLIT_KEY, JSON.stringify(all)); }catch(e){} redraw(); });
 }
 
 // NDX 只有平移/縮放，不參與 NQ 的十字線同步（避免互相干擾）
@@ -3332,7 +3464,7 @@ function step1kPerTFBar(tf){
 }
 // 找到 cur1 所在bar，往後跳到下N個「tf完整收盤」的位置
 function moveNext(n){
-  if(!mode1kBars.length) return;
+  if(!mode1kBars.length || viewMode) return;
   const prevCur1=cur1;
   const tf=getSmallestTF();
   if(tf==='1k'){
@@ -3356,7 +3488,7 @@ function moveNext(n){
   hoverBar=null;renderAll();
 }
 function movePrev(n){
-  if(!mode1kBars.length) return;
+  if(!mode1kBars.length || viewMode) return;
   const prevCur1=cur1;
   const tf=getSmallestTF();
   if(tf==='1k'){
@@ -3392,7 +3524,7 @@ function currentMinTF(){
 //  - 最小格局是 1K → 一根1K移動
 //  - 最小格局是 5K/15K/60K → 以該格局K棒的收盤邊界(idx_end)為單位，一根一根移動
 function stepPlayback(dir){
-  if(!mode1kBars.length) return;
+  if(!mode1kBars.length || viewMode) return;
   const minTF=currentMinTF();
   if(minTF==='1k' || !allBars[minTF] || !allBars[minTF].length){
     const nc=cur1+dir;
@@ -3527,15 +3659,20 @@ function findPm3Idx(bars){
 
 function getModeStartIdx() {
   if(!mode1kBars.length) return 0;
-  if(startMode==='preopen') return findPreOpenIdx(mode1kBars, currentDay); // 盤前時段（5K約15:55 / 冬令16:55）
-  if(startMode==='am8')    return findAm8Idx(mode1kBars);                // 早上8點（5K約07:55）
-  if(startMode==='noon')   return findNoonIdx(mode1kBars);               // 中午12點（5K約11:55）
-  if(startMode==='pm3')    return findPm3Idx(mode1kBars);                // 下午3點（5K約14:55）
-  return findOpenIdx(mode1kBars, currentDay);                             // 開盤前一根（5K約21:25 / 冬令22:25）
+  return findSessEndIdx(START_SESS_KEY[startMode]||'asia');
+}
+// 當天某個時段方框（asia=藍、eu=黃、us=紅）的最後一根 → mode1kBars 的位置
+function findSessEndIdx(key){
+  const runs=(typeof sessRunsFor==='function')?sessRunsFor(currentDay):[];
+  let run=null;
+  for(let i=runs.length-1;i>=0;i--){ if(runs[i].key===key){ run=runs[i]; break; } }
+  if(!run || !run.bars.length) return dayOff;
+  const pos=barPosAtIdx(mode1kBars, run.bars[run.bars.length-1].idx);
+  return pos>=dayOff ? pos : dayOff;
 }
 
 function startModeLabel(){
-  return MKT.startLabels[startMode] || MKT.startLabels.open;
+  return START_LABELS[startMode] || START_LABELS.asiaEnd;
 }
 
 // 開關「畫方框」模式
@@ -3584,8 +3721,7 @@ function clearZones(){ zoneList=[]; zoneDraft=null; if(mode1kBars.length) render
 
 // 切換「復盤起始時段」：開盤 → 盤前 → 早上8點 → 中午12點 → 下午3點 → 開盤（循環；台指沒有下午3點）
 function toggleStartMode(){
-  const order=['open','preopen','am8','noon'].concat(MKT.pm3TW?['pm3']:[]);
-  startMode = order[(order.indexOf(startMode)+1) % order.length];
+  startMode = START_MODES[(START_MODES.indexOf(startMode)+1) % START_MODES.length];
   localStorage.setItem('nq_start_mode', startMode);
   const btn=document.getElementById('btnStartMode');
   if(btn) btn.textContent = '起始：'+startModeLabel();
@@ -3875,6 +4011,7 @@ function ordSnap(){ tradeUndoStack.push(JSON.stringify({dayPositions, dayClosedT
 
 // 共用：用指定的價格／K 棒成交一筆買或賣（跟按「買進」「賣出」一樣的抵消、加碼、結算邏輯）
 function tradeExec(side, qty, price, bar, extra){
+  if(viewMode){ alert('觀看模式下不能下模擬單（看得到未來）。請先關掉 👁 觀看模式。'); return; }
   extra=extra||{};
   const time=bar.ts, idx=bar.idx;
   getDayMarkers().push({type: side, idx, ts: time, price, ...(extra.marker||{})});
@@ -9635,7 +9772,7 @@ function indOpt(id,key){
 function indNow(L){
   if(L && L.cap!=null) return {cap:L.cap, px:L.capPx, day:L.day};
   if(!mode1kBars.length) return null;
-  return {cap:mode1kBars[cur1].idx, px:mode1kBars[cur1].c, day:currentDay};
+  return {cap:mode1kBars[cur1].idx, px:mode1kBars[cur1].c, day:(viewMode&&DAYS.length)?(viewDayOfIdx(mode1kBars[cur1].idx)||DAYS[DAYS.length-1]):currentDay};
 }
 
 function drawIndicators(ctx, L, tf, layer){
@@ -10157,6 +10294,17 @@ function snDayStarts(){
   a.sort((x,y)=>x[0]-y[0]); _snDayStarts={n:DAYS.length,a:a}; return a;
 }
 const SN_WD='日一二三四五六';
+// 十字線上方的日期：M/D(周X)，例如 9/14(周一)
+function xhDateLabel(idx){
+  const a=snDayStarts(); if(!a.length||idx==null||idx<a[0][0]) return '';
+  let lo=0,hi=a.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(a[m][0]<=idx) lo=m; else hi=m-1; }
+  const [first,day,fm]=a[lo];
+  const unit=(MKT.id==='tx')?5:1;
+  const base=new Date(day+'T12:00:00');
+  if(MKT.id==='tx' && fm>=12*60) base.setDate(base.getDate()-1);
+  base.setDate(base.getDate()+Math.floor((fm+(idx-first)*unit)/1440));
+  return (base.getMonth()+1)+'/'+base.getDate()+'(周'+SN_WD[base.getDay()]+')';
+}
 function snDateOfIdx(idx, withWd){
   const a=snDayStarts(); if(!a.length||idx==null||idx<a[0][0]) return '';
   let lo=0,hi=a.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(a[m][0]<=idx) lo=m; else hi=m-1; }
@@ -11647,7 +11795,7 @@ function snrMerge(remote){
   if(ch.has('s')||ch.has('f')){ try{ saveStoryStorage(); if(typeof renderStoryTimeline==='function') renderStoryTimeline(); if(mode1kBars.length) renderAll(); }catch(e){} }
   if(ch.has('p')){ try{
     indicatorOn=JSON.parse(localStorage.getItem('nqIndicatorsOn')||'{}')||{}; indicatorOpts=JSON.parse(localStorage.getItem('nqIndicatorOpts')||'{}')||{};
-    const sm=localStorage.getItem('nq_start_mode'); if(['open','preopen','am8','noon','pm3'].includes(sm) && !(sm==='pm3' && !MKT.pm3TW)) startMode=sm;
+    const sm=localStorage.getItem('nq_start_mode'); if(START_MODES.includes(sm)){ startMode=sm; const _b=document.getElementById('btnStartMode'); if(_b) _b.textContent='起始：'+startModeLabel(); }
     if(mode1kBars.length) renderAll(); }catch(e){} }
   snrLast=snrStr(snrCollect());   // 套用進來的不算本機修改
   snsSave();
