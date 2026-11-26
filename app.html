@@ -1486,6 +1486,79 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
   .rk-c{align-self:stretch}
   .rk-a{height:420px}.rk-b,.rk-d,.rk-e,.rk-f{height:300px} }
 @media (max-width:820px){ .rk-dash{grid-template-columns:minmax(0,1fr);grid-template-areas:"a" "c" "b" "d" "e" "f";} .rk-c{max-height:none} }
+/* ===== 🗂 分類（藍框／黃框自動分類 + 手動調整 + 多格局觀看） ===== */
+.dcls-ov{position:fixed;inset:0;background:radial-gradient(ellipse at top,#14141a 0%,#050508 70%);z-index:700;display:none;flex-direction:column;padding:12px 14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--t1);}
+.dcls-ov.show{display:flex;}
+.dcls-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;flex-shrink:0;}
+.dcls-title{font-size:16px;font-weight:800;}
+.dcls-sum{display:flex;gap:6px;flex-wrap:wrap;}
+.dcls-sum span{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;background:var(--bg3);border:1px solid var(--b2);color:var(--t2);}
+.dcls-sum i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0;}
+.dcls-btn{height:28px;padding:0 11px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.dcls-btn:hover{border-color:#7c3aed;}
+.dcls-btn.pri{background:#7c3aed;border-color:#7c3aed;}
+.dcls-sp{flex:1;}
+.dcls-tfs{display:flex;gap:4px;}
+.dcls-tf{height:28px;padding:0 11px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t2);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;}
+.dcls-tf.on{background:#2563eb;border-color:#2563eb;color:#fff;}
+.dcls-body{flex:1;min-height:0;display:flex;gap:10px;}
+.dcls-side{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;min-height:0;}
+.dcls-side-tools{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--b1);flex-shrink:0;}
+.dcls-side-tools input{flex:1;min-width:0;height:26px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);padding:0 8px;font-size:12px;font-family:inherit;}
+.dcls-side-tools select{height:26px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:11px;font-family:inherit;}
+.dcls-cats{flex:1;min-height:0;overflow-y:auto;padding:6px;}
+.dcls-cat{border:1px solid var(--b2);border-radius:9px;margin-bottom:8px;background:var(--bg3);overflow:hidden;}
+.dcls-cat.drop{outline:2px dashed #a78bfa;outline-offset:-2px;}
+.dcls-cat.dragging{opacity:.4;}
+.dcls-cat-h{display:flex;align-items:center;gap:7px;padding:7px 9px;cursor:pointer;user-select:none;border-left:4px solid var(--c);}
+.dcls-grip{cursor:grab;color:var(--t3);font-size:12px;padding:0 2px;}
+.dcls-cat-name{font-size:13px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dcls-cat-rule{font-size:9px;color:var(--t3);font-weight:600;padding:0 9px 6px 20px;line-height:1.45;}
+.dcls-cnt{font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px;background:rgba(255,255,255,.08);color:var(--t2);}
+.dcls-cat-act{width:22px;height:22px;border-radius:5px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:13px;}
+.dcls-cat-act:hover{background:rgba(255,255,255,.1);color:#fff;}
+.dcls-days{display:flex;flex-direction:column;gap:2px;padding:0 6px 6px;max-height:340px;overflow-y:auto;}
+.dcls-cat.closed .dcls-days,.dcls-cat.closed .dcls-cat-rule{display:none;}
+.dcls-day{display:flex;align-items:center;gap:6px;padding:4px 7px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid transparent;}
+.dcls-day:hover{background:rgba(255,255,255,.05);}
+.dcls-day.on{background:rgba(37,99,235,.22);border-color:#2563eb;}
+.dcls-day.dragging{opacity:.4;}
+.dcls-day-d{font-family:monospace;font-weight:700;}
+.dcls-day-w{color:var(--t3);font-size:10px;}
+.dcls-tag{margin-left:auto;font-size:9px;font-weight:800;padding:1px 6px;border-radius:8px;}
+.dcls-tag.man{background:rgba(250,204,21,.16);color:#facc15;}
+.dcls-tag.auto{background:rgba(255,255,255,.06);color:var(--t3);}
+.dcls-empty{font-size:11px;color:var(--t3);padding:6px 8px;}
+.dcls-main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;}
+.dcls-dhdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;flex-shrink:0;}
+.dcls-nav{width:30px;height:30px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:#fff;font-size:17px;cursor:pointer;}
+.dcls-date{font-size:16px;font-weight:800;font-family:monospace;min-width:150px;text-align:center;}
+.dcls-pos{font-size:11px;color:var(--t3);}
+.dcls-move{display:flex;align-items:center;gap:6px;padding:4px 6px 4px 10px;border-radius:8px;border:1px solid var(--b2);background:var(--bg2);}
+.dcls-move span{font-size:11px;color:var(--t2);font-weight:700;}
+.dcls-move select{height:26px;border-radius:6px;border:1px solid var(--b2);background:var(--bg3);color:#fff;font-weight:800;font-size:12px;font-family:inherit;}
+.dcls-boxinfo{display:flex;gap:10px;align-items:center;font-size:11px;font-family:monospace;padding:5px 10px;border-radius:8px;background:var(--bg2);border:1px solid var(--b1);}
+.dcls-boxinfo b{font-family:-apple-system,sans-serif;}
+.dcls-hint{font-size:10px;color:var(--t3);margin-left:auto;}
+.dcls-charts{flex:1;min-height:0;display:flex;}
+.dcls-charts .treplay-canvas-multi{flex:1;min-height:0;}
+#dclsCanvasMulti{flex-direction:column;}
+#dclsCanvasMulti.lr{flex-direction:row;}
+#dclsCanvasMulti.lr>.treplay-canvas-wrap{min-width:0;}
+.dcls-ma{display:flex;gap:4px;align-items:center;}
+.dcls-ma button{height:28px;padding:0 8px;border-radius:7px;border:1px solid var(--b2);background:var(--bg3);color:var(--t1);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;}
+.dcls-ma button.off{opacity:.35;}
+.dcls-ma i{display:inline-block;width:14px;height:3px;border-radius:2px;}
+@media (max-width:820px){ #dclsCanvasMulti.lr{flex-direction:column;} }
+.dcls-noday{flex:1;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:13px;border:1px dashed var(--b2);border-radius:10px;}
+.dcls-pop{position:fixed;z-index:9000;background:var(--bg2);border:1px solid var(--b2);border-radius:10px;padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.8);display:none;min-width:160px;}
+.dcls-pop.show{display:block;}
+.dcls-pop button{display:block;width:100%;text-align:left;padding:7px 10px;border:none;background:transparent;color:var(--t1);font-size:12px;border-radius:6px;cursor:pointer;font-family:inherit;}
+.dcls-pop button:hover{background:rgba(255,255,255,.08);}
+.dcls-pop .cols{display:flex;gap:5px;padding:6px 8px;flex-wrap:wrap;}
+.dcls-pop .cols i{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.dcls-pop .cols i.on{border-color:#fff;}
+@media (max-width:820px){ .dcls-body{flex-direction:column;} .dcls-side{width:auto;max-height:38vh;} }
 </style>
 </head>
 <body>
@@ -1493,9 +1566,7 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
 <div class="app" style="display:none" id="appRoot">
   <div class="topbar">
     <span class="app-title"><span class="mkt-switch" title="切換商品：NQ／台指（兩邊各自保留進度、筆記、交易紀錄）"><button data-m="nq" onclick="switchMarket('nq')">NQ</button><button data-m="tx" onclick="switchMarket('tx')">台指</button></span><span id="appTitleTxt">複盤</span></span>
-    <button class="day-btn" onclick="openMktOverview()" title="打開 🌐 總體行情回顧（看目前這一天）" style="font-size:12px;padding:0 8px;width:auto;">🌐 總體行情回顧</button>
-    <button class="day-btn" id="btnToggleStory" onclick="toggleStoryPanel()" title="顯示/隱藏右側行情分類面板" style="font-size:12px;padding:0 8px;width:auto;">🗂 面板</button>
-    <button class="day-btn" onclick="openMktOverviewCf()" title="打開 🌐 總體行情回顧，用資料夾／分類篩選你分類過的行情" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
+    <button class="day-btn" onclick="openDayCls()" title="🗂 分類：用藍框／黃框高低點自動把每天分成 趨勢多／趨勢空／震盪，可以自己拖曳調整、新增分類，右邊多格局看圖" style="font-size:12px;padding:0 8px;width:auto;">🗂 分類</button>
     <button class="day-btn" id="btnClsReplay" onclick="openClsReplayPicker(this)" title="只回測某一個分類或資料夾：選好後，日期上一頁/下一頁只會在有這個分類的交易日之間移動，盤中一樣一根一根看" style="font-size:12px;padding:0 8px;width:auto;">🎯 分類回測</button>
     <button class="day-btn" id="btnStartMode" onclick="toggleStartMode()" title="選擇復盤從哪裡開始（循環切換）：藍框最後一根 → 黃框最後一根 → 紅框最後一根" style="font-size:12px;padding:0 8px;width:auto;">起始：藍框最後一根</button>
     <button class="day-btn" id="btnViewMode" onclick="toggleViewMode()" title="觀看模式：所有有資料的範圍都能用滑鼠左右拉著看（不受「看不到未來」限制）；點日期會直接跳到那天。觀看模式下不能播放、不能下模擬單" style="font-size:12px;padding:0 8px;width:auto;">👁 觀看：關</button>
@@ -1651,6 +1722,35 @@ svg[onmousemove^="chartXHair"]{cursor:crosshair;}
   <div class="cpalette" id="cpalette"></div>
   <div class="cpopup-close" onclick="closeCP()">✕ 關閉</div>
 </div>
+<!-- 🗂 分類：每天依藍框（亞盤）／黃框（歐盤）高低點自動分類，可手動調整、新增分類，右邊多格局看圖 -->
+<div class="dcls-ov" id="dclsOv">
+  <div class="dcls-top">
+    <span class="dcls-title">🗂 分類</span>
+    <div class="dcls-sum" id="dclsSum"></div>
+    <span class="dcls-sp"></span>
+    <button class="dcls-btn" onclick="dclsAddCat()" title="新增一個自己的分類（只能手動把日子拖進來）">＋ 新增分類</button>
+    <button class="dcls-btn" onclick="dclsResetAuto()" title="清掉所有手動調整，全部照藍框／黃框規則重新分類">⟳ 重新自動分類</button>
+    <div class="dcls-ma" id="dclsMa" title="均線（和主畫面共用設定）"></div>
+    <button class="dcls-btn" id="dclsLay" onclick="dclsToggleLay()" title="多個格局要左右排還是上下排">⬌ 左右</button>
+    <button class="dcls-btn ind-trigger" onclick="toggleIndicatorMenu(this)" title="指標設定（和主畫面共用；要看到藍黃紅框，請開「亞盤／歐盤／美盤」）">📐 指標</button>
+    <div class="dcls-tfs" id="dclsTfs"></div>
+    <button class="dcls-btn" onclick="closeDayCls()">✕ 關閉</button>
+  </div>
+  <div class="dcls-body">
+    <aside class="dcls-side">
+      <div class="dcls-side-tools">
+        <input id="dclsQ" placeholder="搜尋日期，例如 2025-03" oninput="dclsRenderSide()">
+        <select id="dclsSort" onchange="dclsRenderSide()"><option value="desc">新→舊</option><option value="asc">舊→新</option></select>
+      </div>
+      <div class="dcls-cats" id="dclsCats"></div>
+    </aside>
+    <section class="dcls-main">
+      <div class="dcls-dhdr" id="dclsDhdr"></div>
+      <div class="dcls-charts" id="dclsCharts"><div class="treplay-canvas-multi" id="dclsCanvasMulti"></div></div>
+    </section>
+  </div>
+</div>
+<div class="dcls-pop" id="dclsPop"></div>
 <div class="tresult-overlay" id="tresultOverlay">
   <div class="tresult-card">
     <div class="tresult-tabs" id="tresultTabs" style="display:none;">
@@ -3561,6 +3661,7 @@ function stepPlayback(dir){
 document.addEventListener('keydown',e=>{
   if(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if(document.getElementById('sclsOverlay') && document.getElementById('sclsOverlay').classList.contains('show')) return;
+  if(document.getElementById('dclsOv') && document.getElementById('dclsOv').classList.contains('show')) return;
   if(document.getElementById('tresultOverlay') && document.getElementById('tresultOverlay').classList.contains('show')) return;
   if(document.getElementById('sneOv') && document.getElementById('sneOv').classList.contains('show')) return;
   if(document.getElementById('journalOverlay') && document.getElementById('journalOverlay').classList.contains('show')) return;
@@ -4797,12 +4898,12 @@ function dayViewBarsAll(d, tf){
   def.forEach(b=>{ if(!map.has(b.idx)) map.set(b.idx,b); });
   return (_dayWinCache[key]=[...map.values()].sort((a,b)=>a.idx-b.idx));
 }
-DayChart.prototype.bars=function(tf){ return dayViewBarsAll(this.o.getDay(), tf); };
+DayChart.prototype.bars=function(tf){ return this.o.getBars ? this.o.getBars(tf) : dayViewBarsAll(this.o.getDay(), tf); };
 DayChart.prototype.defN=function(tf){ return Math.min(this.bars(tf).length, dayViewBars(this.o.getDay(), tf).length); };   // 預設要顯示幾根
 DayChart.prototype.getView=function(tf){
   const bars=this.bars(tf);
   let v=this.view[tf];
-  if(!v) v={n:this.defN(tf), end:bars.length-1};
+  if(!v) v=(this.o.defView && this.o.defView(tf, bars)) || {n:this.defN(tf), end:bars.length-1};
   v.n=Math.max(Math.min(20,bars.length), Math.min(bars.length, Math.round(v.n)));
   v.end=Math.max(v.n-1, Math.min(bars.length-1, Math.round(v.end)));
   this.view[tf]=v; return v;
@@ -5203,7 +5304,9 @@ DayChart.prototype.attach=function(tf){
   });
   body.addEventListener('touchmove', e=>{
     if(e.touches.length!==1) return; e.preventDefault();
-    const b=barAt(e.touches[0].clientX); if(b) self.crossAt(b.idx);
+    const b=barAt(e.touches[0].clientX); if(!b) return;
+    const _cv=document.getElementById(P+'cv_'+tf), l=_cv&&_cv._layout, _r=body.getBoundingClientRect(), my=e.touches[0].clientY-_r.top;
+    self.crossAt(b.idx, (l && l.rng) ? l.hi-(my-l.P.t)/(l.H-l.P.t-l.P.b)*l.rng : null);
   }, {passive:false});
   body.addEventListener('touchend', ()=>self.clearCross());
 };
@@ -7880,14 +7983,14 @@ function migrateStoryNoteTs(){
 function toggleStoryPanel(){
   const col=document.getElementById('storyCol'), btn=document.getElementById('btnToggleStory');
   const hidden=col.classList.toggle('hidden');
-  btn.style.opacity = hidden?'0.5':'1';
+  if(btn) btn.style.opacity = hidden?'0.5':'1';
   localStorage.setItem('nqStoryPanelOpen', hidden?'0':'1');
   requestAnimationFrame(()=>renderAll());
 }
 (function initStoryPanelState(){
   if(localStorage.getItem('nqStoryPanelOpen')==='0'){
     document.getElementById('storyCol').classList.add('hidden');
-    document.getElementById('btnToggleStory').style.opacity='0.5';
+    const _b=document.getElementById('btnToggleStory'); if(_b) _b.style.opacity='0.5';
   }
 })();
 
@@ -9805,6 +9908,7 @@ function rerenderMkovForIndicators(){
   if(page && page.classList.contains('show')) mkovChart.renderAll();
   const pc=document.getElementById('pageCmp');
   if(pc && pc.classList.contains('show')) cmpChart.renderAll();
+  try{ if(typeof dclsOpen==='function' && dclsOpen()) dclsChart.renderAll(); }catch(e){}
 }
 function renderIndicatorMenu(){
   const pop=document.getElementById('indPopup');
@@ -13655,6 +13759,317 @@ function dgAfterRender(){
   try{ _DG._px2=null; dgPXUpd(); }catch(e){ console.error(e); }
   try{ dgPrevUpd(); }catch(e){ console.error(e); }
 }
+
+// ============================================================
+// 🗂 分類：每天用 藍框（亞盤）和 黃框（歐盤）的高低點自動分類
+//   趨勢多：黃框高 > 藍框高，且 黃框低 > 藍框低
+//   趨勢空：黃框高 < 藍框高，且 黃框低 < 藍框低
+//   震盪　：黃框高 < 藍框高，且 黃框低 > 藍框低（黃框在藍框裡面）
+//   其他（黃框把藍框整個包住、相等、資料不完整）→ 未分類
+// 手動拖曳／下拉改分類會記住（覆蓋自動結果）；可新增自己的分類；右邊可開多個格局看圖
+// ============================================================
+const DCLS_KEY='dcls_v1_'+MKT.id;
+const DCLS_NONE='__none__';
+const DCLS_AUTO_CATS=[
+  {id:'bull',  name:'趨勢多', color:'#ef4444', auto:true},
+  {id:'bear',  name:'趨勢空', color:'#22c55e', auto:true},
+  {id:'range', name:'震盪',   color:'#f59e0b', auto:true}
+];
+const DCLS_RULES={
+  bull:'黃框高 ＞ 藍框高，且 黃框低 ＞ 藍框低',
+  bear:'黃框高 ＜ 藍框高，且 黃框低 ＜ 藍框低',
+  range:'黃框高 ＜ 藍框高，且 黃框低 ＞ 藍框低（黃框在藍框裡）',
+  [DCLS_NONE]:'黃框把藍框整個包住／高低點相等／資料不完整，或自己移過來的'
+};
+const DCLS_COLORS=['#ef4444','#22c55e','#f59e0b','#3b82f6','#a78bfa','#ec4899','#14b8a6','#eab308','#f97316','#94a3b8'];
+let dcls=dclsLoad(), dclsDay=null, dclsCatSel=null, dclsTFs=null, dclsG={}, dclsDrag=null;
+const _dclsBoxCache={};
+
+function dclsLoad(){
+  let s=null; try{ s=JSON.parse(localStorage.getItem(DCLS_KEY)||'null'); }catch(e){}
+  if(!s || !Array.isArray(s.cats)) s={cats:[], manual:{}, closed:{}};
+  s.manual=s.manual||{}; s.closed=s.closed||{};
+  DCLS_AUTO_CATS.forEach(a=>{ if(!s.cats.some(c=>c.id===a.id)) s.cats.push({...a}); });
+  return s;
+}
+function dclsSave(){ try{ localStorage.setItem(DCLS_KEY, JSON.stringify(dcls)); }catch(e){} }
+function dclsAllCats(){ return [...dcls.cats, {id:DCLS_NONE, name:'未分類', color:'#71717a', fixed:true}]; }
+function dclsCat(id){ return dclsAllCats().find(c=>c.id===id) || dclsAllCats().slice(-1)[0]; }
+
+// 這天的藍框（亞盤）和接在後面的黃框（歐盤）高低點
+function dclsBoxes(d){
+  if(d in _dclsBoxCache) return _dclsBoxCache[d];
+  let out=null;
+  try{
+    const runs=sessRunsFor(d);
+    const ai=runs.findIndex(r=>r.key==='asia');
+    if(ai>=0){
+      const eu=runs.slice(ai+1).find(r=>r.key==='eu') || runs.find(r=>r.key==='eu');
+      if(eu){
+        const hl=r=>{ let h=-Infinity,l=Infinity; r.bars.forEach(b=>{ if(b.h>h) h=b.h; if(b.l<l) l=b.l; }); return {h,l}; };
+        out={b:hl(runs[ai]), y:hl(eu)};
+      }
+    }
+  }catch(e){}
+  return (_dclsBoxCache[d]=out);
+}
+function dclsAuto(d){
+  const x=dclsBoxes(d); if(!x) return DCLS_NONE;
+  const b=x.b, y=x.y;
+  if(y.h>b.h && y.l>b.l) return 'bull';
+  if(y.h<b.h && y.l<b.l) return 'bear';
+  if(y.h<b.h && y.l>b.l) return 'range';
+  return DCLS_NONE;
+}
+function dclsIsManual(d){ const m=dcls.manual[d]; return m!=null && (m===DCLS_NONE || dcls.cats.some(c=>c.id===m)); }
+function dclsCatOf(d){ return dclsIsManual(d) ? dcls.manual[d] : dclsAuto(d); }
+function dclsGroups(){
+  const g={}; dclsAllCats().forEach(c=>g[c.id]=[]);
+  DAYS.forEach(d=>{ if(!DATA[d]) return; (g[dclsCatOf(d)]||g[DCLS_NONE]).push(d); });
+  return g;
+}
+
+// ---------- 開／關 ----------
+function openDayCls(){
+  if(!DAYS.length){ alert('資料還沒載入完成'); return; }
+  document.getElementById('dclsOv').classList.add('show');
+  if(!dclsTFs) dclsTFs=['1k','5k'];
+  dclsApplyLay(); dclsRenderMa();
+  dclsG=dclsGroups();
+  if(!dclsDay || !DATA[dclsDay]){
+    const cd=(currentDay && DATA[currentDay]) ? currentDay : DAYS[DAYS.length-1];
+    dclsDay=cd;
+  }
+  if(!dclsCatSel) dclsCatSel=dclsCatOf(dclsDay);
+  dclsRenderTfs(); dclsRenderSide(); dclsRenderHdr();
+  dclsChart.buildCanvases();
+  requestAnimationFrame(()=>{ dclsChart.resetAll(); dclsChart.renderAll(); dclsScrollToCur(); });
+}
+function closeDayCls(){ document.getElementById('dclsOv').classList.remove('show'); dclsPopClose(); }
+function dclsOpen(){ const o=document.getElementById('dclsOv'); return !!(o && o.classList.contains('show')); }
+
+// ---------- 上方：各分類天數 + 格局 ----------
+function dclsRenderSum(){
+  const el=document.getElementById('dclsSum'); if(!el) return;
+  el.innerHTML=dclsAllCats().map(c=>`<span><i style="background:${c.color}"></i>${dclsEsc(c.name)} ${(dclsG[c.id]||[]).length}</span>`).join('');
+}
+function dclsRenderTfs(){
+  document.getElementById('dclsTfs').innerHTML=TF_ORDER.map(tf=>`<button class="dcls-tf${dclsTFs.includes(tf)?' on':''}" onclick="dclsToggleTF('${tf}')" title="開／關這個格局（可同時開多個）">${tfDisp(tf)}</button>`).join('');
+}
+function dclsToggleTF(tf){
+  if(dclsTFs.includes(tf)){ if(dclsTFs.length===1) return; dclsTFs=dclsTFs.filter(x=>x!==tf); }
+  else dclsTFs=[...dclsTFs, tf].sort((a,b)=>TF_ORDER.indexOf(a)-TF_ORDER.indexOf(b));
+  dclsRenderTfs(); dclsChart.buildCanvases(); requestAnimationFrame(()=>dclsChart.renderAll());
+}
+
+// ---------- 左側：分類清單 ----------
+function dclsRenderSide(){
+  dclsG=dclsGroups(); dclsRenderSum();
+  const q=(document.getElementById('dclsQ').value||'').trim().replace(/\//g,'-');
+  const asc=document.getElementById('dclsSort').value==='asc';
+  const box=document.getElementById('dclsCats');
+  box.innerHTML=dclsAllCats().map(c=>{
+    let ds=(dclsG[c.id]||[]).filter(d=>!q || d.includes(q));
+    ds=asc ? ds : ds.slice().reverse();
+    const rule=DCLS_RULES[c.id] ? `<div class="dcls-cat-rule">${c.auto?'自動：':''}${DCLS_RULES[c.id]}</div>` : `<div class="dcls-cat-rule">自訂分類：把日子拖進來，或在右上「分類到」選它</div>`;
+    const days=ds.length ? ds.map(d=>`<div class="dcls-day${d===dclsDay?' on':''}" draggable="true" data-d="${d}" onclick="dclsPick('${d}','${c.id}')">
+        <span class="dcls-day-d">${d}</span><span class="dcls-day-w">${weekdayZh(d)}</span>
+        <span class="dcls-tag ${dclsIsManual(d)?'man':'auto'}">${dclsIsManual(d)?'手動':'自動'}</span></div>`).join('')
+      : `<div class="dcls-empty">${q?'沒有符合的日期':'還沒有日子，拖一天進來'}</div>`;
+    return `<div class="dcls-cat${dcls.closed[c.id]?' closed':''}" data-cat="${c.id}" style="--c:${c.color}">
+      <div class="dcls-cat-h" onclick="dclsToggleCat('${c.id}')">
+        ${c.fixed?'<span class="dcls-grip" style="visibility:hidden">⋮⋮</span>':`<span class="dcls-grip" draggable="true" data-gcat="${c.id}" title="拖曳調整分類順序" onclick="event.stopPropagation()">⋮⋮</span>`}
+        <span class="dcls-cat-name" style="color:${c.color}">${dclsEsc(c.name)}</span>
+        <span class="dcls-cnt">${ds.length}${q?'/'+(dclsG[c.id]||[]).length:''}</span>
+        ${c.fixed?'':`<button class="dcls-cat-act" onclick="event.stopPropagation();dclsCatMenu('${c.id}',this)" title="改名／顏色／刪除">⋯</button>`}
+      </div>${rule}<div class="dcls-days">${days}</div></div>`;
+  }).join('');
+}
+function dclsEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+function dclsToggleCat(id){ dcls.closed[id]=!dcls.closed[id]; if(!dcls.closed[id]) delete dcls.closed[id]; dclsSave(); dclsRenderSide(); }
+function dclsScrollToCur(){ const el=document.querySelector('#dclsCats .dcls-day.on'); if(el) el.scrollIntoView({block:'nearest'}); }
+
+// 拖曳：日子 → 分類（改分類）；⋮⋮ → 分類（調整順序）
+(function(){
+  const box=()=>document.getElementById('dclsCats');
+  document.addEventListener('dragstart',e=>{
+    if(!dclsOpen()) return;
+    const g=e.target.closest && e.target.closest('[data-gcat]');
+    const d=e.target.closest && e.target.closest('.dcls-day');
+    if(g){ dclsDrag={type:'cat', v:g.dataset.gcat}; g.closest('.dcls-cat').classList.add('dragging'); }
+    else if(d){ dclsDrag={type:'day', v:d.dataset.d}; d.classList.add('dragging'); }
+    else return;
+    try{ e.dataTransfer.setData('text/plain', dclsDrag.v); e.dataTransfer.effectAllowed='move'; }catch(_){}
+  });
+  document.addEventListener('dragover',e=>{
+    if(!dclsDrag) return; const c=e.target.closest && e.target.closest('#dclsCats .dcls-cat'); if(!c) return;
+    e.preventDefault();
+    box().querySelectorAll('.dcls-cat.drop').forEach(x=>{ if(x!==c) x.classList.remove('drop'); }); c.classList.add('drop');
+  });
+  document.addEventListener('drop',e=>{
+    if(!dclsDrag) return; const c=e.target.closest && e.target.closest('#dclsCats .dcls-cat');
+    const dr=dclsDrag; dclsDrag=null;
+    if(!c){ dclsRenderSide(); return; }
+    e.preventDefault();
+    const to=c.dataset.cat;
+    if(dr.type==='day') dclsMove(dr.v, to);
+    else if(dr.type==='cat' && dr.v!==to){
+      const i=dcls.cats.findIndex(x=>x.id===dr.v); if(i<0) return;
+      const [it]=dcls.cats.splice(i,1);
+      const j=to===DCLS_NONE ? dcls.cats.length : dcls.cats.findIndex(x=>x.id===to);
+      dcls.cats.splice(j<0?dcls.cats.length:j, 0, it); dclsSave(); dclsRenderSide(); dclsRenderHdr();
+    } else dclsRenderSide();
+  });
+  document.addEventListener('dragend',()=>{ if(dclsDrag){ dclsDrag=null; } if(dclsOpen()) box().querySelectorAll('.drop,.dragging').forEach(x=>x.classList.remove('drop','dragging')); });
+})();
+
+// 把某天移到某分類（移回自動判斷的那一類＝取消手動）
+function dclsMove(d, to){
+  if(to===dclsAuto(d)) delete dcls.manual[d]; else dcls.manual[d]=to;
+  dclsSave(); dclsRenderSide(); if(d===dclsDay) dclsRenderHdr();
+}
+function dclsUnManual(d){ delete dcls.manual[d]; dclsSave(); dclsRenderSide(); dclsRenderHdr(); }
+
+// ---------- 分類：新增／改名／顏色／刪除 ----------
+function dclsAddCat(){
+  const name=(prompt('新分類名稱：')||'').trim(); if(!name) return;
+  const used=new Set(dcls.cats.map(c=>c.color));
+  const color=DCLS_COLORS.find(c=>!used.has(c)) || DCLS_COLORS[dcls.cats.length%DCLS_COLORS.length];
+  dcls.cats.push({id:'c'+Date.now().toString(36), name, color}); dclsSave(); dclsRenderSide(); dclsRenderHdr();
+}
+function dclsCatMenu(id, anchor){
+  const c=dcls.cats.find(x=>x.id===id); if(!c) return;
+  const pop=document.getElementById('dclsPop');
+  pop.innerHTML=`<button onclick="dclsRenameCat('${id}')">✏️ 改名</button>
+    <div class="cols">${DCLS_COLORS.map(col=>`<i class="${col===c.color?'on':''}" style="background:${col}" onclick="dclsColorCat('${id}','${col}')"></i>`).join('')}</div>
+    ${c.auto?'<button disabled style="color:var(--t3);cursor:default">🔒 自動分類不能刪（可改名）</button>':`<button onclick="dclsDelCat('${id}')" style="color:#f87171">🗑 刪除分類</button>`}`;
+  const r=anchor.getBoundingClientRect();
+  pop.style.left=Math.min(r.left, window.innerWidth-200)+'px'; pop.style.top=(r.bottom+4)+'px';
+  pop.classList.add('show');
+}
+function dclsPopClose(){ const p=document.getElementById('dclsPop'); if(p) p.classList.remove('show'); }
+document.addEventListener('mousedown',e=>{ const p=document.getElementById('dclsPop'); if(p && p.classList.contains('show') && !p.contains(e.target) && !(e.target.closest&&e.target.closest('.dcls-cat-act'))) dclsPopClose(); });
+function dclsRenameCat(id){
+  const c=dcls.cats.find(x=>x.id===id); dclsPopClose(); if(!c) return;
+  const n=(prompt('分類名稱：', c.name)||'').trim(); if(!n) return;
+  c.name=n; dclsSave(); dclsRenderSide(); dclsRenderHdr();
+}
+function dclsColorCat(id,col){ const c=dcls.cats.find(x=>x.id===id); if(!c) return; c.color=col; dclsSave(); dclsPopClose(); dclsRenderSide(); dclsRenderHdr(); }
+function dclsDelCat(id){
+  const c=dcls.cats.find(x=>x.id===id); dclsPopClose(); if(!c || c.auto) return;
+  const n=Object.values(dcls.manual).filter(v=>v===id).length;
+  if(!confirm(`刪除「${c.name}」？${n?`裡面 ${n} 天會回到自動分類。`:''}`)) return;
+  Object.keys(dcls.manual).forEach(d=>{ if(dcls.manual[d]===id) delete dcls.manual[d]; });
+  dcls.cats=dcls.cats.filter(x=>x.id!==id); delete dcls.closed[id];
+  if(dclsCatSel===id) dclsCatSel=dclsCatOf(dclsDay);
+  dclsSave(); dclsRenderSide(); dclsRenderHdr();
+}
+function dclsResetAuto(){
+  const n=Object.keys(dcls.manual).length;
+  if(!n){ alert('目前沒有手動調整，全部都是自動分類。'); return; }
+  if(!confirm(`清掉 ${n} 天的手動調整，全部照藍框／黃框規則重新分類？\n（自訂分類本身會保留，但裡面的日子會回到自動分類）`)) return;
+  dcls.manual={}; dclsSave(); dclsCatSel=dclsCatOf(dclsDay); dclsRenderSide(); dclsRenderHdr();
+}
+
+// ---------- 右側：選一天、換日、看圖 ----------
+function dclsPick(d, cat){
+  if(!DATA[d]) return;
+  dclsDay=d; if(cat) dclsCatSel=cat;
+  document.querySelectorAll('#dclsCats .dcls-day.on').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll(`#dclsCats .dcls-cat[data-cat="${dclsCatSel}"] .dcls-day[data-d="${d}"]`).forEach(x=>x.classList.add('on'));
+  dclsRenderHdr(); dclsChart.resetAll(); dclsChart.renderAll();
+}
+// 在「目前瀏覽的分類」裡往前／往後一天（照日期）
+function dclsStep(dir){
+  const L=(dclsG[dclsCatSel]||[]); if(!L.length) return;
+  let t=null;
+  if(dir>0){ t=L.find(d=>d>dclsDay); } else { for(let i=L.length-1;i>=0;i--) if(L[i]<dclsDay){ t=L[i]; break; } }
+  if(t){ dclsPick(t, dclsCatSel); dclsScrollToCur(); }
+}
+function dclsRenderHdr(){
+  const el=document.getElementById('dclsDhdr'); if(!el || !dclsDay) return;
+  const d=dclsDay, cur=dclsCatOf(d), auto=dclsAuto(d), man=dclsIsManual(d);
+  const L=dclsG[dclsCatSel]||[], pos=L.indexOf(d), sc=dclsCat(dclsCatSel);
+  const x=dclsBoxes(d), f=v=>(+v).toFixed(MKT.tick<1?2:0);
+  const opts=dclsAllCats().map((c,i)=>`<option value="${c.id}"${c.id===cur?' selected':''}>${i<9?(i+1)+'. ':''}${dclsEsc(c.name)}${c.id===auto?'（自動）':''}</option>`).join('');
+  el.innerHTML=`
+    <button class="dcls-nav" onclick="dclsStep(-1)" title="這個分類的上一天（－ 或 ←）">‹</button>
+    <span class="dcls-date">${d}（${weekdayZh(d)}）</span>
+    <button class="dcls-nav" onclick="dclsStep(1)" title="這個分類的下一天（＋ 或 →）">›</button>
+    <span class="dcls-pos">瀏覽 <b style="color:${sc.color}">${dclsEsc(sc.name)}</b> ${pos>=0?`第 ${pos+1} / ${L.length} 天`:`（這天已移出，共 ${L.length} 天）`}</span>
+    <div class="dcls-move"><span>分類到</span><select onchange="dclsMove('${d}',this.value)" style="color:${dclsCat(cur).color}">${opts}</select>
+      ${man?`<button class="dcls-btn" style="height:24px;font-size:11px" onclick="dclsUnManual('${d}')" title="取消手動，回到自動判斷">↺ 還原自動</button>`:''}</div>
+    <div class="dcls-boxinfo">${x?`<span><b style="color:#4f8ff7">藍框</b> 高 ${f(x.b.h)} 低 ${f(x.b.l)}</span><span><b style="color:#e0a100">黃框</b> 高 ${f(x.y.h)} 低 ${f(x.y.l)}</span><span>→ 自動判斷 <b style="color:${dclsCat(auto).color}">${dclsEsc(dclsCat(auto).name)}</b></span>`:'<span style="color:var(--t3)">這天沒有完整的藍框／黃框資料</span>'}</div>
+    <button class="dcls-btn" onclick="dclsGoMain()" title="關掉分類，到主畫面復盤這一天">▶ 主畫面復盤這天</button>
+    <span class="dcls-hint">‹ › 或 ＋／－ 在同分類換日・數字鍵 1~${Math.min(9,dclsAllCats().length)} 快速分類・滾輪縮放、拖曳平移</span>`;
+}
+function dclsGoMain(){ const d=dclsDay; closeDayCls(); try{ loadDay(d); }catch(e){ console.warn(e); } }
+
+const dclsChart = new DayChart({
+  prefix:'dcls', wrapId:'dclsCanvasMulti',
+  getDay:()=>dclsDay, getTFs:()=>dclsTFs||[], getMarks:()=>[],
+  defView:(tf,bars)=>dclsDefView(tf,bars),
+  getBars:tf=>dclsBars(tf)
+});
+// 分類頁的K棒：原本的「昨天＋今天（到 03:30）」再往後接到這天資料的最後一根（紅框結束）
+const _dclsBarsCache={};
+function dclsBars(tf){
+  const d=dclsDay; if(!d) return [];
+  const k=d+'|'+tf; if(_dclsBarsCache[k]) return _dclsBarsCache[k];
+  const base=dayViewBarsAll(d, tf); if(!base.length) return base;
+  const last=base[base.length-1], le=last.idx_end||last.idx;
+  const extra=((DATA[d]&&DATA[d][tf])||[]).filter(b=>b.idx>le);
+  return (_dclsBarsCache[k]=extra.length ? base.concat(extra) : base);
+}
+// 預設範圍：5K＝藍框第一根 → 紅框最後一根；1K＝黃框 17:00 → 紅框 03:00（其他格局照原本）
+function dclsDefView(tf, bars){
+  const d=dclsDay; if(!d || !DATA[d]) return null;
+  let i0=null, i1=null;
+  try{
+    if(tfDisp(tf)==='5K'){
+      const runs=sessRunsFor(d), ai=runs.findIndex(r=>r.key==='asia'); if(ai<0) return null;
+      const us=runs.slice(ai+1).find(r=>r.key==='us'); if(!us) return null;
+      const lb=us.bars[us.bars.length-1]; i0=runs[ai].bars[0].idx; i1=lb.idx_end||lb.idx;
+    } else if(tfDisp(tf)==='1K'){
+      const b1=DATA[d]['1k']||[], a=b1.find(b=>b.ts==='17:00'), z=a && b1.find(b=>b.idx>a.idx && b.ts==='03:00');
+      if(!a || !z) return null; i0=a.idx; i1=z.idx;
+    } else return null;
+  }catch(e){ return null; }
+  const s=dayFindPos(bars,i0,tf), e=dayFindPos(bars,i1,tf);
+  return (s>=0 && e>=s) ? {n:e-s+1, end:e} : null;
+}
+// 左右／上下（分類頁自己記，預設左右，不影響主畫面）
+let dclsLR=(()=>{ try{ return localStorage.getItem('dcls_lr')!=='tb'; }catch(e){ return true; } })();
+function dclsApplyLay(){
+  const w=document.getElementById('dclsCanvasMulti'); if(w) w.classList.toggle('lr', dclsLR);
+  const b=document.getElementById('dclsLay'); if(b) b.textContent=dclsLR?'⬌ 左右':'⬍ 上下';
+}
+function dclsToggleLay(){ dclsLR=!dclsLR; try{ localStorage.setItem('dcls_lr', dclsLR?'lr':'tb'); }catch(e){} dclsApplyLay(); requestAnimationFrame(()=>dclsChart.renderAll()); }
+// 均線：跟主畫面同一組設定（MA5/10/20/60），在這裡開關，主畫面也會跟著變
+function dclsRenderMa(){
+  const el=document.getElementById('dclsMa'); if(!el) return;
+  const anyOn=maConfig.some(m=>m.on);
+  el.innerHTML=maConfig.map((ma,i)=>`<button class="${ma.on?'':'off'}" onclick="dclsToggleMa(${i})" title="開／關 MA${ma.p}"><i style="background:${ma.c}"></i>MA${ma.p}</button>`).join('')
+    +`<button onclick="dclsToggleMa(-1)" title="全部均線顯示／隱藏">${anyOn?'隱藏均線':'顯示均線'}</button>`;
+}
+function dclsToggleMa(i){
+  if(i<0){ try{ toggleAllMa(); }catch(e){ const on=!maConfig.some(m=>m.on); maConfig.forEach(m=>m.on=on); } }
+  else { maConfig[i].on=!maConfig[i].on; try{ buildCfgRow(); rebuildMaBars(); if(mode1kBars.length) renderAll(); }catch(e){} }
+  dclsRenderMa(); dclsChart.renderAll();
+}
+
+// 鍵盤：＋／－／←／→ 同分類換日；1~9 把這天分到第 N 個分類；Esc 關閉
+window.addEventListener('keydown', e=>{
+  if(!dclsOpen()) return;
+  if(/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))) return;
+  if(e.key==='Escape'){ if(document.getElementById('dclsPop').classList.contains('show')) dclsPopClose(); else closeDayCls(); e.preventDefault(); return; }
+  if(isNextDayKey(e) || e.key==='ArrowRight'){ dclsStep(1); e.preventDefault(); return; }
+  if(isPrevDayKey(e) || e.key==='ArrowLeft'){ dclsStep(-1); e.preventDefault(); return; }
+  if(!e.ctrlKey && !e.metaKey && !e.altKey && /^[1-9]$/.test(e.key)){
+    const c=dclsAllCats()[+e.key-1]; if(c && dclsDay){ dclsMove(dclsDay, c.id); e.preventDefault(); }
+  }
+});
+window.addEventListener('resize',()=>{ if(dclsOpen()){ clearTimeout(window._dclsRT); window._dclsRT=setTimeout(()=>dclsChart.renderAll(),120); } });
 </script>
 </body>
 </html>
